@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+# Invoke on Spark; Python/model execution stays inside the dedicated image.
+set -euo pipefail
+project_root="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)"
+refs="$(dirname "$project_root")/_heartcodec_refs"
+image=heartcodec-reference:20261101
+common=(--rm --user "$(id -u):$(id -g)" -e USER=heartcodec -e LOGNAME=heartcodec
+  -e HOME=/workspace -e TORCHINDUCTOR_CACHE_DIR=/workspace/.cache/inductor
+  -e CUBLAS_WORKSPACE_CONFIG=:4096:8 -v "$project_root:/workspace" -w /workspace)
+case "${1:-}" in
+  prepare)
+    docker run "${common[@]}" -e HF_HUB_OFFLINE=0 -e HF_HUB_DISABLE_XET=1 \
+      -e HF_HOME=/workspace/.cache/huggingface "$image" /opt/sa3-venv/bin/python reference/prepare_models.py
+    ;;
+  float32|bfloat16)
+    suffix=f32
+    if [[ "$1" == bfloat16 ]]; then suffix=bf16; fi
+    docker run "${common[@]}" --gpus all --network none -v "$refs:/refs:ro" \
+      "$image" /opt/sa3-venv/bin/python reference/export_reference.py --upstream /refs/MuLaCover \
+      --output "refdata/upstream-$suffix" --dtype "$1"
+    ;;
+  *) echo 'Usage: bash reference/run-spark.sh prepare|float32|bfloat16' >&2; exit 2 ;;
+esac

@@ -1,0 +1,6 @@
+/.cache/
+/models/
+/refdata/
+/build*/
+__pycache__/
+*.pyc
