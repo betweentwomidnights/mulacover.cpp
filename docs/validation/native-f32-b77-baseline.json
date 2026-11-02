@@ -1,0 +1,118 @@
+{
+  "reference_manifest_sha256": "a42129fa97f295a3241bf46efb2a1a16937321d61723315b56391cfff8c0380a",
+  "upstream_revision": "e27fa7fa0da7c9817879cc6210cc5693f9327946",
+  "checkpoint_revision": "bbbaef2b31835c2ef5172ff528dbe325230d46fb",
+  "ggml_revision": "b77ae790e628270af46a8af1eca38441c23f1252",
+  "ggml_worktree_clean": true,
+  "backend": "cuda",
+  "gates": {
+    "logits_and_cache_max_abs": 0.001,
+    "relative_l2": 0.0001,
+    "activation_atol": 0.001,
+    "activation_rtol": 1e-06,
+    "activation_policy": "elementwise abs(delta)<=atol+rtol*abs(reference), plus relative L2; flat absolute diagnostic retained"
+  },
+  "passed": false,
+  "shared_ggml_baseline": "b77ae790e628270af46a8af1eca38441c23f1252",
+  "unadopted_review_candidate": false,
+  "cases": [
+    {
+      "name": "conditional",
+      "frames": 3,
+      "branches": 1,
+      "native_reset_replay_bit_exact": true,
+      "stats": {
+        "weight_bytes": 17516732416,
+        "cache_bytes": 1879343104,
+        "graph_bytes": 98073472,
+        "elapsed_seconds": 2.36685,
+        "replay_bit_exact": true,
+        "cache_tail_zero": true,
+        "ggml_commit": "b77ae790",
+        "ggml_version": "0.27.0"
+      },
+      "passed": false,
+      "tensor_count": 300,
+      "failed_tensor_count": 130,
+      "groups": {
+        "kv": {
+          "tensors": 186,
+          "failed_tensors": 57,
+          "max_abs": 0.007080793380737305,
+          "max_relative_l2": 0.0005056490579415145,
+          "passed": false
+        },
+        "raw_logits": {
+          "tensors": 24,
+          "failed_tensors": 21,
+          "max_abs": 0.006339073181152344,
+          "max_relative_l2": 0.0005119558813800656,
+          "passed": false
+        },
+        "guided_logits": {
+          "tensors": 24,
+          "failed_tensors": 21,
+          "max_abs": 0.006339073181152344,
+          "max_relative_l2": 0.0005119558813800656,
+          "passed": false
+        },
+        "activations": {
+          "tensors": 66,
+          "failed_tensors": 31,
+          "max_abs": 0.09101486206054688,
+          "max_relative_l2": 0.0011478033491210272,
+          "passed": false
+        }
+      }
+    },
+    {
+      "name": "cfg-1.5",
+      "frames": 3,
+      "branches": 2,
+      "native_reset_replay_bit_exact": true,
+      "stats": {
+        "weight_bytes": 17516732416,
+        "cache_bytes": 3758686208,
+        "graph_bytes": 98073472,
+        "elapsed_seconds": 4.62365,
+        "replay_bit_exact": true,
+        "cache_tail_zero": true,
+        "ggml_commit": "b77ae790",
+        "ggml_version": "0.27.0"
+      },
+      "passed": false,
+      "tensor_count": 300,
+      "failed_tensor_count": 124,
+      "groups": {
+        "kv": {
+          "tensors": 186,
+          "failed_tensors": 54,
+          "max_abs": 0.007082581520080566,
+          "max_relative_l2": 0.00043938886437399824,
+          "passed": false
+        },
+        "raw_logits": {
+          "tensors": 24,
+          "failed_tensors": 21,
+          "max_abs": 0.006339550018310547,
+          "max_relative_l2": 0.0004759119274488578,
+          "passed": false
+        },
+        "guided_logits": {
+          "tensors": 24,
+          "failed_tensors": 23,
+          "max_abs": 0.009502887725830078,
+          "max_relative_l2": 0.0005219096234552113,
+          "passed": false
+        },
+        "activations": {
+          "tensors": 66,
+          "failed_tensors": 26,
+          "max_abs": 0.09096145629882812,
+          "max_relative_l2": 0.0012042822355105543,
+          "passed": false
+        }
+      }
+    }
+  ]
+}

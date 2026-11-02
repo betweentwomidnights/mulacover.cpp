@@ -1,5 +1,9 @@
 # Native FP32 frame/logit/cache parity
 
+Historical passing baseline: `07b77b0`. Current `b77ae79` fails CUDA parity;
+see [shared-pin validation](GGML_B77_ALIGNMENT.md). The results below remain
+unchanged as historical evidence, not validation of the new consumer pin.
+
 Validated November 1, 2026, in dedicated Spark Docker containers. Native source
 development and Windows static/DLL smoke tests run on the laptop. This milestone
 consumes prepared prompt/Qwen/symbolic tensors and teacher-forced RVQ codes; it
@@ -97,13 +101,15 @@ CUDA matmul uses explicit F32 precision, `GGML_CUDA_TF32=0`, and
 GB10 `121a-real`; reference is Torch 2.7.1+cu128 in the pinned HeartCodec reference
 image. No production containers or host Python environments were changed.
 
-The repositories are not all aligned today: see `GGML_PIN_INVENTORY.md`. This
-milestone makes no new GGML commit, PR or consumer pin change. A candidate
+At the time of this milestone the repositories were not aligned. See the current
+`GGML_PIN_INVENTORY.md` and alignment report for later changes. This historical
+milestone made no new GGML commit, PR or consumer pin change. A candidate
 installed-package dependency patch was deferred because the existing in-tree
 target already links correctly. Earlier installed-package diagnostic runs are
 not the canonical result used here.
 
 ```bash
+# Current commands use b77ae79; CUDA parity is expected to fail pending review.
 bash reference/run-spark.sh convert
 bash reference/run-spark.sh build
 bash reference/run-spark.sh parity

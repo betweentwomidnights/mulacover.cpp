@@ -6,7 +6,11 @@ sampling and its reference fixtures. Sibling `heartcodec.cpp` owns RVQ/flow/SQ
 decoding and will be consumed as `heartcodec::heartcodec`, sharing one copy of
 `betweentwomidnights/ggml` with the generator and other model libraries.
 
-**Native FP32 teacher-forced frame/logit/cache parity now passes on Spark CUDA.**
+**Native FP32 teacher-forced frame/logit/cache parity passed on Spark CUDA at `07b77b0`.**
+The coordinated baseline is now `b77ae79`; its CUDA parity currently fails due to
+a reproduced source-precision issue. See [shared-pin validation](docs/GGML_B77_ALIGNMENT.md).
+The isolated candidate in [draft GGML PR #21](https://github.com/betweentwomidnights/ggml/pull/21)
+passes all 600 tensors; it is not adopted by consumer pins.
 The generator implements prompt/audio embeddings, the 28-layer backbone, style
 modulation, eight symbolic adaptors and gated cross-attention, the three-layer
 local decoder, all eight output heads, CFG and persistent KV state. Both
@@ -18,10 +22,10 @@ and symbolic inputs are supplied by the caller; text/Qwen/MIDI preprocessing
 currently comes from the upstream fixture harness. The laptop is the primary C++
 workspace; full FP32 native/reference execution stays in Spark Docker containers.
 
-GGML was not changed for this milestone. This baseline uses HeartCodec's existing
-`07b77b0` source checkout, mounted read-only. Other inspected consumers record
-`b77ae79`; see the [pin inventory](docs/GGML_PIN_INVENTORY.md). Selecting/adopting a
-common pin requires coordination. CMake defaults to the in-tree target and reuses
+The original milestone used `07b77b0`; historical reports retain that provenance.
+HeartCodec now uses the coordinated `b77ae79` source pin, mounted read-only.
+See the [pin inventory](docs/GGML_PIN_INVENTORY.md). A required precision fix is
+being reviewed separately; no consumer adopts it yet. CMake defaults to the in-tree target and reuses
 an already-provided GGML target; it never builds a second GGML instance.
 
 `reference/export_reference.py` executes the pinned upstream preprocessing and

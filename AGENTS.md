@@ -6,8 +6,10 @@
   inside dedicated Docker images. Do not change production containers.
 - Match unquantized reference tensors before quantizing the generator.
 - Keep weights, caches and large fixtures out of Git; keep compact manifests and reports.
-- Native FP32 teacher-forced frame/logit/cache parity now passes 600 tensors on
-  Spark CUDA; see `docs/NATIVE_PARITY.md`. Windows static/DLL smoke tests pass.
+- Native FP32 teacher-forced frame/logit/cache parity passed 600 tensors on
+  Spark CUDA at historical `07b77b0`; see `docs/NATIVE_PARITY.md`. The coordinated
+  `b77ae79` baseline currently fails CUDA precision parity; see
+  `docs/GGML_B77_ALIGNMENT.md`. Windows static/DLL smoke tests pass.
   Full F32 weights exceed laptop VRAM; native/reference GPU execution stays in
   Spark Docker. Routine C++ editing/building happens on the laptop.
 - Use the FP32 oracle for F32 math; BF16 reference fixtures are a separate suite.
@@ -19,6 +21,8 @@
   An essential GGML change belongs in an isolated worktree/branch and a focused
   draft PR for other agents to review. Do not advance consumer pins as part of
   that proposal; adoption must be coordinated after review.
-- `docs/GGML_PIN_INVENTORY.md` records current consumer divergence. The validated
-  native baseline is HeartCodec's clean `07b77b0`, not a claim of alignment with
-  sa3.cpp/yue2.cpp. Do not automatically repair another repository's checkout.
+- The coordinated GGML pin is `b77ae790e628270af46a8af1eca38441c23f1252`,
+  branch `feature/shared-sa3-acestep-v0.17` (historical name). Any necessary PR
+  must be based on that baseline and target that branch. Do not patch shared
+  checkouts or adopt an unreviewed fix. Earlier `07b77b0` reports are historical.
+  Do not automatically repair another repository's working checkout.

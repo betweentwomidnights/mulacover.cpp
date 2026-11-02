@@ -21,7 +21,10 @@ ggml_tensor * Graph::ids(const std::vector<int32_t> & data) {
     Binding b{t,{}};b.bytes.resize(data.size()*4);std::memcpy(b.bytes.data(),data.data(),b.bytes.size());bindings.push_back(std::move(b));return t;
 }
 ggml_tensor * Graph::mm(ggml_tensor * a,ggml_tensor * b) {
-    auto * t=ggml_mul_mat(ctx,a,b);ggml_mul_mat_set_prec(t,GGML_PREC_F32);return t;
+    auto * t=ggml_mul_mat(ctx,a,b);
+    if(!ggml_prec_set_acc(t,GGML_PREC_F32)||!ggml_prec_set_src(t,GGML_PREC_F32,1))
+        throw std::runtime_error("Cannot request generator matmul precision");
+    return t;
 }
 ggml_tensor * Graph::linear(const std::string & p,ggml_tensor * x,bool bias) {
     auto * y=mm(model.get(p+".weight"),x);return bias?ggml_add(ctx,y,model.get(p+".bias")):y;

@@ -1,0 +1,127 @@
+{
+  "reference_manifest_sha256": "a42129fa97f295a3241bf46efb2a1a16937321d61723315b56391cfff8c0380a",
+  "upstream_revision": "e27fa7fa0da7c9817879cc6210cc5693f9327946",
+  "checkpoint_revision": "bbbaef2b31835c2ef5172ff528dbe325230d46fb",
+  "ggml_revision": "0f2ed045eaff6bf01bed074878b6988248efbc22",
+  "ggml_worktree_clean": true,
+  "shared_ggml_baseline": "b77ae790e628270af46a8af1eca38441c23f1252",
+  "unadopted_review_candidate": true,
+  "backend": "cuda",
+  "gates": {
+    "logits_and_cache_max_abs": 0.001,
+    "relative_l2": 0.0001,
+    "activation_atol": 0.001,
+    "activation_rtol": 1e-06,
+    "activation_policy": "elementwise abs(delta)<=atol+rtol*abs(reference), plus relative L2; flat absolute diagnostic retained"
+  },
+  "passed": true,
+  "cases": [
+    {
+      "name": "conditional",
+      "frames": 3,
+      "branches": 1,
+      "native_reset_replay_bit_exact": true,
+      "stats": {
+        "weight_bytes": 17516732416,
+        "cache_bytes": 1879343104,
+        "graph_bytes": 98073472,
+        "elapsed_seconds": 2.37738,
+        "replay_bit_exact": true,
+        "cache_tail_zero": true,
+        "ggml_commit": "0f2ed045",
+        "ggml_version": "0.27.0"
+      },
+      "flat_absolute_diagnostic_failures": [],
+      "passed": true,
+      "tensor_count": 300,
+      "failed_tensor_count": 0,
+      "groups": {
+        "kv": {
+          "tensors": 186,
+          "failed_tensors": 0,
+          "max_abs": 4.4345855712890625e-05,
+          "max_relative_l2": 3.1444727243632737e-06,
+          "passed": true
+        },
+        "raw_logits": {
+          "tensors": 24,
+          "failed_tensors": 0,
+          "max_abs": 1.940131187438965e-05,
+          "max_relative_l2": 1.6509466852522492e-06,
+          "passed": true
+        },
+        "guided_logits": {
+          "tensors": 24,
+          "failed_tensors": 0,
+          "max_abs": 1.940131187438965e-05,
+          "max_relative_l2": 1.6509466852522492e-06,
+          "passed": true
+        },
+        "activations": {
+          "tensors": 66,
+          "failed_tensors": 0,
+          "max_abs": 0.0009002685546875,
+          "max_relative_l2": 3.3035901079085854e-06,
+          "passed": true
+        }
+      },
+      "all_logit_argmax_equal": true
+    },
+    {
+      "name": "cfg-1.5",
+      "frames": 3,
+      "branches": 2,
+      "native_reset_replay_bit_exact": true,
+      "stats": {
+        "weight_bytes": 17516732416,
+        "cache_bytes": 3758686208,
+        "graph_bytes": 98073472,
+        "elapsed_seconds": 4.01384,
+        "replay_bit_exact": true,
+        "cache_tail_zero": true,
+        "ggml_commit": "0f2ed045",
+        "ggml_version": "0.27.0"
+      },
+      "flat_absolute_diagnostic_failures": [
+        "frame0.stage.backbone.layers.27",
+        "frame0.stage.peft_layers.27.0"
+      ],
+      "passed": true,
+      "tensor_count": 300,
+      "failed_tensor_count": 0,
+      "groups": {
+        "kv": {
+          "tensors": 186,
+          "failed_tensors": 0,
+          "max_abs": 4.482269287109375e-05,
+          "max_relative_l2": 2.809941037123322e-06,
+          "passed": true
+        },
+        "raw_logits": {
+          "tensors": 24,
+          "failed_tensors": 0,
+          "max_abs": 2.3603439331054688e-05,
+          "max_relative_l2": 1.6656998168978655e-06,
+          "passed": true
+        },
+        "guided_logits": {
+          "tensors": 24,
+          "failed_tensors": 0,
+          "max_abs": 3.62396240234375e-05,
+          "max_relative_l2": 1.8246197348723098e-06,
+          "passed": true
+        },
+        "activations": {
+          "tensors": 66,
+          "failed_tensors": 0,
+          "max_abs": 0.001953125,
+          "max_relative_l2": 2.336379809805654e-06,
+          "passed": true
+        }
+      },
+      "all_logit_argmax_equal": true
+    }
+  ],
+  "review_pull_request": "https://github.com/betweentwomidnights/ggml/pull/21",
+  "review_base_branch": "feature/shared-sa3-acestep-v0.17"
+}

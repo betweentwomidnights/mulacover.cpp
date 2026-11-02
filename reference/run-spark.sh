@@ -18,18 +18,19 @@ case "${1:-}" in
   build)
     docker run "${common[@]}" --gpus all --network none -v "$codec:/codec:ro" \
       heartcodec-dev:20261101 /bin/bash -lc \
-      'cmake -S . -B build-spark-cuda-source-pin -G Ninja -DCMAKE_BUILD_TYPE=Release \
+      'cmake -S . -B build-shared-b77-cuda -G Ninja -DCMAKE_BUILD_TYPE=Release \
         -DMULACOVER_HEARTCODEC_DIR=/codec -DMULACOVER_USE_INSTALLED_GGML=OFF \
+        -DHEARTCODEC_BUILD_TOOLS=ON -DHEARTCODEC_BUILD_TESTS=ON \
         -DMULACOVER_CUDA=ON -DGGML_NATIVE=OFF -DCMAKE_CUDA_ARCHITECTURES=121a-real \
         > build-native-configure.log 2>&1 &&
-       cmake --build build-spark-cuda-source-pin -j4 > build-native.log 2>&1 &&
-       ctest --test-dir build-spark-cuda-source-pin --output-on-failure'
+       cmake --build build-shared-b77-cuda -j4 > build-native.log 2>&1 &&
+       ctest --test-dir build-shared-b77-cuda --output-on-failure'
     ;;
   parity)
     docker run "${common[@]}" --gpus all --network none -e GGML_CUDA_TF32=0 \
       -v "$codec:/codec:ro" "$image" /opt/sa3-venv/bin/python tools/run-parity.py \
       --reference refdata/upstream-f32 --model models/mulacover-f32.gguf \
-      --cli build-spark-cuda-source-pin/bin/mulacover-parity --output refdata/native-cuda-source-pin \
+      --cli build-shared-b77-cuda/bin/mulacover-parity --output refdata/b77-native-baseline \
       --backend cuda --ggml-source /codec/ggml
     ;;
   prepare)
