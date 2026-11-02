@@ -43,7 +43,11 @@ that the user-recognized vocal MIDI reaches prepared conditioning, while its
 preservation in the generated Q4 cover remains unresolved.
 The matching [official upstream FP32 control](docs/UPSTREAM_AUDIO_CONTROL.md)
 now produces 68.88 seconds with all 11 freshly prepared inputs matching exactly;
-its Torch RNG differs from native sampling and its listening assessment is pending.
+the user hears horns playing the guitar melody without vocals. That original
+comparison used different RNG streams.
+The [opt-in Philox control](docs/PHILOX_PARITY.md) now matches Torch random tensors
+bit-for-bit on both GPUs and all 6,888 native F32 codes/EOS for that full-song case.
+The decoded waveform remains close but fails the unchanged strict error limits.
 
 Prepared prompt/style
 and symbolic inputs are supplied by the caller; text/Qwen/MIDI preprocessing

@@ -93,6 +93,7 @@ case "$command" in
       /opt/sa3-venv/bin/python tools/generate.py --reference "${MULACOVER_GENERATION_REFERENCE:-refdata/upstream-f32}" --model "models/mulacover-$generator_mix.gguf" \
       --cli "$build/bin/mulacover-generate" --ggml-source /codec/ggml --frames "${MULACOVER_GENERATION_FRAMES:-100}" \
       --capacity "${MULACOVER_GENERATION_CAPACITY:-256}" --output "${MULACOVER_GENERATION_OUTPUT:-refdata/generate-$generator_mix-spark}" \
+      --rng "${MULACOVER_GENERATION_RNG:-native}" --rng-cuda-blocks "${MULACOVER_RNG_CUDA_BLOCKS:-0}" \
       --flow-model /codec/models/heartcodec-flow-f32.gguf --sq-model /codec/models/heartcodec-sq-codec-f32.gguf
     ;;
   prepare)

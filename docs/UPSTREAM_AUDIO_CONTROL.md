@@ -22,7 +22,11 @@ The comparison files under `refdata/covers/billiegasm-upstream-listening/` use o
 shared constant gain of 0.79203825 (-2.02508 dB), preserving relative levels while
 bringing the highest peak to -1 dBFS. No limiting or edits are applied. The
 original native F32 output remains 70 seconds; the EOS difference is retained.
-Official-output listening assessment is pending.
+The user hears the guitar melody played by horns, without vocalizations, in this
+official output. That accepts the instrumental request for this particular run,
+not every prompt or seed. The follow-up [matched-Philox control](PHILOX_PARITY.md)
+now reproduces all generated codes/EOS natively; strict decoded waveform error
+remains a separately recorded failure.
 
 The source remains MuLaCover `e27fa7fa0da7c9817879cc6210cc5693f9327946`, with
 generator `bbbaef2b31835c2ef5172ff528dbe325230d46fb`, Qwen

@@ -12,7 +12,7 @@ if($DevelopmentGgml){$flags+="-DMULACOVER_GGML_SOURCE_DIR=$DevelopmentGgml"}
 else{$flags+='-DMULACOVER_GGML_SOURCE_DIR=';if($Backend -eq 'cuda'){$build='build-windows-cuda';if($Shared){$build+='-dll'}}}
 $static=if($Shared){'OFF'}else{'ON'}
 & $cmake -S $projectRoot -B (Join-Path $projectRoot $build) -G 'Visual Studio 17 2022' -A x64 `
-  -DMULACOVER_USE_INSTALLED_GGML=OFF -DGGML_NATIVE=OFF "-DMULACOVER_STATIC=$static" @flags
+  -DMULACOVER_USE_INSTALLED_GGML=OFF -DGGML_NATIVE=OFF -DHEARTCODEC_BUILD_TOOLS=ON -DHEARTCODEC_BUILD_TESTS=ON "-DMULACOVER_STATIC=$static" @flags
 if($LASTEXITCODE){throw 'CMake configuration failed'}
 & $cmake --build (Join-Path $projectRoot $build) --config Release --parallel 4 -- /verbosity:minimal /nologo
 if($LASTEXITCODE){throw 'Build failed'}

@@ -51,7 +51,9 @@ int32_t sample_logits(const float * logits,const mulacover_sampling_config_v1 & 
     for(int i=0;i<8197;++i) {
         const uint64_t index=(uint64_t(frame)*8+uint64_t(head))*8197+uint64_t(i);
         const double noise=c.exponential_noise?c.exponential_noise[head*8197+i]:exponential(c.seed,index);
-        const double score=probabilities[size_t(i)]/noise;
+        // Supplied noise is Torch F32: division must round to F32 before argmax.
+        // Keep the established double-precision native RNG policy unchanged.
+        const double score=c.exponential_noise?double(probabilities[size_t(i)]/float(noise)):probabilities[size_t(i)]/noise;
         if(score>best){best=score;selected=i;}
     }
     return selected;

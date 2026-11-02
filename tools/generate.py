@@ -16,6 +16,7 @@ p.add_argument('--backend',choices=('cpu','cuda'),default='cuda');p.add_argument
 p.add_argument('--capacity',type=int,default=256);p.add_argument('--guidance',type=float,default=1.5)
 p.add_argument('--temperature',type=float,default=1);p.add_argument('--top-k',type=int,default=250);p.add_argument('--seed',type=int,default=1701)
 p.add_argument('--decoder-seed',type=int,default=1701);p.add_argument('--decoder-steps',type=int,default=10);p.add_argument('--segment-codes',type=int,default=372)
+p.add_argument('--rng',choices=('native','torch-cuda'),default='native');p.add_argument('--rng-cuda-blocks',type=int,default=0);p.add_argument('--rng-device',type=int,default=0)
 a=p.parse_args();root=Path(__file__).resolve().parents[1]
 profile=json.loads((root/'dependencies/ggml-development.json').read_text())
 revision=subprocess.check_output(['git','-C',str(a.ggml_source),'rev-parse','HEAD'],text=True).strip()
@@ -40,6 +41,9 @@ command=[str(a.cli.resolve()),'--model',str(a.model.resolve()),'--input',str(inp
     '--backend',a.backend,'--frames',str(a.frames),'--capacity',str(a.capacity),'--guidance',str(a.guidance),
     '--temperature',str(a.temperature),'--top-k',str(a.top_k),'--seed',str(a.seed),
     '--decoder-seed',str(a.decoder_seed),'--decoder-steps',str(a.decoder_steps),'--segment-codes',str(a.segment_codes)]
+command+=['--rng',a.rng]
+if a.rng=='torch-cuda':command+=['--rng-cuda-blocks',str(a.rng_cuda_blocks),'--rng-device',str(a.rng_device)]
+elif a.rng_cuda_blocks or a.rng_device:raise ValueError('CUDA RNG options require torch-cuda mode')
 if bool(a.flow_model)!=bool(a.sq_model):raise ValueError('Supply both codec models or neither')
 if a.flow_model:command+=['--flow-model',str(a.flow_model.resolve()),'--sq-model',str(a.sq_model.resolve())]
 spec=importlib.util.spec_from_file_location('native_parity',root/'tools/run-parity.py');helper=importlib.util.module_from_spec(spec);spec.loader.exec_module(helper)
@@ -58,9 +62,10 @@ def digest(path):
 report=dict(ggml_revision=revision,shared_baseline=profile['shared_baseline'],ggml_bump_check_started=False,
     command=command,decoder=dict(seed=a.decoder_seed,steps=a.decoder_steps,segment_codes=a.segment_codes,guidance=1.25),
     prepared_manifest_sha256=digest(a.reference/'manifest.json'),upstream_revision=manifest['upstream_revision'],
-    model_sha256=digest(a.model),codes_sha256=digest(a.output/'codes.i32'),execution_passed=True,
+    model_sha256=digest(a.model),cli_sha256=digest(a.cli),codes_sha256=digest(a.output/'codes.i32'),execution_passed=True,
     audio_quality_accepted=False,device_memory_sampling=memory,run=result,
-    rng='Native SplitMix64 indexed by seed/frame/head/category, exponential race; not a PyTorch RNG seed')
+    rng=('Torch CUDA Philox4x32-10, F32 exponential per head and consecutive F32 normal per codec window; explicit target grid cap'
+        if a.rng=='torch-cuda' else 'Native SplitMix64 indexed by seed/frame/head/category, exponential race; not a PyTorch RNG seed'))
 if a.flow_model:
     if (a.output/'audio.wav').stat().st_size!=44+result['audio_samples_per_channel']*8:raise ValueError('WAV length mismatch')
     report.update(flow_model_sha256=digest(a.flow_model),sq_model_sha256=digest(a.sq_model),audio_sha256=digest(a.output/'audio.wav'))

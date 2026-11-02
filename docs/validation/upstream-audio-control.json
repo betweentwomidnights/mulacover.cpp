@@ -101,8 +101,8 @@
       "unclipped_decoder_capture": "audio-f32.wav (float32 stereo)"
     },
     "execution_passed": true,
-    "instrumental_control_accepted": false,
-    "listening_assessment": "pending",
+    "instrumental_control_accepted": true,
+    "listening_assessment": "User hears the guitar melody played by horns, with no vocalizations",
     "ggml_bump_check_started": false
   },
   "executed_harness_snapshot": "refdata\\covers\\billiegasm-full-acoustic\\official-upstream-f32\\harness-used.py",
@@ -145,9 +145,9 @@
   "shared_listening_gain": 0.7920382480000546,
   "shared_listening_gain_db": -2.025076911283714,
   "listening_processing": "Same constant gain for both comparison files; raw outputs preserved; no limiting or edits",
-  "upstream_listener_assessment": "pending",
+  "upstream_listener_assessment": "User hears the guitar melody played by horns, with no vocalizations",
   "native_listener_assessment": "User hears vocalizations following the guitar melody",
-  "interpretation": "Behavioral control only: Torch sampler/codec RNG and full cache differ from native. No model or port attribution before listening and appropriate coupled comparisons",
+  "interpretation": "User reports no vocals upstream but guitar-melody vocalization in native FP32. Original runs used different RNG streams, so matched Philox comparison is required before attributing a port defect.",
   "ggml_bump_check_started": false,
   "sibling_source_or_pins_modified": false,
   "checks": {
@@ -155,5 +155,12 @@
     "both_float_outputs_finite": true,
     "official_pcm16_channels_rate_length_match": true,
     "source_hash_unchanged": true
+  },
+  "upstream_listener_observation": {
+    "date": "2026-11-02",
+    "observation": "In the upstream I actually hear the guitar melody just played by horns instead. No vocalizations.",
+    "listening_audio_sha256": "b537156076a3d9e3dd55371db38398cca088a38b754e4b35cfebcff8d937fc9d",
+    "vocal_presence": "none heard by user",
+    "instrumental_control_accepted_for_this_run": true
   }
 }

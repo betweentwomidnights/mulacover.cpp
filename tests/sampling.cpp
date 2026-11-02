@@ -22,6 +22,11 @@ int main() {
     std::vector<float> flat(8197,1);
     if(mula::sample_logits(flat.data(),c,0,0)!=2636||mula::sample_logits(flat.data(),c,1,0)!=5605||
        mula::sample_logits(flat.data(),c,0,1)!=5410)return 1;
+    // Torch F32 race has an exact tie here; double division incorrectly picks 8.
+    std::vector<float> pair(8197,-1000);pair[4]=1;pair[8]=0;
+    noise.assign(8*8197,1);noise[4]=0.043003447353839874f;noise[8]=0.015820084139704704f;
+    c.top_k=2;c.exponential_noise=noise.data();c.noise_count=int64_t(noise.size());
+    if(mula::sample_logits(pair.data(),c,0,0)!=4)return 1;
     logits[1]=std::numeric_limits<float>::quiet_NaN();try{mula::sampling_probabilities(logits.data(),1,250);return 1;}catch(const std::runtime_error &){}
     int32_t codes[8]={0};if(mula::stop_reason(codes))return 1;
     codes[0]=8192;if(mula::stop_reason(codes)!=MULACOVER_PADDING_V1)return 1;
