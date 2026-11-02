@@ -1,0 +1,159 @@
+{
+  "date": "2026-11-02",
+  "image": "heartcodec-reference:20261101",
+  "image_id": "sha256:70947194330272d2aed83dfa51923165ef013a32b0a03f9be8afb2d65957524b",
+  "source_audio_sha256": "140f18292989b1026113f02e0b6e2c9c1eaea29df05965f9404e40d76f74af9a",
+  "source_modified": false,
+  "source_audio_uploaded": false,
+  "official_upstream": {
+    "upstream_revision": "e27fa7fa0da7c9817879cc6210cc5693f9327946",
+    "upstream_worktree_clean": true,
+    "models": {
+      "generator": {
+        "repo": "HeartMuLa/MuLaCover",
+        "revision": "bbbaef2b31835c2ef5172ff528dbe325230d46fb"
+      },
+      "style": {
+        "repo": "Qwen/Qwen3-Embedding-0.6B",
+        "revision": "97b0c614be4d77ee51c0cef4e5f07c00f9eb65b3"
+      }
+    },
+    "codec_source": {
+      "repo": "HeartMuLa/HeartCodec-oss-20260123",
+      "revision": "f889dab0532cfa4bf459f2a3367eb6d346b8eeda",
+      "snapshot": "/workspace/.cache/huggingface/hub/models--HeartMuLa--HeartCodec-oss-20260123/snapshots/f889dab0532cfa4bf459f2a3367eb6d346b8eeda"
+    },
+    "versions": {
+      "torch": "2.7.1+cu128",
+      "transformers": "4.57.6",
+      "torchtune": "0.4.0",
+      "tokenizers": "0.22.1",
+      "numpy": "2.0.2",
+      "mido": "1.3.3",
+      "soundfile": "0.13.1"
+    },
+    "request": {
+      "lyrics": "[Instrumental]",
+      "tags": "warm acoustic pop, soft drums, instrumental, no vocals",
+      "melody_midi": "transcription/excerpt-midi/melody.mid",
+      "chord_midi": "transcription/excerpt-midi/chords.mid",
+      "melody_role": "instrumental",
+      "source_audio_sha256": "140f18292989b1026113f02e0b6e2c9c1eaea29df05965f9404e40d76f74af9a"
+    },
+    "request_sha256": "08713c474f5da509b17d70dd9153bf323fb7a80a2bcc09371762ead6b17b6665",
+    "input_midi_hashes": {
+      "melody_midi": "0fbef0ef0b8aa7b50c4c922f527510562d8ff856b42220328a00681b87f95107",
+      "chord_midi": "80020974ac4d00215f1fbdd655d61358a0ab4c5dcbc4e3e1b7568706657ee752"
+    },
+    "prepared_manifest_sha256": "9d5aa1b513c2c598c3acebc4ac283629d692ea9431ea60051dc0f4f7e63f161e",
+    "fresh_preprocessing_bit_exact": {
+      "tokens": true,
+      "tokens_mask": true,
+      "input_pos": true,
+      "qwen_embedding": true,
+      "muq_embedding": true,
+      "qwen_indices": true,
+      "muq_indices": true,
+      "pianoroll": true,
+      "drum_pianoroll": true,
+      "chord": true,
+      "context_mask": true
+    },
+    "generator_dtype": "float32",
+    "codec_dtype": "float32",
+    "requested_frames": 875,
+    "frames": 861,
+    "eos": true,
+    "generation_seed": 1701,
+    "decoder_seed": 1701,
+    "guidance": 1.5,
+    "temperature": 1.0,
+    "top_k": 250,
+    "upstream_cache_capacity": 8192,
+    "decoder": {
+      "duration": 29.76,
+      "segment_codes": 372,
+      "steps": 10,
+      "guidance": 1.25
+    },
+    "generation_seconds": 370.9282632260001,
+    "decode_seconds": 46.4377960950369,
+    "generation_peak_allocated_bytes": 29342910976,
+    "decode_peak_allocated_bytes": 9975715840,
+    "audio": {
+      "samples_per_channel": 3306240,
+      "sample_rate": 48000,
+      "channels": 2,
+      "peak": 1.1252624988555908,
+      "rms": 0.17225736042345635,
+      "samples_above_full_scale": 12
+    },
+    "files": {
+      "codes.i32": "813013676e452b300a4d8554df7e030b55163c214bbd78272dc1ba38f6566f93",
+      "audio-f32.wav": "c7ba4995c93ac7d07d8f0135215e22a5d8f96cbcd0e7d24608ff8a3f52b516db",
+      "audio-official.wav": "ad5a4f758a30b6ed5d637679ab5f5ab1e5fc20740122c3f863aefa982b1e9d11"
+    },
+    "sampler": "Unmodified upstream Torch exponential sampler; seed is not native SplitMix64-equivalent",
+    "codec_noise": "Unmodified upstream Torch codec noise; not native C++ RNG-equivalent",
+    "instrumentation": "Backbone progress hook and decoder-output capture only; original upstream generator/sampler/codec/postprocess execute",
+    "output_formats": {
+      "original_upstream_postprocess": "audio-official.wav (soundfile default PCM16)",
+      "unclipped_decoder_capture": "audio-f32.wav (float32 stereo)"
+    },
+    "execution_passed": true,
+    "instrumental_control_accepted": false,
+    "listening_assessment": "pending",
+    "ggml_bump_check_started": false
+  },
+  "executed_harness_snapshot": "refdata\\covers\\billiegasm-full-acoustic\\official-upstream-f32\\harness-used.py",
+  "executed_harness_sha256": "9682ba55917bcbf301fcdfac75ff5bf7b65bf20fa32b7c9966c517c66fb50a56",
+  "harness_note": "Final helper moves its observation-only progress hook from the unused backbone root to the first backbone layer and records its initial source hash; generation/sampling/decoding calls are unchanged",
+  "fresh_prepared_tensors_bit_exact": true,
+  "prepared_tensor_count": 11,
+  "same_prepared_manifest_as_native_f32": true,
+  "native_f32_provenance_sha256": "37a85e297c607a11867561a9fc1268cceee6d4fe7b6a1bde2045e329a0142f89",
+  "audio": {
+    "upstream-f32": {
+      "frames": 861,
+      "duration_seconds": 68.88,
+      "peak": 1.1252624988555908,
+      "rms": 0.17225736042345635,
+      "samples_above_full_scale": 12,
+      "finite": true,
+      "raw_sha256": "c7ba4995c93ac7d07d8f0135215e22a5d8f96cbcd0e7d24608ff8a3f52b516db",
+      "listening_copy": {
+        "path": "refdata\\covers\\billiegasm-upstream-listening\\upstream-f32.wav",
+        "sha256": "b537156076a3d9e3dd55371db38398cca088a38b754e4b35cfebcff8d937fc9d",
+        "peak": 0.8912509679794312
+      }
+    },
+    "native-f32": {
+      "frames": 875,
+      "duration_seconds": 70.0,
+      "peak": 0.8857024312019348,
+      "rms": 0.151341383026334,
+      "samples_above_full_scale": 0,
+      "finite": true,
+      "raw_sha256": "eff9d5af1e438f8c61a2fcd793bf77c48e6782999dc827799861bc574b0fad84",
+      "listening_copy": {
+        "path": "refdata\\covers\\billiegasm-upstream-listening\\native-f32.wav",
+        "sha256": "ca7ffb116a9c64d70582a9ce929afe4bad91ccc414f9ba82da6011187e120458",
+        "peak": 0.7015101909637451
+      }
+    }
+  },
+  "shared_listening_gain": 0.7920382480000546,
+  "shared_listening_gain_db": -2.025076911283714,
+  "listening_processing": "Same constant gain for both comparison files; raw outputs preserved; no limiting or edits",
+  "upstream_listener_assessment": "pending",
+  "native_listener_assessment": "User hears vocalizations following the guitar melody",
+  "interpretation": "Behavioral control only: Torch sampler/codec RNG and full cache differ from native. No model or port attribution before listening and appropriate coupled comparisons",
+  "ggml_bump_check_started": false,
+  "sibling_source_or_pins_modified": false,
+  "checks": {
+    "output_hashes_match": true,
+    "both_float_outputs_finite": true,
+    "official_pcm16_channels_rate_length_match": true,
+    "source_hash_unchanged": true
+  }
+}

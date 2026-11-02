@@ -41,6 +41,9 @@ on the laptop, with full replay checks and a sampled 6,776 MiB peak through deco
 Follow-up [melody-source and F32/Q4 controls](docs/FULL_SONG_CONTROLS.md) verify
 that the user-recognized vocal MIDI reaches prepared conditioning, while its
 preservation in the generated Q4 cover remains unresolved.
+The matching [official upstream FP32 control](docs/UPSTREAM_AUDIO_CONTROL.md)
+now produces 68.88 seconds with all 11 freshly prepared inputs matching exactly;
+its Torch RNG differs from native sampling and its listening assessment is pending.
 
 Prepared prompt/style
 and symbolic inputs are supplied by the caller; text/Qwen/MIDI preprocessing

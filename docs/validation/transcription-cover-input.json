@@ -16,7 +16,7 @@
   "cover_test_executed": true,
   "instrumental_controllability_verified": false,
   "pending_checks": [
-    "Listener assessment of Q4 Spark control; official upstream comparison to distinguish native implementation and model/prompt behavior",
+    "Listener assessment of Q4 Spark and completed official upstream FP32 controls",
     "Preservation of the confirmed vocal melody through generation; no F32 vocal-lane control yet",
     "Remaining transcription lanes and generated musical/audio quality",
     "Native prompt/tokenizer/Qwen/MIDI preparation"
@@ -37,5 +37,8 @@
   "followup_validation_report": "full-song-controls.json",
   "vocal_midi_listener_confirmed": true,
   "vocal_source_q4_generated_melody_recognized": false,
-  "fp32_instrumental_lane_listener_observation": "User still hears vocalizations following the guitar melody"
+  "fp32_instrumental_lane_listener_observation": "User still hears vocalizations following the guitar melody",
+  "upstream_fp32_control_executed": true,
+  "upstream_fp32_generated_seconds": 68.88,
+  "upstream_validation_report": "upstream-audio-control.json"
 }

@@ -67,10 +67,12 @@ observations alone.
 The user subsequently confirmed vocalizations following the guitar melody in the
 native FP32 instrumental-lane control as well. This demonstrates that the reported
 behavior is not exclusive to Q4 quantization. Instrumental control is not accepted
-for that F32 run either. Q4 Spark listening remains pending. No matching official
-upstream full-song generation has been auditioned, so this finding does not yet
-distinguish the underlying model/prompt behavior from native implementation
-differences. The separate vocal-lane melody-preservation question remains open.
+for that F32 run either. Q4 Spark listening remains pending. An
+[official upstream full-song control](UPSTREAM_AUDIO_CONTROL.md) has now completed
+68.88 seconds with all 11 prepared inputs matching; its listening assessment is
+pending. The current finding does not yet distinguish the underlying model/prompt
+behavior from native implementation differences. The separate vocal-lane
+melody-preservation question remains open.
 
 All 11 prepared tensors are hash-checked. Between the original and vocal-source
 runs, only `input.pianoroll` differs; the other ten tensors are byte-identical.

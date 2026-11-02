@@ -64,8 +64,11 @@
   instrumental lane; no F32 vocal-lane run or combined-lane run has been made.
   User also hears guitar-melody vocalizations in the native F32 instrumental-lane
   control. This behavior is not exclusive to Q4. Q4 Spark listening remains
-  pending, and no official upstream full-song control distinguishes native
-  implementation differences from underlying model/prompt behavior yet.
+  pending. An official upstream full-song FP32 control now executes (861 frames,
+  68.88s, EOS), with all 11 fresh prepared tensors matching the native control.
+  See `docs/UPSTREAM_AUDIO_CONTROL.md`. Its listening assessment remains pending;
+  Torch sampler/codec RNG and default 8192 cache differ from native, so this is a
+  behavioral control, not matched-noise parity or proof of a model/port cause.
   Do not blame transcription or quantization
   without the relevant evidence, or relax the recorded numerical gates.
   Preserve the raw

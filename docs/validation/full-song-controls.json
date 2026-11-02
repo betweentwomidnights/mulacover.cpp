@@ -551,7 +551,8 @@
   "precision_interpretation": "The reported guitar-melody vocalization also occurs in native FP32, so it is not exclusive to Q4. This does not distinguish underlying model/prompt behavior from native implementation differences, and does not resolve vocal-lane melody preservation.",
   "remaining_listening_and_controls": [
     "Same-platform Q4 Spark instrumental-lane listening",
-    "Official upstream full-song control with the same input before attributing the result to the model or the port",
+    "Listening assessment of the completed official upstream full-song control before model/port attribution",
     "Vocal-lane F32 comparison for preservation of the confirmed vocal MIDI melody"
-  ]
+  ],
+  "upstream_control_report": "upstream-audio-control.json"
 }
