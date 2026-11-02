@@ -1,0 +1,135 @@
+{
+  "reference_manifest_sha256": "a42129fa97f295a3241bf46efb2a1a16937321d61723315b56391cfff8c0380a",
+  "upstream_revision": "e27fa7fa0da7c9817879cc6210cc5693f9327946",
+  "checkpoint_revision": "bbbaef2b31835c2ef5172ff528dbe325230d46fb",
+  "ggml_revision": "07b77b0112cc30861b49116b057bac33e819ee06",
+  "ggml_worktree_clean": true,
+  "backend": "cuda",
+  "gates": {
+    "logits_and_cache_max_abs": 0.001,
+    "relative_l2": 0.0001,
+    "activation_atol": 0.001,
+    "activation_rtol": 1e-06,
+    "activation_policy": "elementwise abs(delta)<=atol+rtol*abs(reference), plus relative L2; flat absolute diagnostic retained"
+  },
+  "passed": true,
+  "cases": [
+    {
+      "name": "conditional",
+      "frames": 3,
+      "branches": 1,
+      "native_reset_replay_bit_exact": true,
+      "stats": {
+        "weight_bytes": 17516732416,
+        "cache_bytes": 1879343104,
+        "graph_bytes": 98073472,
+        "elapsed_seconds": 2.03127,
+        "replay_bit_exact": true,
+        "cache_tail_zero": true,
+        "ggml_commit": "07b77b01",
+        "ggml_version": "0.17.0"
+      },
+      "flat_absolute_diagnostic_failures": [],
+      "passed": true,
+      "tensor_count": 300,
+      "groups": {
+        "kv": {
+          "tensors": 186,
+          "max_abs": 4.4345855712890625e-05,
+          "max_relative_l2": 3.144830523665573e-06,
+          "passed": true
+        },
+        "raw_logits": {
+          "tensors": 24,
+          "max_abs": 1.9788742065429688e-05,
+          "max_relative_l2": 1.6625954997845758e-06,
+          "passed": true
+        },
+        "guided_logits": {
+          "tensors": 24,
+          "max_abs": 1.9788742065429688e-05,
+          "max_relative_l2": 1.6625954997845758e-06,
+          "passed": true
+        },
+        "activations": {
+          "tensors": 66,
+          "max_abs": 0.00089263916015625,
+          "max_relative_l2": 3.287321674019533e-06,
+          "passed": true
+        }
+      },
+      "flat_absolute_diagnostics": {}
+    },
+    {
+      "name": "cfg-1.5",
+      "frames": 3,
+      "branches": 2,
+      "native_reset_replay_bit_exact": true,
+      "stats": {
+        "weight_bytes": 17516732416,
+        "cache_bytes": 3758686208,
+        "graph_bytes": 98073472,
+        "elapsed_seconds": 3.91507,
+        "replay_bit_exact": true,
+        "cache_tail_zero": true,
+        "ggml_commit": "07b77b01",
+        "ggml_version": "0.17.0"
+      },
+      "flat_absolute_diagnostic_failures": [
+        "frame0.stage.backbone.layers.27",
+        "frame0.stage.peft_layers.27.0"
+      ],
+      "passed": true,
+      "tensor_count": 300,
+      "groups": {
+        "kv": {
+          "tensors": 186,
+          "max_abs": 4.482269287109375e-05,
+          "max_relative_l2": 2.8106055020606426e-06,
+          "passed": true
+        },
+        "raw_logits": {
+          "tensors": 24,
+          "max_abs": 2.4318695068359375e-05,
+          "max_relative_l2": 1.6775862316054345e-06,
+          "passed": true
+        },
+        "guided_logits": {
+          "tensors": 24,
+          "max_abs": 3.62396240234375e-05,
+          "max_relative_l2": 1.8379954895931497e-06,
+          "passed": true
+        },
+        "activations": {
+          "tensors": 66,
+          "max_abs": 0.001953125,
+          "max_relative_l2": 2.323971333903607e-06,
+          "passed": true
+        }
+      },
+      "flat_absolute_diagnostics": {
+        "frame0.stage.backbone.layers.27": {
+          "max_abs": 0.00146484375,
+          "relative_l2": 2.1064015373065683e-07,
+          "flat_absolute_gate_passed": false,
+          "activation_mixed_tolerance_passed": true,
+          "worst_reference": -4549.466796875,
+          "worst_native": -4549.46533203125,
+          "worst_reference_float32_ulp": 0.00048828125,
+          "passed": true
+        },
+        "frame0.stage.peft_layers.27.0": {
+          "max_abs": 0.001953125,
+          "relative_l2": 2.290503211083514e-07,
+          "flat_absolute_gate_passed": false,
+          "activation_mixed_tolerance_passed": true,
+          "worst_reference": -4548.724609375,
+          "worst_native": -4548.72265625,
+          "worst_reference_float32_ulp": 0.00048828125,
+          "passed": true
+        }
+      }
+    }
+  ],
+  "detailed_report_sha256": "96b5bfd941d280659a927283015df98d62fd43d94162217fae2e07714561e7be"
+}

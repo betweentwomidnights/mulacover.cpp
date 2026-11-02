@@ -6,9 +6,23 @@ sampling and its reference fixtures. Sibling `heartcodec.cpp` owns RVQ/flow/SQ
 decoding and will be consumed as `heartcodec::heartcodec`, sharing one copy of
 `betweentwomidnights/ggml` with the generator and other model libraries.
 
-The first milestone is frozen upstream reference data. **No native generator or
-Q4_K_M generator is implemented yet.** The laptop is the primary C++ workspace;
-full upstream reference execution stays in dedicated Spark Docker containers.
+**Native FP32 teacher-forced frame/logit/cache parity now passes on Spark CUDA.**
+The generator implements prompt/audio embeddings, the 28-layer backbone, style
+modulation, eight symbolic adaptors and gated cross-attention, the three-layer
+local decoder, all eight output heads, CFG and persistent KV state. Both
+conditional and CFG=1.5 cases match three frames and replay exactly after reset.
+See [the parity report](docs/NATIVE_PARITY.md) and [C ABI](docs/C_ABI_V1.md).
+
+Q4_K_M and free-running sampling are not implemented yet. Prepared prompt/style
+and symbolic inputs are supplied by the caller; text/Qwen/MIDI preprocessing
+currently comes from the upstream fixture harness. The laptop is the primary C++
+workspace; full FP32 native/reference execution stays in Spark Docker containers.
+
+GGML was not changed for this milestone. This baseline uses HeartCodec's existing
+`07b77b0` source checkout, mounted read-only. Other inspected consumers record
+`b77ae79`; see the [pin inventory](docs/GGML_PIN_INVENTORY.md). Selecting/adopting a
+common pin requires coordination. CMake defaults to the in-tree target and reuses
+an already-provided GGML target; it never builds a second GGML instance.
 
 `reference/export_reference.py` executes the pinned upstream preprocessing and
 generator on original synthetic melody/chord/drum MIDI and original short lyrics.
@@ -44,7 +58,20 @@ Use `--dtype bfloat16 --output refdata/upstream-bf16` for the BF16 oracle. Run
 retrieve the pinned weights. The immutable reference image ID and build recipe
 are recorded in HeartCodec's `docs/SPARK_WORKFLOW.md` and `docker/`.
 
-Next: audit generator tensor mapping and tokenizer metadata, implement one native
-teacher-forced frame against the FP32 fixtures, then validate incremental cache
-updates and sampling before a Q4_K_M weight policy. Audio transcription and the
-full HeartCodec audio tokenizer are later components.
+Native reproduction on Spark:
+
+```bash
+bash reference/run-spark.sh convert
+bash reference/run-spark.sh build
+bash reference/run-spark.sh parity
+```
+
+The Windows static/DLL smoke tests build with `scripts/build-windows.ps1` and
+`scripts/build-windows.ps1 -Shared`; they use the unchanged in-tree CPU backend.
+Local Python checks require NumPy only, using
+`python -m unittest discover -s tests -v`. Full FP32 weights remain on Spark.
+
+Next: coordinate the cross-repository GGML baseline, then add a controlled
+Q4_K_M policy and measure logit/cache drift and laptop memory. Native sampling and
+prompt/style preprocessing follow. Existing yue2.cpp SheetSage2 melody/chord MIDI
+exports provide a later [transcription integration seam](docs/TRANSCRIPTION_INTEGRATION.md).
