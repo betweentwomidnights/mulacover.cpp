@@ -90,7 +90,7 @@ case "$command" in
   generate)
     generator_mix="${MULACOVER_GENERATOR_MIX:-q4_k_m}"
     docker run "${common[@]}" --gpus all --network none -v "$codec:/codec:ro" "${development_mount[@]}" "$image" \
-      /opt/sa3-venv/bin/python tools/generate.py --reference refdata/upstream-f32 --model "models/mulacover-$generator_mix.gguf" \
+      /opt/sa3-venv/bin/python tools/generate.py --reference "${MULACOVER_GENERATION_REFERENCE:-refdata/upstream-f32}" --model "models/mulacover-$generator_mix.gguf" \
       --cli "$build/bin/mulacover-generate" --ggml-source /codec/ggml --frames "${MULACOVER_GENERATION_FRAMES:-100}" \
       --capacity "${MULACOVER_GENERATION_CAPACITY:-256}" --output "${MULACOVER_GENERATION_OUTPUT:-refdata/generate-$generator_mix-spark}" \
       --flow-model /codec/models/heartcodec-flow-f32.gguf --sq-model /codec/models/heartcodec-sq-codec-f32.gguf

@@ -1,0 +1,14 @@
+{
+  "date": "2026-11-02",
+  "case": "billiegasm-full-vocal-acoustic",
+  "listening_audio_sha256": "b7a905bc82f814bfd9144d80d095ed35a3e2b701e9a29cf8d63cdc05fb40d43d",
+  "user_observation": "The original singer's melody I do not recognize. ideally sheetsage2 should be able to do vocals, melody, and instrument lanes right?",
+  "original_vocal_melody_recognized": false,
+  "vocal_presence": "not answered for this clip",
+  "routing_verified": true,
+  "transcription_accuracy_unverified": false,
+  "vocal_midi_preview_listener_observation": "Ok that vocal melody is correct!",
+  "vocal_midi_preview_sha256": "4aa5ebd599bae2c5773f64c19745bc382c7636247c3a6084a1a8d37826d98c43",
+  "vocal_midi_transcription_listener_accepted": true,
+  "acceptance_scope": "Vocal MIDI melody recognizability for this source, not all transcription lanes or general accuracy"
+}

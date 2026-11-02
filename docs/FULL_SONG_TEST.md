@@ -20,7 +20,9 @@ condition on the singer's melody: melody source and output instrumentation are
 separate controls. The missing original vocal line was not explicitly supplied
 in this test. A controlled vocal-only/combined MIDI comparison can test melody
 selection; a matching FP32 run is still needed before attributing the vocalization
-to quantization or to the underlying model's instrumental control.
+to quantization or to the underlying model's instrumental control. Those first
+[vocal-lane and same-platform precision controls](FULL_SONG_CONTROLS.md) now
+execute; their listening results and limitations are recorded separately.
 
 The raw WAV has peak 1.01176 and RMS 0.14925, with one individual channel sample
 above full scale. A separate `generation/audio-listening.wav` applies one constant

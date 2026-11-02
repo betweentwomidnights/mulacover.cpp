@@ -55,6 +55,14 @@
   does not represent the vocalist's melody. Instrumental control is not accepted
   for this run. We selected 137 instrumental notes and excluded 44 vocal notes;
   melody source selection is separate from desired output instrumentation.
-  Full-song F32 control and vocal-only/combined comparisons remain outstanding.
+  Full-song controls now execute: Q4 vocal lane on laptop (63.28s, EOS), F32
+  instrumental lane on Spark (70s), and Q4 instrumental lane on Spark (66.48s,
+  EOS). See `docs/FULL_SONG_CONTROLS.md`. User confirms the direct vocal MIDI
+  preview is correct but does not recognize that melody in the Q4 vocal-lane
+  generated clip. All 44 vocal onsets/sustains reach prepared conditioning;
+  preservation through generation remains unresolved. The F32 control uses the
+  instrumental lane; no F32 vocal-lane run or combined-lane run has been made.
+  Spark-pair listening remains pending. Do not blame transcription or quantization
+  without the relevant evidence, or relax the recorded numerical gates.
   Preserve the raw
   WAV; the separate listening copy uses only a constant -1.10158 dB gain.

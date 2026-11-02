@@ -38,6 +38,9 @@ prompt/MIDI preparation still use the upstream Spark Docker bridge. Listening
 acceptance for vocals and musical fidelity remains pending.
 The [full-song acoustic test](docs/FULL_SONG_TEST.md) now generates all 70 seconds
 on the laptop, with full replay checks and a sampled 6,776 MiB peak through decode.
+Follow-up [melody-source and F32/Q4 controls](docs/FULL_SONG_CONTROLS.md) verify
+that the user-recognized vocal MIDI reaches prepared conditioning, while its
+preservation in the generated Q4 cover remains unresolved.
 
 Prepared prompt/style
 and symbolic inputs are supplied by the caller; text/Qwen/MIDI preprocessing

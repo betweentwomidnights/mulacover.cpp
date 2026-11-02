@@ -16,8 +16,9 @@
   "cover_test_executed": true,
   "instrumental_controllability_verified": false,
   "pending_checks": [
-    "Controlled vocal-only/combined MIDI and F32/Q4 listening comparisons after vocalization in the full-song acoustic Q4 run",
-    "Musical transcription and cover fidelity against source",
+    "Listener assessment of the same-platform Spark F32/Q4 instrumental-lane controls",
+    "Preservation of the confirmed vocal melody through generation; no F32 vocal-lane control yet",
+    "Remaining transcription lanes and generated musical/audio quality",
     "Native prompt/tokenizer/Qwen/MIDI preparation"
   ],
   "last_test_on": "2026-11-02",
@@ -32,5 +33,8 @@
   "generated_full_song_seconds": 70,
   "excerpt_listener_observation": "User heard instruments only in the eight-second acoustic Q4 clip",
   "excerpt_validation_report": "first-cover-test.json",
-  "full_song_listener_observation": "User reports vocalization of the guitar melody and no audible original vocal melody; input selected instrumental lane and excluded 44 vocal notes"
+  "full_song_listener_observation": "User reports vocalization of the guitar melody and no audible original vocal melody; input selected instrumental lane and excluded 44 vocal notes",
+  "followup_validation_report": "full-song-controls.json",
+  "vocal_midi_listener_confirmed": true,
+  "vocal_source_q4_generated_melody_recognized": false
 }
