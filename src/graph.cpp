@@ -22,7 +22,10 @@ ggml_tensor * Graph::ids(const std::vector<int32_t> & data) {
 }
 ggml_tensor * Graph::mm(ggml_tensor * a,ggml_tensor * b) {
     auto * t=ggml_mul_mat(ctx,a,b);
-    if(!ggml_prec_set_acc(t,GGML_PREC_F32)||!ggml_prec_set_src(t,GGML_PREC_F32,1))
+    const auto source_precision=a->type==GGML_TYPE_F32?GGML_PREC_F32:
+        ggml_is_quantized(a->type)?GGML_PREC_Q8:GGML_PREC_DEFAULT;
+    if(!ggml_prec_set_acc(t,GGML_PREC_F32)||
+       (source_precision!=GGML_PREC_DEFAULT&&!ggml_prec_set_src(t,source_precision,1)))
         throw std::runtime_error("Cannot request generator matmul precision");
     return t;
 }

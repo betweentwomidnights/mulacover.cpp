@@ -1,5 +1,9 @@
 # Shared GGML baseline validation
 
+Later user decision: continue MuLaCover development using this fix while deferring
+all five sibling bumps and ggml-bump-check. The isolated development profile is
+documented in [DEVELOPMENT_GGML.md](DEVELOPMENT_GGML.md); shared pins below remain unchanged.
+
 November 1, 2026. MuLaCover consumes HeartCodec's coordinated GGML
 `b77ae790e628270af46a8af1eca38441c23f1252`. Its normal parity harness checks that
 clean source SHA and the executable's linked commit. No new GGML revision is

@@ -1,0 +1,914 @@
+{
+  "date": "2026-11-01",
+  "ggml_development_profile": {
+    "repository": "https://github.com/betweentwomidnights/ggml.git",
+    "shared_baseline": "b77ae790e628270af46a8af1eca38441c23f1252",
+    "revision": "0f2ed045eaff6bf01bed074878b6988248efbc22",
+    "branch": "fix/cuda-f32-source-precision-b77",
+    "pull_request": "https://github.com/betweentwomidnights/ggml/pull/21",
+    "scope": "MuLaCover development only; coordinated sibling bumps and ggml-bump-check deferred by user"
+  },
+  "global_bump_testing_started": false,
+  "quantization_policy": "mulacover-kquant-v1",
+  "quantization_accuracy_accepted": false,
+  "scope": "Prepared synthetic conditions, three teacher-forced frames plus exact replay; full requested cache allocation, not full occupancy or free-running audio",
+  "quantization": {
+    "mix": "q4_k_m",
+    "policy": "mulacover-kquant-v1",
+    "source_bytes": 17516780256,
+    "file_bytes": 2939966176,
+    "tensor_count": 669,
+    "types": {
+      "f32": {
+        "tensors": 255,
+        "bytes": 21891488
+      },
+      "q4_K": {
+        "tensors": 302,
+        "bytes": 1461353472
+      },
+      "q6_K": {
+        "tensors": 112,
+        "bytes": 1456667520
+      }
+    }
+  },
+  "checks": {
+    "python_tests": 7,
+    "python_windows_passed": true,
+    "python_spark_docker_passed": true,
+    "windows_cpu_cuda_c_abi_smoke_passed": true,
+    "spark_combined_native_tests": 4,
+    "spark_combined_native_tests_passed": true,
+    "development_profile_rejects_wrong_ggml_sha": true,
+    "windows_baseline_dll_c_abi_passed": true
+  },
+  "configurations": [
+    {
+      "name": "spark-f32",
+      "backend": "cuda",
+      "ggml_revision": "0f2ed045eaff6bf01bed074878b6988248efbc22",
+      "cache_capacity": 8192,
+      "reference_manifest_sha256": "a42129fa97f295a3241bf46efb2a1a16937321d61723315b56391cfff8c0380a",
+      "checkpoint_revision": "bbbaef2b31835c2ef5172ff528dbe325230d46fb",
+      "model_file_bytes": 17516780256,
+      "model_sha256": "5f3bfcb7bd441301d272546e4bfb7ddd690df45447251100f5e223e036dab62c",
+      "execution_passed": true,
+      "fp32_parity_passed": true,
+      "cases": [
+        {
+          "name": "conditional",
+          "tensors": 300,
+          "execution_passed": true,
+          "strict_fp32_gate_failures": 0,
+          "native_reset_replay_bit_exact": true,
+          "stats": {
+            "weight_bytes": 17516732416,
+            "cache_bytes": 1879343104,
+            "graph_bytes": 98073472,
+            "cache_capacity": 8192,
+            "elapsed_seconds": 2.16429,
+            "replay_bit_exact": true,
+            "cache_tail_zero": true,
+            "ggml_commit": "0f2ed045",
+            "ggml_version": "0.27.0"
+          },
+          "device_memory_sampling": {
+            "samples": 0,
+            "interval_seconds": 0.2,
+            "scope": "nvidia-smi physical GPU 0 total device usage, includes desktop/other processes",
+            "process_wall_seconds": 10.237092650990235
+          },
+          "groups": {
+            "kv": {
+              "tensors": 186,
+              "max_abs": 4.4345855712890625e-05,
+              "max_relative_l2": 3.1444727243632737e-06
+            },
+            "raw_logits": {
+              "tensors": 24,
+              "max_abs": 1.940131187438965e-05,
+              "max_relative_l2": 1.6509466852522492e-06,
+              "top1_agreement_mean": 1.0,
+              "top32_overlap_mean": 1.0,
+              "kl_reference_to_native_mean": 2.3173665822900747e-12,
+              "teacher_log_probability_delta_mean": -1.0544835223521194e-07
+            },
+            "guided_logits": {
+              "tensors": 24,
+              "max_abs": 1.940131187438965e-05,
+              "max_relative_l2": 1.6509466852522492e-06,
+              "top1_agreement_mean": 1.0,
+              "top32_overlap_mean": 1.0,
+              "kl_reference_to_native_mean": 2.3173665822900747e-12,
+              "teacher_log_probability_delta_mean": -1.0544835223521194e-07
+            },
+            "activations": {
+              "tensors": 66,
+              "max_abs": 0.0009002685546875,
+              "max_relative_l2": 3.3035901079085854e-06
+            }
+          }
+        },
+        {
+          "name": "cfg-1.5",
+          "tensors": 300,
+          "execution_passed": true,
+          "strict_fp32_gate_failures": 0,
+          "native_reset_replay_bit_exact": true,
+          "stats": {
+            "weight_bytes": 17516732416,
+            "cache_bytes": 3758686208,
+            "graph_bytes": 98073472,
+            "cache_capacity": 8192,
+            "elapsed_seconds": 3.95514,
+            "replay_bit_exact": true,
+            "cache_tail_zero": true,
+            "ggml_commit": "0f2ed045",
+            "ggml_version": "0.27.0"
+          },
+          "device_memory_sampling": {
+            "samples": 0,
+            "interval_seconds": 0.2,
+            "scope": "nvidia-smi physical GPU 0 total device usage, includes desktop/other processes",
+            "process_wall_seconds": 11.285251137014711
+          },
+          "groups": {
+            "kv": {
+              "tensors": 186,
+              "max_abs": 4.482269287109375e-05,
+              "max_relative_l2": 2.809941037123322e-06
+            },
+            "raw_logits": {
+              "tensors": 24,
+              "max_abs": 2.3603439331054688e-05,
+              "max_relative_l2": 1.6656998168978655e-06,
+              "top1_agreement_mean": 1.0,
+              "top32_overlap_mean": 1.0,
+              "kl_reference_to_native_mean": 1.4004479986978057e-12,
+              "teacher_log_probability_delta_mean": 1.4429562200657386e-07
+            },
+            "guided_logits": {
+              "tensors": 24,
+              "max_abs": 3.62396240234375e-05,
+              "max_relative_l2": 1.8246197348723098e-06,
+              "top1_agreement_mean": 1.0,
+              "top32_overlap_mean": 1.0,
+              "kl_reference_to_native_mean": 5.022031584356237e-12,
+              "teacher_log_probability_delta_mean": 5.486326556021955e-07
+            },
+            "activations": {
+              "tensors": 66,
+              "max_abs": 0.001953125,
+              "max_relative_l2": 2.336379809805654e-06
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "spark-f16",
+      "backend": "cuda",
+      "ggml_revision": "0f2ed045eaff6bf01bed074878b6988248efbc22",
+      "cache_capacity": 8192,
+      "reference_manifest_sha256": "a42129fa97f295a3241bf46efb2a1a16937321d61723315b56391cfff8c0380a",
+      "checkpoint_revision": "bbbaef2b31835c2ef5172ff528dbe325230d46fb",
+      "model_file_bytes": 8768709920,
+      "model_sha256": "857e23632755a35cf89bca0ba51138842505bba9a17ef3ec9995eacc76c97d5c",
+      "execution_passed": true,
+      "fp32_parity_passed": false,
+      "cases": [
+        {
+          "name": "conditional",
+          "tensors": 300,
+          "execution_passed": true,
+          "strict_fp32_gate_failures": 230,
+          "native_reset_replay_bit_exact": true,
+          "stats": {
+            "weight_bytes": 8768663552,
+            "cache_bytes": 1879343104,
+            "graph_bytes": 98073472,
+            "cache_capacity": 8192,
+            "elapsed_seconds": 1.92629,
+            "replay_bit_exact": true,
+            "cache_tail_zero": true,
+            "ggml_commit": "0f2ed045",
+            "ggml_version": "0.27.0"
+          },
+          "device_memory_sampling": {
+            "samples": 0,
+            "interval_seconds": 0.2,
+            "scope": "nvidia-smi physical GPU 0 total device usage, includes desktop/other processes",
+            "process_wall_seconds": 5.17913733900059
+          },
+          "groups": {
+            "kv": {
+              "tensors": 186,
+              "max_abs": 0.0066280364990234375,
+              "max_relative_l2": 0.0006402170070756879
+            },
+            "raw_logits": {
+              "tensors": 24,
+              "max_abs": 0.011590003967285156,
+              "max_relative_l2": 0.0011644132320843246,
+              "top1_agreement_mean": 1.0,
+              "top32_overlap_mean": 0.9986979166666666,
+              "kl_reference_to_native_mean": 1.1859761924477245e-06,
+              "teacher_log_probability_delta_mean": 0.00026347910125879004
+            },
+            "guided_logits": {
+              "tensors": 24,
+              "max_abs": 0.011590003967285156,
+              "max_relative_l2": 0.0011644132320843246,
+              "top1_agreement_mean": 1.0,
+              "top32_overlap_mean": 0.9986979166666666,
+              "kl_reference_to_native_mean": 1.1859761924477245e-06,
+              "teacher_log_probability_delta_mean": 0.00026347910125879004
+            },
+            "activations": {
+              "tensors": 66,
+              "max_abs": 0.07906341552734375,
+              "max_relative_l2": 0.0009681576428289384
+            }
+          }
+        },
+        {
+          "name": "cfg-1.5",
+          "tensors": 300,
+          "execution_passed": true,
+          "strict_fp32_gate_failures": 236,
+          "native_reset_replay_bit_exact": true,
+          "stats": {
+            "weight_bytes": 8768663552,
+            "cache_bytes": 3758686208,
+            "graph_bytes": 98073472,
+            "cache_capacity": 8192,
+            "elapsed_seconds": 3.62305,
+            "replay_bit_exact": true,
+            "cache_tail_zero": true,
+            "ggml_commit": "0f2ed045",
+            "ggml_version": "0.27.0"
+          },
+          "device_memory_sampling": {
+            "samples": 0,
+            "interval_seconds": 0.2,
+            "scope": "nvidia-smi physical GPU 0 total device usage, includes desktop/other processes",
+            "process_wall_seconds": 7.315447192988358
+          },
+          "groups": {
+            "kv": {
+              "tensors": 186,
+              "max_abs": 0.008176803588867188,
+              "max_relative_l2": 0.000667653470741117
+            },
+            "raw_logits": {
+              "tensors": 24,
+              "max_abs": 0.018224000930786133,
+              "max_relative_l2": 0.0011156629686260673,
+              "top1_agreement_mean": 1.0,
+              "top32_overlap_mean": 0.9973958333333334,
+              "kl_reference_to_native_mean": 1.0826017329068364e-06,
+              "teacher_log_probability_delta_mean": 0.00024940198089854854
+            },
+            "guided_logits": {
+              "tensors": 24,
+              "max_abs": 0.018785476684570312,
+              "max_relative_l2": 0.0016471882620557922,
+              "top1_agreement_mean": 1.0,
+              "top32_overlap_mean": 0.9986979166666666,
+              "kl_reference_to_native_mean": 2.988393126371192e-06,
+              "teacher_log_probability_delta_mean": 0.0003741275893494785
+            },
+            "activations": {
+              "tensors": 66,
+              "max_abs": 0.31591796875,
+              "max_relative_l2": 0.0010278743503204083
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "spark-q8_0",
+      "backend": "cuda",
+      "ggml_revision": "0f2ed045eaff6bf01bed074878b6988248efbc22",
+      "cache_capacity": 8192,
+      "reference_manifest_sha256": "a42129fa97f295a3241bf46efb2a1a16937321d61723315b56391cfff8c0380a",
+      "checkpoint_revision": "bbbaef2b31835c2ef5172ff528dbe325230d46fb",
+      "model_file_bytes": 4668938528,
+      "model_sha256": "f66604f34caed5c1b7b81c9ddf86c4d3af44128faf4b0122fd3bf4d10580ff77",
+      "execution_passed": true,
+      "fp32_parity_passed": false,
+      "cases": [
+        {
+          "name": "conditional",
+          "tensors": 300,
+          "execution_passed": true,
+          "strict_fp32_gate_failures": 300,
+          "native_reset_replay_bit_exact": true,
+          "stats": {
+            "weight_bytes": 4668897792,
+            "cache_bytes": 1879343104,
+            "graph_bytes": 98073472,
+            "cache_capacity": 8192,
+            "elapsed_seconds": 1.48997,
+            "replay_bit_exact": true,
+            "cache_tail_zero": true,
+            "ggml_commit": "0f2ed045",
+            "ggml_version": "0.27.0"
+          },
+          "device_memory_sampling": {
+            "samples": 0,
+            "interval_seconds": 0.2,
+            "scope": "nvidia-smi physical GPU 0 total device usage, includes desktop/other processes",
+            "process_wall_seconds": 2.8483718470088206
+          },
+          "groups": {
+            "kv": {
+              "tensors": 186,
+              "max_abs": 1.4265302419662476,
+              "max_relative_l2": 0.0807723082892408
+            },
+            "raw_logits": {
+              "tensors": 24,
+              "max_abs": 0.42764368653297424,
+              "max_relative_l2": 0.053818808609709924,
+              "top1_agreement_mean": 0.875,
+              "top32_overlap_mean": 0.9661458333333334,
+              "kl_reference_to_native_mean": 0.0019354281704268292,
+              "teacher_log_probability_delta_mean": -0.03626721007807628
+            },
+            "guided_logits": {
+              "tensors": 24,
+              "max_abs": 0.42764368653297424,
+              "max_relative_l2": 0.053818808609709924,
+              "top1_agreement_mean": 0.875,
+              "top32_overlap_mean": 0.9661458333333334,
+              "kl_reference_to_native_mean": 0.0019354281704268292,
+              "teacher_log_probability_delta_mean": -0.03626721007807628
+            },
+            "activations": {
+              "tensors": 66,
+              "max_abs": 28.330917358398438,
+              "max_relative_l2": 0.06898701312587018
+            }
+          }
+        },
+        {
+          "name": "cfg-1.5",
+          "tensors": 300,
+          "execution_passed": true,
+          "strict_fp32_gate_failures": 300,
+          "native_reset_replay_bit_exact": true,
+          "stats": {
+            "weight_bytes": 4668897792,
+            "cache_bytes": 3758686208,
+            "graph_bytes": 98073472,
+            "cache_capacity": 8192,
+            "elapsed_seconds": 2.73382,
+            "replay_bit_exact": true,
+            "cache_tail_zero": true,
+            "ggml_commit": "0f2ed045",
+            "ggml_version": "0.27.0"
+          },
+          "device_memory_sampling": {
+            "samples": 0,
+            "interval_seconds": 0.2,
+            "scope": "nvidia-smi physical GPU 0 total device usage, includes desktop/other processes",
+            "process_wall_seconds": 4.135743083024863
+          },
+          "groups": {
+            "kv": {
+              "tensors": 186,
+              "max_abs": 1.4265302419662476,
+              "max_relative_l2": 0.07248430354349034
+            },
+            "raw_logits": {
+              "tensors": 24,
+              "max_abs": 0.4276430308818817,
+              "max_relative_l2": 0.041710019914527496,
+              "top1_agreement_mean": 0.9375,
+              "top32_overlap_mean": 0.9700520833333334,
+              "kl_reference_to_native_mean": 0.0014940304352163037,
+              "teacher_log_probability_delta_mean": -0.03735928196257021
+            },
+            "guided_logits": {
+              "tensors": 24,
+              "max_abs": 0.602637767791748,
+              "max_relative_l2": 0.07454603611028195,
+              "top1_agreement_mean": 0.9166666666666666,
+              "top32_overlap_mean": 0.9518229166666666,
+              "kl_reference_to_native_mean": 0.004318385032178276,
+              "teacher_log_probability_delta_mean": -0.036493779875134136
+            },
+            "activations": {
+              "tensors": 66,
+              "max_abs": 28.330886840820312,
+              "max_relative_l2": 0.048801393743690316
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "spark-q4_k_m",
+      "backend": "cuda",
+      "ggml_revision": "0f2ed045eaff6bf01bed074878b6988248efbc22",
+      "cache_capacity": 8192,
+      "reference_manifest_sha256": "a42129fa97f295a3241bf46efb2a1a16937321d61723315b56391cfff8c0380a",
+      "checkpoint_revision": "bbbaef2b31835c2ef5172ff528dbe325230d46fb",
+      "model_file_bytes": 2939966176,
+      "model_sha256": "74ebd8a8537f55ea3f3566cfa17c7e28734fc555af5fbc1a254bec94a182f814",
+      "execution_passed": true,
+      "fp32_parity_passed": false,
+      "cases": [
+        {
+          "name": "conditional",
+          "tensors": 300,
+          "execution_passed": true,
+          "strict_fp32_gate_failures": 300,
+          "native_reset_replay_bit_exact": true,
+          "stats": {
+            "weight_bytes": 2939920896,
+            "cache_bytes": 1879343104,
+            "graph_bytes": 98073472,
+            "cache_capacity": 8192,
+            "elapsed_seconds": 1.49906,
+            "replay_bit_exact": true,
+            "cache_tail_zero": true,
+            "ggml_commit": "0f2ed045",
+            "ggml_version": "0.27.0"
+          },
+          "device_memory_sampling": {
+            "samples": 0,
+            "interval_seconds": 0.2,
+            "scope": "nvidia-smi physical GPU 0 total device usage, includes desktop/other processes",
+            "process_wall_seconds": 2.8630054959794506
+          },
+          "groups": {
+            "kv": {
+              "tensors": 186,
+              "max_abs": 5.1177778244018555,
+              "max_relative_l2": 0.268940053075775
+            },
+            "raw_logits": {
+              "tensors": 24,
+              "max_abs": 2.4157460927963257,
+              "max_relative_l2": 0.20317800369098762,
+              "top1_agreement_mean": 0.75,
+              "top32_overlap_mean": 0.8528645833333334,
+              "kl_reference_to_native_mean": 0.03691406070474572,
+              "teacher_log_probability_delta_mean": 0.024189642197891326
+            },
+            "guided_logits": {
+              "tensors": 24,
+              "max_abs": 2.4157460927963257,
+              "max_relative_l2": 0.20317800369098762,
+              "top1_agreement_mean": 0.75,
+              "top32_overlap_mean": 0.8528645833333334,
+              "kl_reference_to_native_mean": 0.03691406070474572,
+              "teacher_log_probability_delta_mean": 0.024189642197891326
+            },
+            "activations": {
+              "tensors": 66,
+              "max_abs": 54.86956787109375,
+              "max_relative_l2": 0.21814376107697767
+            }
+          }
+        },
+        {
+          "name": "cfg-1.5",
+          "tensors": 300,
+          "execution_passed": true,
+          "strict_fp32_gate_failures": 300,
+          "native_reset_replay_bit_exact": true,
+          "stats": {
+            "weight_bytes": 2939920896,
+            "cache_bytes": 3758686208,
+            "graph_bytes": 98073472,
+            "cache_capacity": 8192,
+            "elapsed_seconds": 2.77912,
+            "replay_bit_exact": true,
+            "cache_tail_zero": true,
+            "ggml_commit": "0f2ed045",
+            "ggml_version": "0.27.0"
+          },
+          "device_memory_sampling": {
+            "samples": 0,
+            "interval_seconds": 0.2,
+            "scope": "nvidia-smi physical GPU 0 total device usage, includes desktop/other processes",
+            "process_wall_seconds": 4.0184344990120735
+          },
+          "groups": {
+            "kv": {
+              "tensors": 186,
+              "max_abs": 5.1177778244018555,
+              "max_relative_l2": 0.2345364276005507
+            },
+            "raw_logits": {
+              "tensors": 24,
+              "max_abs": 2.4157453775405884,
+              "max_relative_l2": 0.1505249520280405,
+              "top1_agreement_mean": 0.7916666666666666,
+              "top32_overlap_mean": 0.87109375,
+              "kl_reference_to_native_mean": 0.02636363857153373,
+              "teacher_log_probability_delta_mean": -0.03034011059103231
+            },
+            "guided_logits": {
+              "tensors": 24,
+              "max_abs": 3.743063449859619,
+              "max_relative_l2": 0.25712249449039926,
+              "top1_agreement_mean": 0.4583333333333333,
+              "top32_overlap_mean": 0.8072916666666666,
+              "kl_reference_to_native_mean": 0.0765810944489306,
+              "teacher_log_probability_delta_mean": 0.10152775259019375
+            },
+            "activations": {
+              "tensors": 66,
+              "max_abs": 54.869537353515625,
+              "max_relative_l2": 0.2002159644388196
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "laptop-cuda-q4_k_m-cap8192",
+      "backend": "cuda",
+      "ggml_revision": "0f2ed045eaff6bf01bed074878b6988248efbc22",
+      "cache_capacity": 8192,
+      "reference_manifest_sha256": "a42129fa97f295a3241bf46efb2a1a16937321d61723315b56391cfff8c0380a",
+      "checkpoint_revision": "bbbaef2b31835c2ef5172ff528dbe325230d46fb",
+      "model_file_bytes": 2939966176,
+      "model_sha256": "74ebd8a8537f55ea3f3566cfa17c7e28734fc555af5fbc1a254bec94a182f814",
+      "execution_passed": true,
+      "fp32_parity_passed": false,
+      "cases": [
+        {
+          "name": "conditional",
+          "tensors": 300,
+          "execution_passed": true,
+          "strict_fp32_gate_failures": 300,
+          "native_reset_replay_bit_exact": true,
+          "stats": {
+            "weight_bytes": 2939920896,
+            "cache_bytes": 1879343104,
+            "graph_bytes": 98073472,
+            "cache_capacity": 8192,
+            "elapsed_seconds": 3.92579,
+            "replay_bit_exact": true,
+            "cache_tail_zero": true,
+            "ggml_commit": "0f2ed045",
+            "ggml_version": "0.27.0"
+          },
+          "device_memory_sampling": {
+            "samples": 27,
+            "interval_seconds": 0.2,
+            "scope": "nvidia-smi physical GPU 0 total device usage, includes desktop/other processes",
+            "first_used_mib": 654,
+            "peak_used_mib": 5539,
+            "total_mib": 8151,
+            "process_wall_seconds": 6.98399999999674
+          },
+          "groups": {
+            "kv": {
+              "tensors": 186,
+              "max_abs": 5.190728425979614,
+              "max_relative_l2": 0.27250791621364306
+            },
+            "raw_logits": {
+              "tensors": 24,
+              "max_abs": 2.2983087301254272,
+              "max_relative_l2": 0.20258831863363036,
+              "top1_agreement_mean": 0.7916666666666666,
+              "top32_overlap_mean": 0.8528645833333334,
+              "kl_reference_to_native_mean": 0.03746360137372915,
+              "teacher_log_probability_delta_mean": 0.032588375970109364
+            },
+            "guided_logits": {
+              "tensors": 24,
+              "max_abs": 2.2983087301254272,
+              "max_relative_l2": 0.20258831863363036,
+              "top1_agreement_mean": 0.7916666666666666,
+              "top32_overlap_mean": 0.8528645833333334,
+              "kl_reference_to_native_mean": 0.03746360137372915,
+              "teacher_log_probability_delta_mean": 0.032588375970109364
+            },
+            "activations": {
+              "tensors": 66,
+              "max_abs": 49.328125,
+              "max_relative_l2": 0.21821029210734438
+            }
+          }
+        },
+        {
+          "name": "cfg-1.5",
+          "tensors": 300,
+          "execution_passed": true,
+          "strict_fp32_gate_failures": 300,
+          "native_reset_replay_bit_exact": true,
+          "stats": {
+            "weight_bytes": 2939920896,
+            "cache_bytes": 3758686208,
+            "graph_bytes": 98073472,
+            "cache_capacity": 8192,
+            "elapsed_seconds": 7.22965,
+            "replay_bit_exact": true,
+            "cache_tail_zero": true,
+            "ggml_commit": "0f2ed045",
+            "ggml_version": "0.27.0"
+          },
+          "device_memory_sampling": {
+            "samples": 40,
+            "interval_seconds": 0.2,
+            "scope": "nvidia-smi physical GPU 0 total device usage, includes desktop/other processes",
+            "first_used_mib": 654,
+            "peak_used_mib": 7331,
+            "total_mib": 8151,
+            "process_wall_seconds": 10.46799999999348
+          },
+          "groups": {
+            "kv": {
+              "tensors": 186,
+              "max_abs": 5.190728425979614,
+              "max_relative_l2": 0.23909940596683843
+            },
+            "raw_logits": {
+              "tensors": 24,
+              "max_abs": 2.29830801486969,
+              "max_relative_l2": 0.1501259207077537,
+              "top1_agreement_mean": 0.8333333333333334,
+              "top32_overlap_mean": 0.876953125,
+              "kl_reference_to_native_mean": 0.02594557052198708,
+              "teacher_log_probability_delta_mean": -0.025552268461559686
+            },
+            "guided_logits": {
+              "tensors": 24,
+              "max_abs": 3.5918354988098145,
+              "max_relative_l2": 0.25690170508746807,
+              "top1_agreement_mean": 0.7083333333333334,
+              "top32_overlap_mean": 0.8125,
+              "kl_reference_to_native_mean": 0.0758968546968843,
+              "teacher_log_probability_delta_mean": 0.12662367531234353
+            },
+            "activations": {
+              "tensors": 66,
+              "max_abs": 49.328094482421875,
+              "max_relative_l2": 0.2002159639492627
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "laptop-cuda-q4_k_m-cap256",
+      "backend": "cuda",
+      "ggml_revision": "0f2ed045eaff6bf01bed074878b6988248efbc22",
+      "cache_capacity": 256,
+      "reference_manifest_sha256": "a42129fa97f295a3241bf46efb2a1a16937321d61723315b56391cfff8c0380a",
+      "checkpoint_revision": "bbbaef2b31835c2ef5172ff528dbe325230d46fb",
+      "model_file_bytes": 2939966176,
+      "model_sha256": "74ebd8a8537f55ea3f3566cfa17c7e28734fc555af5fbc1a254bec94a182f814",
+      "execution_passed": true,
+      "fp32_parity_passed": false,
+      "cases": [
+        {
+          "name": "conditional",
+          "tensors": 300,
+          "execution_passed": true,
+          "strict_fp32_gate_failures": 300,
+          "native_reset_replay_bit_exact": true,
+          "stats": {
+            "weight_bytes": 2939920896,
+            "cache_bytes": 59015168,
+            "graph_bytes": 4959104,
+            "cache_capacity": 256,
+            "elapsed_seconds": 0.911921,
+            "replay_bit_exact": true,
+            "cache_tail_zero": true,
+            "ggml_commit": "0f2ed045",
+            "ggml_version": "0.27.0"
+          },
+          "device_memory_sampling": {
+            "samples": 16,
+            "interval_seconds": 0.2,
+            "scope": "nvidia-smi physical GPU 0 total device usage, includes desktop/other processes",
+            "first_used_mib": 654,
+            "peak_used_mib": 3709,
+            "total_mib": 8151,
+            "process_wall_seconds": 4.032000000006519
+          },
+          "groups": {
+            "kv": {
+              "tensors": 186,
+              "max_abs": 5.190728425979614,
+              "max_relative_l2": 0.27250791621364306
+            },
+            "raw_logits": {
+              "tensors": 24,
+              "max_abs": 2.2983087301254272,
+              "max_relative_l2": 0.20258831863363036,
+              "top1_agreement_mean": 0.7916666666666666,
+              "top32_overlap_mean": 0.8528645833333334,
+              "kl_reference_to_native_mean": 0.03746360137372915,
+              "teacher_log_probability_delta_mean": 0.032588375970109364
+            },
+            "guided_logits": {
+              "tensors": 24,
+              "max_abs": 2.2983087301254272,
+              "max_relative_l2": 0.20258831863363036,
+              "top1_agreement_mean": 0.7916666666666666,
+              "top32_overlap_mean": 0.8528645833333334,
+              "kl_reference_to_native_mean": 0.03746360137372915,
+              "teacher_log_probability_delta_mean": 0.032588375970109364
+            },
+            "activations": {
+              "tensors": 66,
+              "max_abs": 49.328125,
+              "max_relative_l2": 0.21821029210734438
+            }
+          }
+        },
+        {
+          "name": "cfg-1.5",
+          "tensors": 300,
+          "execution_passed": true,
+          "strict_fp32_gate_failures": 300,
+          "native_reset_replay_bit_exact": true,
+          "stats": {
+            "weight_bytes": 2939920896,
+            "cache_bytes": 118030336,
+            "graph_bytes": 4959104,
+            "cache_capacity": 256,
+            "elapsed_seconds": 1.56168,
+            "replay_bit_exact": true,
+            "cache_tail_zero": true,
+            "ggml_commit": "0f2ed045",
+            "ggml_version": "0.27.0"
+          },
+          "device_memory_sampling": {
+            "samples": 18,
+            "interval_seconds": 0.2,
+            "scope": "nvidia-smi physical GPU 0 total device usage, includes desktop/other processes",
+            "first_used_mib": 654,
+            "peak_used_mib": 3771,
+            "total_mib": 8151,
+            "process_wall_seconds": 4.64100000000326
+          },
+          "groups": {
+            "kv": {
+              "tensors": 186,
+              "max_abs": 5.190728425979614,
+              "max_relative_l2": 0.23909940596683843
+            },
+            "raw_logits": {
+              "tensors": 24,
+              "max_abs": 2.29830801486969,
+              "max_relative_l2": 0.1501259207077537,
+              "top1_agreement_mean": 0.8333333333333334,
+              "top32_overlap_mean": 0.876953125,
+              "kl_reference_to_native_mean": 0.02594557052198708,
+              "teacher_log_probability_delta_mean": -0.025552268461559686
+            },
+            "guided_logits": {
+              "tensors": 24,
+              "max_abs": 3.5918354988098145,
+              "max_relative_l2": 0.25690170508746807,
+              "top1_agreement_mean": 0.7083333333333334,
+              "top32_overlap_mean": 0.8125,
+              "kl_reference_to_native_mean": 0.0758968546968843,
+              "teacher_log_probability_delta_mean": 0.12662367531234353
+            },
+            "activations": {
+              "tensors": 66,
+              "max_abs": 49.328094482421875,
+              "max_relative_l2": 0.2002159639492627
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "laptop-cpu-q4_k_m-cap256",
+      "backend": "cpu",
+      "ggml_revision": "0f2ed045eaff6bf01bed074878b6988248efbc22",
+      "cache_capacity": 256,
+      "reference_manifest_sha256": "a42129fa97f295a3241bf46efb2a1a16937321d61723315b56391cfff8c0380a",
+      "checkpoint_revision": "bbbaef2b31835c2ef5172ff528dbe325230d46fb",
+      "model_file_bytes": 2939966176,
+      "model_sha256": "74ebd8a8537f55ea3f3566cfa17c7e28734fc555af5fbc1a254bec94a182f814",
+      "execution_passed": true,
+      "fp32_parity_passed": false,
+      "cases": [
+        {
+          "name": "conditional",
+          "tensors": 300,
+          "execution_passed": true,
+          "strict_fp32_gate_failures": 300,
+          "native_reset_replay_bit_exact": true,
+          "stats": {
+            "weight_bytes": 2939913152,
+            "cache_bytes": 59015168,
+            "graph_bytes": 4948000,
+            "cache_capacity": 256,
+            "elapsed_seconds": 2.25824,
+            "replay_bit_exact": true,
+            "cache_tail_zero": true,
+            "ggml_commit": "0f2ed045",
+            "ggml_version": "0.27.0"
+          },
+          "device_memory_sampling": {
+            "samples": 0,
+            "interval_seconds": 0.2,
+            "scope": "nvidia-smi physical GPU 0 total device usage, includes desktop/other processes",
+            "process_wall_seconds": 5.592999999993481
+          },
+          "groups": {
+            "kv": {
+              "tensors": 186,
+              "max_abs": 5.032261490821838,
+              "max_relative_l2": 0.24502633043873287
+            },
+            "raw_logits": {
+              "tensors": 24,
+              "max_abs": 2.0021790266036987,
+              "max_relative_l2": 0.19276857883710946,
+              "top1_agreement_mean": 0.75,
+              "top32_overlap_mean": 0.8580729166666666,
+              "kl_reference_to_native_mean": 0.039508096048745604,
+              "teacher_log_probability_delta_mean": 0.0296244477200928
+            },
+            "guided_logits": {
+              "tensors": 24,
+              "max_abs": 2.0021790266036987,
+              "max_relative_l2": 0.19276857883710946,
+              "top1_agreement_mean": 0.75,
+              "top32_overlap_mean": 0.8580729166666666,
+              "kl_reference_to_native_mean": 0.039508096048745604,
+              "teacher_log_probability_delta_mean": 0.0296244477200928
+            },
+            "activations": {
+              "tensors": 66,
+              "max_abs": 51.640380859375,
+              "max_relative_l2": 0.20080951328207042
+            }
+          }
+        },
+        {
+          "name": "cfg-1.5",
+          "tensors": 300,
+          "execution_passed": true,
+          "strict_fp32_gate_failures": 300,
+          "native_reset_replay_bit_exact": true,
+          "stats": {
+            "weight_bytes": 2939913152,
+            "cache_bytes": 118030336,
+            "graph_bytes": 4948000,
+            "cache_capacity": 256,
+            "elapsed_seconds": 4.27689,
+            "replay_bit_exact": true,
+            "cache_tail_zero": true,
+            "ggml_commit": "0f2ed045",
+            "ggml_version": "0.27.0"
+          },
+          "device_memory_sampling": {
+            "samples": 0,
+            "interval_seconds": 0.2,
+            "scope": "nvidia-smi physical GPU 0 total device usage, includes desktop/other processes",
+            "process_wall_seconds": 7.5
+          },
+          "groups": {
+            "kv": {
+              "tensors": 186,
+              "max_abs": 5.032260060310364,
+              "max_relative_l2": 0.21972177508909463
+            },
+            "raw_logits": {
+              "tensors": 24,
+              "max_abs": 2.0021761655807495,
+              "max_relative_l2": 0.18194284293194554,
+              "top1_agreement_mean": 0.8125,
+              "top32_overlap_mean": 0.8704427083333334,
+              "kl_reference_to_native_mean": 0.0297402093765797,
+              "teacher_log_probability_delta_mean": -0.03863989651773888
+            },
+            "guided_logits": {
+              "tensors": 24,
+              "max_abs": 3.1977710723876953,
+              "max_relative_l2": 0.2709827610847201,
+              "top1_agreement_mean": 0.5,
+              "top32_overlap_mean": 0.7877604166666666,
+              "kl_reference_to_native_mean": 0.0861207875772373,
+              "teacher_log_probability_delta_mean": 0.09335458635931974
+            },
+            "activations": {
+              "tensors": 66,
+              "max_abs": 51.640380859375,
+              "max_relative_l2": 0.19519569230775588
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

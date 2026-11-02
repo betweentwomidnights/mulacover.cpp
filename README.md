@@ -11,13 +11,21 @@ The coordinated baseline is now `b77ae79`; its CUDA parity currently fails due t
 a reproduced source-precision issue. See [shared-pin validation](docs/GGML_B77_ALIGNMENT.md).
 The isolated candidate in [draft GGML PR #21](https://github.com/betweentwomidnights/ggml/pull/21)
 passes all 600 tensors; it is not adopted by consumer pins.
+It is now the authorized MuLaCover development dependency through an isolated
+[development profile](docs/DEVELOPMENT_GGML.md). Cross-repo bump/check work is deferred.
 The generator implements prompt/audio embeddings, the 28-layer backbone, style
 modulation, eight symbolic adaptors and gated cross-attention, the three-layer
 local decoder, all eight output heads, CFG and persistent KV state. Both
 conditional and CFG=1.5 cases match three frames and replay exactly after reset.
 See [the parity report](docs/NATIVE_PARITY.md) and [C ABI](docs/C_ABI_V1.md).
 
-Q4_K_M and free-running sampling are not implemented yet. Prepared prompt/style
+**Experimental Q4_K_M now runs on the 8GB RTX 5070 Laptop**, including CFG and a
+fully allocated 8192-position cache. The model is 2.94 GB; sampled GPU usage peaks
+at 7,331 MiB including the desktop (3,771 MiB with capacity 256). Only three active
+teacher-forced frames are tested. [Quantization results](docs/QUANTIZATION.md)
+record substantial logit drift; execution success is not quality acceptance.
+
+Free-running sampling is not implemented yet. Prepared prompt/style
 and symbolic inputs are supplied by the caller; text/Qwen/MIDI preprocessing
 currently comes from the upstream fixture harness. The laptop is the primary C++
 workspace; full FP32 native/reference execution stays in Spark Docker containers.
@@ -25,7 +33,7 @@ workspace; full FP32 native/reference execution stays in Spark Docker containers
 The original milestone used `07b77b0`; historical reports retain that provenance.
 HeartCodec now uses the coordinated `b77ae79` source pin, mounted read-only.
 See the [pin inventory](docs/GGML_PIN_INVENTORY.md). A required precision fix is
-being reviewed separately; no consumer adopts it yet. CMake defaults to the in-tree target and reuses
+being reviewed separately; shared consumer pins remain unchanged. CMake defaults to the in-tree target and reuses
 an already-provided GGML target; it never builds a second GGML instance.
 
 `reference/export_reference.py` executes the pinned upstream preprocessing and
@@ -72,10 +80,13 @@ bash reference/run-spark.sh parity
 
 The Windows static/DLL smoke tests build with `scripts/build-windows.ps1` and
 `scripts/build-windows.ps1 -Shared`; they use the unchanged in-tree CPU backend.
-Local Python checks require NumPy only, using
-`python -m unittest discover -s tests -v`. Full FP32 weights remain on Spark.
+Use `-Backend cuda -DevelopmentGgml C:/dev/_ggml_reviews/cuda-f32-source-b77` for
+the MuLaCover development profile. Local Python checks use `requirements-dev.txt`
+(NumPy/GGUF), then `python -m unittest discover -s tests -v`. Full FP32 weights
+remain on Spark; the experimental Q4_K_M model is present on both machines.
 
-Next: coordinate the cross-repository GGML baseline, then add a controlled
-Q4_K_M policy and measure logit/cache drift and laptop memory. Native sampling and
-prompt/style preprocessing follow. Existing yue2.cpp SheetSage2 melody/chord MIDI
+Next: extend quantization quality/context tests, native sampling and prompt/style
+preprocessing using the isolated fix. The user deferred ggml-bump-check and
+coordinated updates to sa3.cpp, yuey.cpp, acestep.cpp, stems.cpp and audiocraft.cpp
+until MuLaCover works. Existing yue2.cpp SheetSage2 melody/chord MIDI
 exports provide a later [transcription integration seam](docs/TRANSCRIPTION_INTEGRATION.md).

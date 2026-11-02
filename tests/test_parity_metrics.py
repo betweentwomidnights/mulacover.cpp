@@ -26,4 +26,14 @@ class Metrics(unittest.TestCase):
     def test_relative_drift_is_also_gated(self):
         self.assertFalse(parity.metric(np.array([1e-7],np.float32),np.array([1e-4],np.float32),activation=True)['passed'])
 
+    def test_distribution_metrics_are_stable_and_separate_from_fp32_gate(self):
+        expected=np.linspace(-1000,1000,8197,dtype=np.float32)
+        actual=expected+np.float32(20)
+        drift=parity.logit_drift(expected,actual,8196)
+        self.assertAlmostEqual(drift['kl_reference_to_native'],0,places=12)
+        self.assertEqual(drift['top1_agreement'],1)
+        self.assertEqual(drift['top32_overlap'],1)
+        self.assertAlmostEqual(drift['teacher_log_probability_delta_max_abs'],0,places=12)
+        self.assertFalse(parity.metric(expected,actual)['passed'])
+
 if __name__=='__main__':unittest.main()

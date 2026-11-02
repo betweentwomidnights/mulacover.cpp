@@ -10,12 +10,14 @@
   Spark CUDA at historical `07b77b0`; see `docs/NATIVE_PARITY.md`. The coordinated
   `b77ae79` baseline currently fails CUDA precision parity; see
   `docs/GGML_B77_ALIGNMENT.md`. Windows static/DLL smoke tests pass.
-  Full F32 weights exceed laptop VRAM; native/reference GPU execution stays in
-  Spark Docker. Routine C++ editing/building happens on the laptop.
+  Full F32 weights exceed laptop VRAM; F32 native/reference GPU execution stays in
+  Spark Docker. Q4_K_M native execution now runs on the laptop. See
+  `docs/QUANTIZATION.md` for experimental drift and memory results.
 - Use the FP32 oracle for F32 math; BF16 reference fixtures are a separate suite.
   Preserve the strict logit/cache gates and the recorded flat-absolute activation
-  diagnostics. Q4_K_M, free-running sampling and native preprocessing are not yet
-  implemented. The C ABI currently accepts prepared conditioning and teacher codes.
+  diagnostics. Q4_K_M is an experimental measured policy, not quality-approved.
+  Free-running sampling and native preprocessing are not implemented. The C ABI
+  currently accepts prepared conditioning and teacher codes.
 - GGML is shared across repositories. Keep the agreed pin and working tree intact.
   Try the existing in-tree target/API before proposing infrastructure changes.
   An essential GGML change belongs in an isolated worktree/branch and a focused
@@ -24,5 +26,10 @@
 - The coordinated GGML pin is `b77ae790e628270af46a8af1eca38441c23f1252`,
   branch `feature/shared-sa3-acestep-v0.17` (historical name). Any necessary PR
   must be based on that baseline and target that branch. Do not patch shared
-  checkouts or adopt an unreviewed fix. Earlier `07b77b0` reports are historical.
+  checkouts or coordinate adoption of an unreviewed fix. Earlier `07b77b0` reports are historical.
   Do not automatically repair another repository's working checkout.
+- User explicitly authorized continued MuLaCover development on CUDA fix
+  `0f2ed045` before coordinated sibling bumps. Use the isolated source override
+  and `dependencies/ggml-development.json`; leave HeartCodec's recorded GGML pin
+  at `b77ae79`. Do not run ggml-bump-check or update sa3.cpp, yuey.cpp, acestep.cpp,
+  stems.cpp or audiocraft.cpp until the user starts that process after MuLaCover works.

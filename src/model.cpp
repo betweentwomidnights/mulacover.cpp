@@ -1,4 +1,5 @@
 #include "internal.h"
+#include "weight-policy.h"
 #include <algorithm>
 #include <cmath>
 #include <cctype>
@@ -21,10 +22,24 @@ ggml_tensor * Model::get(const std::string & name) const {
     return t;
 }
 void Model::validate() const {
+    std::string precision="f32";
+    const int precision_key=gguf_find_key(gguf,"mulacover.weight_precision");
+    if(precision_key>=0) {
+        if(gguf_get_kv_type(gguf,precision_key)!=GGUF_TYPE_STRING)throw std::runtime_error("Invalid weight precision metadata");
+        precision=gguf_get_val_str(gguf,precision_key);
+        std::transform(precision.begin(),precision.end(),precision.begin(),[](unsigned char c){return char(std::tolower(c));});
+        weight_mix(precision);
+    }
+    if(precision!="f32") {
+        const int policy=gguf_find_key(gguf,"mulacover.quantization_policy");
+        if(policy<0||gguf_get_kv_type(gguf,policy)!=GGUF_TYPE_STRING||std::string(gguf_get_val_str(gguf,policy))!=weight_policy)
+            throw std::runtime_error("Unsupported quantization policy");
+    }
     std::set<std::string> names;
     auto shape=[&](const std::string & n,std::initializer_list<int64_t> dims) {
         auto * t=get(n); int i=0;
-        if(t->type!=GGML_TYPE_F32) throw std::runtime_error("This parity runtime requires F32 weights: "+n);
+        if(t->type!=weight_type(n,ggml_n_dims(t),t->ne[0],precision))
+            throw std::runtime_error("Weight type does not match declared precision policy: "+n);
         for(auto d:dims) if(t->ne[i++]!=d) throw std::runtime_error("Wrong shape: "+n);
         for(;i<4;++i) if(t->ne[i]!=1) throw std::runtime_error("Wrong rank: "+n);
         names.insert(n);
@@ -95,9 +110,9 @@ void Model::load(const mulacover_config_v1 & config) {
         auto * t=get(gguf_get_tensor_name(gguf,i));
         uint64_t offset=gguf_get_data_offset(gguf)+gguf_get_tensor_offset(gguf,i); size_t bytes=ggml_nbytes(t);
         if(length<0||offset>uint64_t(length)||bytes>uint64_t(length)-offset) throw std::runtime_error("Truncated model payload");
-        std::vector<float> data(bytes/4); file.seekg(std::streamoff(offset));
+        std::vector<uint8_t> data(bytes); file.seekg(std::streamoff(offset));
         if(!file.read(reinterpret_cast<char *>(data.data()),std::streamsize(bytes))) throw std::runtime_error("Cannot read model payload");
-        if(!std::all_of(data.begin(),data.end(),[](float v){return std::isfinite(v);})) throw std::runtime_error("Nonfinite model weights");
+        if(!ggml_validate_row_data(t->type,data.data(),bytes)) throw std::runtime_error("Invalid/nonfinite model weights");
         ggml_backend_tensor_set(t,data.data(),0,bytes);
     }
 }

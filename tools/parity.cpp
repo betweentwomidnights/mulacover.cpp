@@ -69,7 +69,7 @@ int main(int argc,char ** argv) {
         mulacover_memory_v1 memory{};memory.size=sizeof(memory);if(mulacover_get_memory_v1(c,&memory,&error))throw std::runtime_error(error.message);
         const auto elapsed=std::chrono::duration<double>(std::chrono::steady_clock::now()-start).count();
         std::ofstream stats(output/"stats.json");stats<<"{\"weight_bytes\":"<<memory.weight_bytes<<",\"cache_bytes\":"<<memory.cache_bytes<<",\"graph_bytes\":"<<memory.graph_bytes
-            <<",\"elapsed_seconds\":"<<elapsed<<",\"replay_bit_exact\":true,\"cache_tail_zero\":true,\"ggml_commit\":\""<<ggml_commit()
+            <<",\"cache_capacity\":"<<config.cache_capacity<<",\"elapsed_seconds\":"<<elapsed<<",\"replay_bit_exact\":true,\"cache_tail_zero\":true,\"ggml_commit\":\""<<ggml_commit()
             <<"\",\"ggml_version\":\""<<ggml_version()<<"\"}\n";
         const float saved=result.logits[0];mulacover_destroy_v1(c);c=nullptr;
         if(!std::isfinite(result.logits[0])||result.logits[0]!=saved)throw std::runtime_error("Frame result did not survive context destruction");

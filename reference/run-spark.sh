@@ -5,10 +5,30 @@ project_root="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)"
 refs="$(dirname "$project_root")/_heartcodec_refs"
 codec="${MULACOVER_HEARTCODEC_DIR:-$(dirname "$project_root")/heartcodec.cpp}"
 image=heartcodec-reference:20261101
+command="${1:-}"
+build=build-shared-b77-cuda
+suffix=b77-native-baseline
+development_mount=()
+revision_args=()
+if [[ "$command" == *-development ]]; then
+  command="${command%-development}"
+  development="${MULACOVER_DEVELOPMENT_GGML_DIR:-$(dirname "$project_root")/ggml-review-b77}"
+  revision="$(sed -n 's/^  "revision": "\([a-f0-9]*\)",/\1/p' "$project_root/dependencies/ggml-development.json")"
+  [[ ${#revision} == 40 && "$(git -C "$development" rev-parse HEAD)" == "$revision" && -z "$(git -C "$development" status --porcelain)" ]] || {
+    echo 'Development GGML checkout does not match the clean pinned profile' >&2; exit 1;
+  }
+  development_mount=(-v "$development:/codec/ggml:ro")
+  revision_args=(--review-ggml-revision "$revision")
+  build=build-review-b77-cuda
+  suffix=development-native-cuda
+fi
+mix="${MULACOVER_QUANTIZATION_MIX:-q4_k_m}"
+capacity="${MULACOVER_CACHE_CAPACITY:-8192}"
 common=(--rm --user "$(id -u):$(id -g)" -e USER=heartcodec -e LOGNAME=heartcodec
   -e HOME=/workspace -e TORCHINDUCTOR_CACHE_DIR=/workspace/.cache/inductor
-  -e CUBLAS_WORKSPACE_CONFIG=:4096:8 -v "$project_root:/workspace" -w /workspace)
-case "${1:-}" in
+  -e CUBLAS_WORKSPACE_CONFIG=:4096:8 -e GGML_CUDA_TF32=0 -e GGML_CUDA_CUBLAS_COMPUTE_TYPE=auto
+  -v "$project_root:/workspace" -w /workspace)
+case "$command" in
   convert)
     docker run "${common[@]}" --network none -e PYTHONPATH=/gguf-deps \
       -v "$refs:/refs:ro" -v "$codec/.python-deps:/gguf-deps:ro" "$image" \
@@ -16,22 +36,36 @@ case "${1:-}" in
       --source models/generator.json --output models/mulacover-f32.gguf
     ;;
   build)
-    docker run "${common[@]}" --gpus all --network none -v "$codec:/codec:ro" \
+    docker run "${common[@]}" --gpus all --network none -v "$codec:/codec:ro" "${development_mount[@]}" \
+      -e MULACOVER_BUILD_DIR="$build" \
       heartcodec-dev:20261101 /bin/bash -lc \
-      'cmake -S . -B build-shared-b77-cuda -G Ninja -DCMAKE_BUILD_TYPE=Release \
+      'cmake -S . -B "$MULACOVER_BUILD_DIR" -G Ninja -DCMAKE_BUILD_TYPE=Release \
         -DMULACOVER_HEARTCODEC_DIR=/codec -DMULACOVER_USE_INSTALLED_GGML=OFF \
+        -DMULACOVER_GGML_SOURCE_DIR= -DGGML_BUILD_TESTS=OFF \
         -DHEARTCODEC_BUILD_TOOLS=ON -DHEARTCODEC_BUILD_TESTS=ON \
         -DMULACOVER_CUDA=ON -DGGML_NATIVE=OFF -DCMAKE_CUDA_ARCHITECTURES=121a-real \
         > build-native-configure.log 2>&1 &&
-       cmake --build build-shared-b77-cuda -j4 > build-native.log 2>&1 &&
-       ctest --test-dir build-shared-b77-cuda --output-on-failure'
+       cmake --build "$MULACOVER_BUILD_DIR" -j4 > build-native.log 2>&1 &&
+       ctest --test-dir "$MULACOVER_BUILD_DIR" --output-on-failure'
     ;;
   parity)
     docker run "${common[@]}" --gpus all --network none -e GGML_CUDA_TF32=0 \
-      -v "$codec:/codec:ro" "$image" /opt/sa3-venv/bin/python tools/run-parity.py \
+      -v "$codec:/codec:ro" "${development_mount[@]}" "$image" /opt/sa3-venv/bin/python tools/run-parity.py \
       --reference refdata/upstream-f32 --model models/mulacover-f32.gguf \
-      --cli build-shared-b77-cuda/bin/mulacover-parity --output refdata/b77-native-baseline \
-      --backend cuda --ggml-source /codec/ggml
+      --cli "$build/bin/mulacover-parity" --output "refdata/$suffix" \
+      --backend cuda --ggml-source /codec/ggml "${revision_args[@]}" --capacity "$capacity"
+    ;;
+  quantize)
+    docker run "${common[@]}" --network none -v "$codec:/codec:ro" "${development_mount[@]}" \
+      heartcodec-dev:20261101 "$build/bin/mulacover-quantize" --input models/mulacover-f32.gguf \
+      --output "models/mulacover-$mix.gguf" --mix "$mix"
+    ;;
+  measure)
+    docker run "${common[@]}" --gpus all --network none -v "$codec:/codec:ro" "${development_mount[@]}" \
+      "$image" /opt/sa3-venv/bin/python tools/run-parity.py \
+      --reference refdata/upstream-f32 --model "models/mulacover-$mix.gguf" \
+      --cli "$build/bin/mulacover-parity" --output "refdata/development-$mix-cuda-cap$capacity" \
+      --backend cuda --ggml-source /codec/ggml "${revision_args[@]}" --capacity "$capacity" --measure-quantization
     ;;
   prepare)
     docker run "${common[@]}" -e HF_HUB_OFFLINE=0 -e HF_HUB_DISABLE_XET=1 \
@@ -44,5 +78,5 @@ case "${1:-}" in
       "$image" /opt/sa3-venv/bin/python reference/export_reference.py --upstream /refs/MuLaCover \
       --output "refdata/upstream-$suffix" --dtype "$1"
     ;;
-  *) echo 'Usage: bash reference/run-spark.sh prepare|float32|bfloat16|convert|build|parity' >&2; exit 2 ;;
+  *) echo 'Usage: bash reference/run-spark.sh prepare|float32|bfloat16|convert|build|parity|build-development|parity-development|quantize-development|measure-development' >&2; exit 2 ;;
 esac
