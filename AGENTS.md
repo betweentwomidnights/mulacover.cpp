@@ -51,5 +51,10 @@
 - User heard instruments only in the first acoustic Q4 excerpt and requested the
   whole song. The full 70-second Q4 acoustic run now executes on the laptop;
   see `docs/FULL_SONG_TEST.md`. All 875 frames, exact replay and terminal/reset
-  checks pass; full-song vocals/fidelity remain listener checks. Preserve the raw
+  checks pass. User reports the full-song output vocalizes the guitar melody and
+  does not represent the vocalist's melody. Instrumental control is not accepted
+  for this run. We selected 137 instrumental notes and excluded 44 vocal notes;
+  melody source selection is separate from desired output instrumentation.
+  Full-song F32 control and vocal-only/combined comparisons remain outstanding.
+  Preserve the raw
   WAV; the separate listening copy uses only a constant -1.10158 dB gain.

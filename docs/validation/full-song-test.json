@@ -6,7 +6,7 @@
   "source_duration_seconds": 69.98512471655329,
   "source_audio_uploaded": false,
   "full_length_cover_executed": true,
-  "listening_assessment": "pending for full song; user heard instruments only in the earlier eight-second acoustic Q4 excerpt",
+  "listening_assessment": "User reports vocalization of the guitar melody and no audible representation of the original vocal melody",
   "instrumental_controllability_accepted": false,
   "musical_cover_fidelity_accepted": false,
   "transcription": {
@@ -317,5 +317,23 @@
   },
   "ggml_bump_check_started": false,
   "sibling_source_or_pins_modified": false,
-  "fully_native_preprocessing": false
+  "fully_native_preprocessing": false,
+  "listener_observations": [
+    {
+      "date": "2026-11-02",
+      "observation": "Very interesting. It decided to vocalize the guitar melody rather than the vocalist's. I don't actually hear the vocal melody represented at all.",
+      "audio_sha256": "4f1dd779e83a5b25478118a110664ebe69d37d0f493ac67c4f5c297a9249b1bb",
+      "vocal_presence": "user-reported vocalization",
+      "original_vocal_melody_representation": "not heard by user",
+      "scope": "This full-song acoustic Q4 run; not an FP32 comparison"
+    }
+  ],
+  "instrumental_request_result": "not satisfied according to user listening report",
+  "melody_routing": {
+    "selected_role": "instrumental",
+    "selected_notes": 137,
+    "excluded_vocal_notes": 44,
+    "selected_midi_sha256": "0fbef0ef0b8aa7b50c4c922f527510562d8ff856b42220328a00681b87f95107",
+    "note": "Melody source selection and generated instrumentation are separate controls. Original vocal melody was not explicitly supplied. No FP32 full-song control yet separates model behavior from Q4 drift."
+  }
 }

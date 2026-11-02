@@ -7,7 +7,20 @@ On November 2, 2026, this run completed all 875 frames without early EOS and
 produced 70 seconds of finite 48kHz float32 stereo. Exact replay and terminal/reset
 checks passed. Generation with checks took 384.94 seconds and three-window codec
 decoding took 34.46 seconds. Sampled GPU usage peaked at 6,776 MiB including the
-desktop; generation used a 470,351,872-byte cache. Full-song listening is pending.
+desktop; generation used a 470,351,872-byte cache.
+
+The user reports that this full-song output vocalizes the guitar melody and that
+the original vocalist's melody is not audible. The instrumental request therefore
+is not accepted for this run. This is a listening observation, not an automated
+voice classification. The eight-second result did not establish full-song control.
+
+Routing was verified: only the 137-note instrumental melody MIDI was supplied,
+with the 44-note vocal lane excluded. An instrumental arrangement can instead
+condition on the singer's melody: melody source and output instrumentation are
+separate controls. The missing original vocal line was not explicitly supplied
+in this test. A controlled vocal-only/combined MIDI comparison can test melody
+selection; a matching FP32 run is still needed before attributing the vocalization
+to quantization or to the underlying model's instrumental control.
 
 The raw WAV has peak 1.01176 and RMS 0.14925, with one individual channel sample
 above full scale. A separate `generation/audio-listening.wav` applies one constant

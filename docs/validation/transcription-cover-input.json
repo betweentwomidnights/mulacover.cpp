@@ -16,7 +16,7 @@
   "cover_test_executed": true,
   "instrumental_controllability_verified": false,
   "pending_checks": [
-    "Listener assessment of instrumental request (singing/vocalizations)",
+    "Controlled vocal-only/combined MIDI and F32/Q4 listening comparisons after vocalization in the full-song acoustic Q4 run",
     "Musical transcription and cover fidelity against source",
     "Native prompt/tokenizer/Qwen/MIDI preparation"
   ],
@@ -30,6 +30,7 @@
   "melody_role": "instrumental",
   "validation_report": "full-song-test.json",
   "generated_full_song_seconds": 70,
-  "excerpt_listener_observation": "User heard instruments only in the eight-second acoustic Q4 clip; full-song listening pending",
-  "excerpt_validation_report": "first-cover-test.json"
+  "excerpt_listener_observation": "User heard instruments only in the eight-second acoustic Q4 clip",
+  "excerpt_validation_report": "first-cover-test.json",
+  "full_song_listener_observation": "User reports vocalization of the guitar melody and no audible original vocal melody; input selected instrumental lane and excluded 44 vocal notes"
 }
