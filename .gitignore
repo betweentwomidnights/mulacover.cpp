@@ -1,4 +1,5 @@
 /.cache/
+/.venv/
 /models/
 /refdata/
 /build*/

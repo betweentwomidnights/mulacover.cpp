@@ -6,6 +6,24 @@ sampling and its reference fixtures. Sibling `heartcodec.cpp` owns RVQ/flow/SQ
 decoding and will be consumed as `heartcodec::heartcodec`, sharing one copy of
 `betweentwomidnights/ggml` with the generator and other model libraries.
 
+Clone the sibling development repositories together:
+
+```bash
+git clone --recurse-submodules https://github.com/betweentwomidnights/heartcodec.cpp.git
+git clone https://github.com/betweentwomidnights/mulacover.cpp.git
+```
+
+Source, compact validation reports and tooling are tracked. Weights, generated
+audio and raw fixtures remain outside Git. Project contributions use the MIT
+license; see [third-party and model terms](THIRD_PARTY_NOTICES.md) for upstream
+components and separate checkpoint/output terms. This is a development library;
+Q4 quality and the remaining numerical gaps are documented below.
+
+**BPM is not clock-locked.** A [controlled BPM study](docs/BPM_CONTROL.md) confirms
+that MIDI tempo metadata leaves every model input unchanged; 80/160-BPM text
+requests also missed their targets in the tested Q4 excerpts. Plan downstream
+timing separately rather than treating BPM tags as a guarantee.
+
 **Native FP32 teacher-forced frame/logit/cache parity passed on Spark CUDA at `07b77b0`.**
 The coordinated baseline is now `b77ae79`; its CUDA parity currently fails due to
 a reproduced source-precision issue. See [shared-pin validation](docs/GGML_B77_ALIGNMENT.md).

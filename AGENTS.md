@@ -84,3 +84,14 @@
   without the relevant evidence, or relax the recorded numerical gates.
   Preserve the raw
   WAV; the separate listening copy uses only a constant -1.10158 dB gain.
+- BPM study: `docs/BPM_CONTROL.md` and `docs/validation/bpm-adherence.json`.
+  Changing only MIDI tempo to 80/160 produces all 11 identical model tensors.
+  Source audio estimates near 120 BPM; official/matched-native F32 near 131.
+  Tested Q4 text tags 80/160 give roughly 128 / 122-127 BPM estimates, not reliable
+  adherence. Do not promise clock-locked BPM or invent a model BPM input; the
+  codec still maps each frame to exactly 80ms. Tag study is one source/seed.
+- Repositories are public under betweentwomidnights: heartcodec.cpp and
+  mulacover.cpp. Publish source/docs/compact reports only; retain model, audio,
+  fixture and build exclusions. HeartCodec's GitHub-initialized MIT LICENSE
+  commit is preserved in local history; MulaCover uses matching own-source MIT
+  with separate upstream source/model notices. Shared-GGML adoption stays deferred.

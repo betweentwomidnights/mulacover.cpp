@@ -1,0 +1,1029 @@
+{
+  "date": "2026-11-02",
+  "metadata_ablation": {
+    "upstream_revision": "e27fa7fa0da7c9817879cc6210cc5693f9327946",
+    "requested_audio_frames": 372,
+    "tempos": [
+      80,
+      160
+    ],
+    "cases": [
+      {
+        "mode": "metadata",
+        "bpm": 80,
+        "prepared": "refdata/bpm-study/metadata-80/prepared",
+        "changed_tensors": [],
+        "note_checks": {
+          "melody_midi": {
+            "notes": 137,
+            "beat_positions_unchanged": true
+          },
+          "chord_midi": {
+            "notes": 160,
+            "beat_positions_unchanged": true
+          }
+        },
+        "tensor_hashes": {
+          "input.tokens": "cd1417b116b1f0ad66cb121e912114a883283bfb2ae1c0988b2fcdb9486a9c47",
+          "input.tokens_mask": "c2cf556de3436312a5c456545931047630c1f4eaa26a0afdfda6d2de1f0adf71",
+          "input.input_pos": "6afe7098f30bdc8564526517c085e62613f6cb67194153840567974cfa6f3815",
+          "input.qwen_embedding": "7a502c3a635af554a58244128a4660fdeb0cde7f2b67098cabe7f4dab4c3bc53",
+          "input.muq_embedding": "ad7facb2586fc6e966c004d7d1d16b024f5805ff7cb47c7a85dabd8b48892ca7",
+          "input.qwen_indices": "8aae6e5d7f1c8e8a3fdccd9c217fd5f13a60d20d8e92f780f1ce4529aa390320",
+          "input.muq_indices": "ed9dfc46eeec5c8cfbadb77f048af0391cdc2e80d0ac7c4d278e7fd55ea74581",
+          "input.pianoroll": "e9dd827e934d7e15151c57a9673dda74a9eee2bbc66e4777609d164e84963c06",
+          "input.drum_pianoroll": "d1768af9860251b5b7bc5c43b5368761bba981c92dd8005238016b83940d5bad",
+          "input.chord": "90e5b97f768f75af8e86d0b1f237e129ffa44747e6e13d70c13bbe9485ead8a3",
+          "input.context_mask": "d20d5d685a1fdb28a974551a0c8c0eed3f75410cf9055957b7a3a9790fc2e06a"
+        }
+      },
+      {
+        "mode": "metadata",
+        "bpm": 160,
+        "prepared": "refdata/bpm-study/metadata-160/prepared",
+        "changed_tensors": [],
+        "note_checks": {
+          "melody_midi": {
+            "notes": 137,
+            "beat_positions_unchanged": true
+          },
+          "chord_midi": {
+            "notes": 160,
+            "beat_positions_unchanged": true
+          }
+        },
+        "tensor_hashes": {
+          "input.tokens": "cd1417b116b1f0ad66cb121e912114a883283bfb2ae1c0988b2fcdb9486a9c47",
+          "input.tokens_mask": "c2cf556de3436312a5c456545931047630c1f4eaa26a0afdfda6d2de1f0adf71",
+          "input.input_pos": "6afe7098f30bdc8564526517c085e62613f6cb67194153840567974cfa6f3815",
+          "input.qwen_embedding": "7a502c3a635af554a58244128a4660fdeb0cde7f2b67098cabe7f4dab4c3bc53",
+          "input.muq_embedding": "ad7facb2586fc6e966c004d7d1d16b024f5805ff7cb47c7a85dabd8b48892ca7",
+          "input.qwen_indices": "8aae6e5d7f1c8e8a3fdccd9c217fd5f13a60d20d8e92f780f1ce4529aa390320",
+          "input.muq_indices": "ed9dfc46eeec5c8cfbadb77f048af0391cdc2e80d0ac7c4d278e7fd55ea74581",
+          "input.pianoroll": "e9dd827e934d7e15151c57a9673dda74a9eee2bbc66e4777609d164e84963c06",
+          "input.drum_pianoroll": "d1768af9860251b5b7bc5c43b5368761bba981c92dd8005238016b83940d5bad",
+          "input.chord": "90e5b97f768f75af8e86d0b1f237e129ffa44747e6e13d70c13bbe9485ead8a3",
+          "input.context_mask": "d20d5d685a1fdb28a974551a0c8c0eed3f75410cf9055957b7a3a9790fc2e06a"
+        }
+      },
+      {
+        "mode": "tags",
+        "bpm": 80,
+        "prepared": "refdata/bpm-study/tags-80/prepared",
+        "changed_tensors": [
+          "input.tokens",
+          "input.tokens_mask",
+          "input.input_pos",
+          "input.qwen_embedding",
+          "input.qwen_indices",
+          "input.muq_indices"
+        ],
+        "note_checks": {},
+        "tensor_hashes": {
+          "input.tokens": "efae9656f0a5724fbd5d5cba3f4c310dc9d912a8ba0c6d69283cb7314ab52c6f",
+          "input.tokens_mask": "be50075b7f34babbc4dcfcd2bf97862705611d27f8656d4cbd23a5acaf3a64c8",
+          "input.input_pos": "fb603b19051e9cbe8b01a3fdae2dc4381002c97475d78e11e877016b7ded8e5c",
+          "input.qwen_embedding": "2b9b0174b190a402d73ed3444751f512779f268f4e4a81f23eed8e5bf2b8a052",
+          "input.muq_embedding": "ad7facb2586fc6e966c004d7d1d16b024f5805ff7cb47c7a85dabd8b48892ca7",
+          "input.qwen_indices": "2000a5125dc1681ec54ae14997dce9effd67d9ca453a967bb99a140b16712db1",
+          "input.muq_indices": "31b4889a79e1ef20eb8a6ba961be39632fff92e918912113f243bba2f907aecf",
+          "input.pianoroll": "e9dd827e934d7e15151c57a9673dda74a9eee2bbc66e4777609d164e84963c06",
+          "input.drum_pianoroll": "d1768af9860251b5b7bc5c43b5368761bba981c92dd8005238016b83940d5bad",
+          "input.chord": "90e5b97f768f75af8e86d0b1f237e129ffa44747e6e13d70c13bbe9485ead8a3",
+          "input.context_mask": "d20d5d685a1fdb28a974551a0c8c0eed3f75410cf9055957b7a3a9790fc2e06a"
+        }
+      },
+      {
+        "mode": "tags",
+        "bpm": 160,
+        "prepared": "refdata/bpm-study/tags-160/prepared",
+        "changed_tensors": [
+          "input.tokens",
+          "input.tokens_mask",
+          "input.input_pos",
+          "input.qwen_embedding",
+          "input.qwen_indices",
+          "input.muq_indices"
+        ],
+        "note_checks": {},
+        "tensor_hashes": {
+          "input.tokens": "2648542b099a5efaca6132913e468d9fa10609f9002a04f9ea60f47af3645796",
+          "input.tokens_mask": "be50075b7f34babbc4dcfcd2bf97862705611d27f8656d4cbd23a5acaf3a64c8",
+          "input.input_pos": "fb603b19051e9cbe8b01a3fdae2dc4381002c97475d78e11e877016b7ded8e5c",
+          "input.qwen_embedding": "f843d8d5fb343b54a1d6ae6d495e461b92c24c5628cdcb93a84ec01e4aa3fb13",
+          "input.muq_embedding": "ad7facb2586fc6e966c004d7d1d16b024f5805ff7cb47c7a85dabd8b48892ca7",
+          "input.qwen_indices": "2000a5125dc1681ec54ae14997dce9effd67d9ca453a967bb99a140b16712db1",
+          "input.muq_indices": "31b4889a79e1ef20eb8a6ba961be39632fff92e918912113f243bba2f907aecf",
+          "input.pianoroll": "e9dd827e934d7e15151c57a9673dda74a9eee2bbc66e4777609d164e84963c06",
+          "input.drum_pianoroll": "d1768af9860251b5b7bc5c43b5368761bba981c92dd8005238016b83940d5bad",
+          "input.chord": "90e5b97f768f75af8e86d0b1f237e129ffa44747e6e13d70c13bbe9485ead8a3",
+          "input.context_mask": "d20d5d685a1fdb28a974551a0c8c0eed3f75410cf9055957b7a3a9790fc2e06a"
+        }
+      }
+    ],
+    "metadata_only_all_11_tensors_identical": true
+  },
+  "tempo_measurements": {
+    "numpy": "2.2.6",
+    "method": "Positive log-spectral flux, 2048-sample Hann window, approximately 100Hz envelope; normalized lag autocorrelation, local maxima between 40 and 240 BPM",
+    "limitation": "Candidates include beat subdivisions and half/double-time aliases. Rank is not a musical beat annotation. Score-clock estimates are also model predictions. No hard adherence claim from either estimator alone.",
+    "cases": {
+      "source": {
+        "audio_path": "C:/Users/thegr/Music/billiegasm_yuey.wav",
+        "sha256": "140f18292989b1026113f02e0b6e2c9c1eaea29df05965f9404e40d76f74af9a",
+        "duration_seconds": 69.98512471655329,
+        "onset_autocorrelation_candidates": [
+          {
+            "bpm": 60.00301094406274,
+            "correlation": 0.637812296822371
+          },
+          {
+            "bpm": 120.0361652247246,
+            "correlation": 0.6169080879815869
+          },
+          {
+            "bpm": 79.99816554168572,
+            "correlation": 0.5402722135328449
+          },
+          {
+            "bpm": 40.00367385625799,
+            "correlation": 0.5355989642034169
+          },
+          {
+            "bpm": 48.00066399302283,
+            "correlation": 0.4981409037390551
+          },
+          {
+            "bpm": 161.8434869954679,
+            "correlation": 0.3513715087007525
+          }
+        ],
+        "windows": [
+          {
+            "start_seconds": 0,
+            "candidates": [
+              {
+                "bpm": 120.05909693677029,
+                "correlation": 0.6265241812682757
+              },
+              {
+                "bpm": 59.99925084498324,
+                "correlation": 0.47901295074305883
+              },
+              {
+                "bpm": 47.99732691208181,
+                "correlation": 0.44379224032593084
+              }
+            ]
+          },
+          {
+            "start_seconds": 10,
+            "candidates": [
+              {
+                "bpm": 120.10148537285352,
+                "correlation": 0.5347715094198793
+              },
+              {
+                "bpm": 60.01302585292579,
+                "correlation": 0.4598829715101683
+              },
+              {
+                "bpm": 79.99731056888575,
+                "correlation": 0.3812970578915514
+              }
+            ]
+          },
+          {
+            "start_seconds": 20,
+            "candidates": [
+              {
+                "bpm": 120.19884778464142,
+                "correlation": 0.34031964362865436
+              },
+              {
+                "bpm": 59.981363420622245,
+                "correlation": 0.22676268597578622
+              },
+              {
+                "bpm": 40.00453531464853,
+                "correlation": 0.21285326784444664
+              }
+            ]
+          },
+          {
+            "start_seconds": 30,
+            "candidates": [
+              {
+                "bpm": 120.35131515464906,
+                "correlation": 0.2672338568656278
+              },
+              {
+                "bpm": 60.04038030008145,
+                "correlation": 0.22654903253124853
+              },
+              {
+                "bpm": 40.084934407419425,
+                "correlation": 0.1443784375989319
+              }
+            ]
+          },
+          {
+            "start_seconds": 40,
+            "candidates": [
+              {
+                "bpm": 60.02036917032777,
+                "correlation": 0.6548905737894042
+              },
+              {
+                "bpm": 120.01035715651463,
+                "correlation": 0.5229753349827008
+              },
+              {
+                "bpm": 40.01309569417683,
+                "correlation": 0.48546577556286624
+              }
+            ]
+          },
+          {
+            "start_seconds": 50,
+            "candidates": [
+              {
+                "bpm": 60.0020508312802,
+                "correlation": 0.6788397482724987
+              },
+              {
+                "bpm": 120.01345810896512,
+                "correlation": 0.5680288265526158
+              },
+              {
+                "bpm": 79.98816986670562,
+                "correlation": 0.49457363777854835
+              }
+            ]
+          }
+        ],
+        "sheetsage2_score_clock": {
+          "estimated_bpm": 119.18017373268086,
+          "clock_residual_beats_rms": 0.27002698682398835,
+          "timestamped_events": 139,
+          "windows": [
+            {
+              "start_seconds": 0.0,
+              "end_seconds": 15.0,
+              "estimated_bpm": 119.85325140974884
+            },
+            {
+              "start_seconds": 10.0,
+              "end_seconds": 25.0,
+              "estimated_bpm": 119.7856514147552
+            },
+            {
+              "start_seconds": 20.0,
+              "end_seconds": 35.0,
+              "estimated_bpm": 120.13721047363502
+            },
+            {
+              "start_seconds": 30.0,
+              "end_seconds": 45.0,
+              "estimated_bpm": 120.27199136380955
+            },
+            {
+              "start_seconds": 40.0,
+              "end_seconds": 55.0,
+              "estimated_bpm": 117.85137043860884
+            },
+            {
+              "start_seconds": 50.0,
+              "end_seconds": 65.0,
+              "estimated_bpm": 119.10747022023882
+            }
+          ],
+          "warnings": [],
+          "method": "Linear fit of SheetSage2 decoded musical beats against its predicted source timestamps; estimated, not ground-truth tempo"
+        }
+      },
+      "upstream-f32": {
+        "audio_path": "refdata/covers/billiegasm-full-acoustic/official-upstream-f32/audio-f32.wav",
+        "sha256": "c7ba4995c93ac7d07d8f0135215e22a5d8f96cbcd0e7d24608ff8a3f52b516db",
+        "duration_seconds": 68.88,
+        "onset_autocorrelation_candidates": [
+          {
+            "bpm": 65.44605539783525,
+            "correlation": 0.7006321244667782
+          },
+          {
+            "bpm": 130.81771354675885,
+            "correlation": 0.6894172550565272
+          },
+          {
+            "bpm": 43.65492890075782,
+            "correlation": 0.5556079051505964
+          },
+          {
+            "bpm": 87.25879268686094,
+            "correlation": 0.5554766129085891
+          },
+          {
+            "bpm": 52.316679646381075,
+            "correlation": 0.5065008940177278
+          },
+          {
+            "bpm": 176.83799496572584,
+            "correlation": 0.11115825919915392
+          }
+        ],
+        "windows": [
+          {
+            "start_seconds": 0,
+            "candidates": [
+              {
+                "bpm": 65.77869705214343,
+                "correlation": 0.5777882203995044
+              },
+              {
+                "bpm": 87.9090812619553,
+                "correlation": 0.4479365704914149
+              },
+              {
+                "bpm": 131.86995753848424,
+                "correlation": 0.4404391805827372
+              }
+            ]
+          },
+          {
+            "start_seconds": 10,
+            "candidates": [
+              {
+                "bpm": 65.6081466596079,
+                "correlation": 0.6856680254647045
+              },
+              {
+                "bpm": 131.26142748534573,
+                "correlation": 0.6539367614034262
+              },
+              {
+                "bpm": 43.75550457813903,
+                "correlation": 0.6008220805642829
+              }
+            ]
+          },
+          {
+            "start_seconds": 20,
+            "candidates": [
+              {
+                "bpm": 65.50950387725017,
+                "correlation": 0.7865129657106484
+              },
+              {
+                "bpm": 130.95663553132422,
+                "correlation": 0.7176802054930795
+              },
+              {
+                "bpm": 43.699078450627084,
+                "correlation": 0.6629886091174968
+              }
+            ]
+          },
+          {
+            "start_seconds": 30,
+            "candidates": [
+              {
+                "bpm": 130.8573564994244,
+                "correlation": 0.7308871341812905
+              },
+              {
+                "bpm": 65.48324280759651,
+                "correlation": 0.6941292780336008
+              },
+              {
+                "bpm": 43.693466414877655,
+                "correlation": 0.5966893667160691
+              }
+            ]
+          },
+          {
+            "start_seconds": 40,
+            "candidates": [
+              {
+                "bpm": 130.63671314850745,
+                "correlation": 0.7381248390513594
+              },
+              {
+                "bpm": 65.34440396625891,
+                "correlation": 0.6968490489289321
+              },
+              {
+                "bpm": 86.98462162741885,
+                "correlation": 0.5975481226180801
+              }
+            ]
+          },
+          {
+            "start_seconds": 50,
+            "candidates": [
+              {
+                "bpm": 130.2081493128701,
+                "correlation": 0.722402139303092
+              },
+              {
+                "bpm": 65.13212792945522,
+                "correlation": 0.7187763161936538
+              },
+              {
+                "bpm": 43.43302325179156,
+                "correlation": 0.6708311392730684
+              }
+            ]
+          }
+        ]
+      },
+      "native-f32": {
+        "audio_path": "refdata/covers/billiegasm-full-acoustic/generation-f32-philox-spark/audio.wav",
+        "sha256": "247306fe3db302e32f46d409722a91bc47f7e526438f97a792ce2525325d20c1",
+        "duration_seconds": 68.88,
+        "onset_autocorrelation_candidates": [
+          {
+            "bpm": 65.44592570030622,
+            "correlation": 0.700649416561967
+          },
+          {
+            "bpm": 130.81760956785453,
+            "correlation": 0.6894262731454252
+          },
+          {
+            "bpm": 43.6548950053774,
+            "correlation": 0.5556262348063791
+          },
+          {
+            "bpm": 87.25855602746161,
+            "correlation": 0.5553637437944244
+          },
+          {
+            "bpm": 52.31668446060761,
+            "correlation": 0.5063676549474877
+          },
+          {
+            "bpm": 176.83977754094872,
+            "correlation": 0.11114811167123095
+          }
+        ],
+        "windows": [
+          {
+            "start_seconds": 0,
+            "candidates": [
+              {
+                "bpm": 65.7786904376844,
+                "correlation": 0.5777846333579635
+              },
+              {
+                "bpm": 87.90908582896829,
+                "correlation": 0.4479501301781775
+              },
+              {
+                "bpm": 131.87024390792976,
+                "correlation": 0.44044250370994037
+              }
+            ]
+          },
+          {
+            "start_seconds": 10,
+            "candidates": [
+              {
+                "bpm": 65.6081560071336,
+                "correlation": 0.6856682307168378
+              },
+              {
+                "bpm": 131.26151233151054,
+                "correlation": 0.653918955515408
+              },
+              {
+                "bpm": 43.75551371124922,
+                "correlation": 0.6008197126305923
+              }
+            ]
+          },
+          {
+            "start_seconds": 20,
+            "candidates": [
+              {
+                "bpm": 65.50950388752499,
+                "correlation": 0.7865129466697961
+              },
+              {
+                "bpm": 130.956635498303,
+                "correlation": 0.717680172575818
+              },
+              {
+                "bpm": 43.69907844848654,
+                "correlation": 0.6629886033724919
+              }
+            ]
+          },
+          {
+            "start_seconds": 30,
+            "candidates": [
+              {
+                "bpm": 130.85742851357222,
+                "correlation": 0.730817198577896
+              },
+              {
+                "bpm": 65.48294388925882,
+                "correlation": 0.6941016615059843
+              },
+              {
+                "bpm": 43.69344069035392,
+                "correlation": 0.5969755032408581
+              }
+            ]
+          },
+          {
+            "start_seconds": 40,
+            "candidates": [
+              {
+                "bpm": 130.6367131442265,
+                "correlation": 0.7381248523648657
+              },
+              {
+                "bpm": 65.34440397810766,
+                "correlation": 0.6968490493962121
+              },
+              {
+                "bpm": 86.98462150363044,
+                "correlation": 0.5975481615980929
+              }
+            ]
+          },
+          {
+            "start_seconds": 50,
+            "candidates": [
+              {
+                "bpm": 130.20811909802612,
+                "correlation": 0.7225927700901038
+              },
+              {
+                "bpm": 65.13209503375278,
+                "correlation": 0.7189354735992276
+              },
+              {
+                "bpm": 43.43304948781141,
+                "correlation": 0.6708700309607015
+              }
+            ]
+          }
+        ],
+        "sheetsage2_score_clock": {
+          "estimated_bpm": 131.05764547408396,
+          "clock_residual_beats_rms": 0.16788751838177293,
+          "timestamped_events": 153,
+          "windows": [
+            {
+              "start_seconds": 0.0,
+              "end_seconds": 15.0,
+              "estimated_bpm": 131.5902272261623
+            },
+            {
+              "start_seconds": 10.0,
+              "end_seconds": 25.0,
+              "estimated_bpm": 131.14889959448413
+            },
+            {
+              "start_seconds": 20.0,
+              "end_seconds": 35.0,
+              "estimated_bpm": 130.92993936691627
+            },
+            {
+              "start_seconds": 30.0,
+              "end_seconds": 45.0,
+              "estimated_bpm": 131.03651271736308
+            },
+            {
+              "start_seconds": 40.0,
+              "end_seconds": 55.0,
+              "estimated_bpm": 130.94376330191156
+            },
+            {
+              "start_seconds": 50.0,
+              "end_seconds": 65.0,
+              "estimated_bpm": 130.38384397515645
+            }
+          ],
+          "warnings": [],
+          "method": "Linear fit of SheetSage2 decoded musical beats against its predicted source timestamps; estimated, not ground-truth tempo"
+        }
+      },
+      "tags-80": {
+        "audio_path": "refdata/bpm-study/tags-80/generation/audio.wav",
+        "sha256": "154637a82a81342118d59338e91d771783d94d55a6c7a4583b59045b9a513de9",
+        "duration_seconds": 29.76,
+        "onset_autocorrelation_candidates": [
+          {
+            "bpm": 128.39026702583863,
+            "correlation": 0.6399560049130323
+          },
+          {
+            "bpm": 64.00896857737469,
+            "correlation": 0.5264145537305226
+          },
+          {
+            "bpm": 85.65093408680055,
+            "correlation": 0.5088308503292059
+          },
+          {
+            "bpm": 42.61617057286678,
+            "correlation": 0.4643335443331496
+          },
+          {
+            "bpm": 51.30288083092568,
+            "correlation": 0.42826049997142285
+          }
+        ],
+        "windows": [
+          {
+            "start_seconds": 0,
+            "candidates": [
+              {
+                "bpm": 129.8412990254321,
+                "correlation": 0.5733623845971164
+              },
+              {
+                "bpm": 86.77456131479131,
+                "correlation": 0.4391289201241621
+              },
+              {
+                "bpm": 52.05346088354011,
+                "correlation": 0.35056649523104483
+              }
+            ]
+          },
+          {
+            "start_seconds": 10,
+            "candidates": [
+              {
+                "bpm": 127.95413398108842,
+                "correlation": 0.6561886707573747
+              },
+              {
+                "bpm": 63.94985267680379,
+                "correlation": 0.5881528582579172
+              },
+              {
+                "bpm": 42.61683688398819,
+                "correlation": 0.5421671610955077
+              }
+            ]
+          }
+        ],
+        "sheetsage2_score_clock": {
+          "estimated_bpm": 127.53616527398638,
+          "clock_residual_beats_rms": 0.07235740292664228,
+          "timestamped_events": 64,
+          "windows": [
+            {
+              "start_seconds": 0.0,
+              "end_seconds": 15.0,
+              "estimated_bpm": 127.85803683903683
+            },
+            {
+              "start_seconds": 10.0,
+              "end_seconds": 25.0,
+              "estimated_bpm": 127.44518521336292
+            }
+          ],
+          "warnings": [],
+          "method": "Linear fit of SheetSage2 decoded musical beats against its predicted source timestamps; estimated, not ground-truth tempo"
+        }
+      },
+      "tags-160": {
+        "audio_path": "refdata/bpm-study/tags-160/generation/audio.wav",
+        "sha256": "d4536b4c73f21dff9ccb4b2d5b66874db3906e0a2fdb38ff7ebfe8dec37b4ddc",
+        "duration_seconds": 29.76,
+        "onset_autocorrelation_candidates": [
+          {
+            "bpm": 126.82014773670342,
+            "correlation": 0.6240642987782908
+          },
+          {
+            "bpm": 63.40612069788004,
+            "correlation": 0.5508524832314091
+          },
+          {
+            "bpm": 84.48748243138074,
+            "correlation": 0.4526728751493078
+          },
+          {
+            "bpm": 42.28944577502911,
+            "correlation": 0.44161723781505213
+          },
+          {
+            "bpm": 50.729777388705116,
+            "correlation": 0.37177183099535577
+          },
+          {
+            "bpm": 149.08606038703292,
+            "correlation": 0.08807457190468795
+          }
+        ],
+        "windows": [
+          {
+            "start_seconds": 0,
+            "candidates": [
+              {
+                "bpm": 125.38461002597865,
+                "correlation": 0.5518207816590629
+              },
+              {
+                "bpm": 83.0744018981633,
+                "correlation": 0.412520138753264
+              },
+              {
+                "bpm": 62.7609082687743,
+                "correlation": 0.36933468789906715
+              }
+            ]
+          },
+          {
+            "start_seconds": 10,
+            "candidates": [
+              {
+                "bpm": 127.09508995347919,
+                "correlation": 0.6921980556546068
+              },
+              {
+                "bpm": 63.478100266256924,
+                "correlation": 0.6797532731338316
+              },
+              {
+                "bpm": 42.29349864463382,
+                "correlation": 0.5993432461532423
+              }
+            ]
+          }
+        ],
+        "sheetsage2_score_clock": {
+          "estimated_bpm": 121.84926023723357,
+          "clock_residual_beats_rms": 0.5941921685790442,
+          "timestamped_events": 61,
+          "windows": [
+            {
+              "start_seconds": 0.0,
+              "end_seconds": 15.0,
+              "estimated_bpm": 113.22668751855474
+            },
+            {
+              "start_seconds": 10.0,
+              "end_seconds": 25.0,
+              "estimated_bpm": 127.27360749337387
+            }
+          ],
+          "warnings": [],
+          "method": "Linear fit of SheetSage2 decoded musical beats against its predicted source timestamps; estimated, not ground-truth tempo"
+        }
+      }
+    }
+  },
+  "tag_generation": {
+    "80": {
+      "ggml_revision": "0f2ed045eaff6bf01bed074878b6988248efbc22",
+      "shared_baseline": "b77ae790e628270af46a8af1eca38441c23f1252",
+      "ggml_bump_check_started": false,
+      "command": [
+        "C:\\dev\\mulacover.cpp\\build-windows-development-cuda\\bin\\Release\\mulacover-generate.exe",
+        "--model",
+        "C:\\dev\\mulacover.cpp\\models\\mulacover-q4_k_m.gguf",
+        "--input",
+        "C:\\dev\\mulacover.cpp\\refdata\\bpm-study\\tags-80\\generation\\input",
+        "--output",
+        "C:\\dev\\mulacover.cpp\\refdata\\bpm-study\\tags-80\\generation",
+        "--prompt-frames",
+        "29",
+        "--symbolic-frames",
+        "540",
+        "--qwen-index",
+        "18",
+        "--muq-index",
+        "21",
+        "--backend",
+        "cuda",
+        "--frames",
+        "372",
+        "--capacity",
+        "512",
+        "--guidance",
+        "1.5",
+        "--temperature",
+        "1",
+        "--top-k",
+        "250",
+        "--seed",
+        "1701",
+        "--decoder-seed",
+        "1701",
+        "--decoder-steps",
+        "10",
+        "--segment-codes",
+        "372",
+        "--rng",
+        "torch-cuda",
+        "--rng-cuda-blocks",
+        "288",
+        "--rng-device",
+        "0",
+        "--flow-model",
+        "C:\\dev\\heartcodec.cpp\\models\\heartcodec-flow-f32.gguf",
+        "--sq-model",
+        "C:\\dev\\heartcodec.cpp\\models\\heartcodec-sq-codec-f32.gguf"
+      ],
+      "decoder": {
+        "seed": 1701,
+        "steps": 10,
+        "segment_codes": 372,
+        "guidance": 1.25
+      },
+      "prepared_manifest_sha256": "6050af0e30ab5f2dbe4bfac826691afbef1e68e231591331818232b239722e76",
+      "upstream_revision": "e27fa7fa0da7c9817879cc6210cc5693f9327946",
+      "model_sha256": "74ebd8a8537f55ea3f3566cfa17c7e28734fc555af5fbc1a254bec94a182f814",
+      "cli_sha256": "ffca5c79b7d5e8a2453d402a74d35aaa2411839dacbf463de944654d26ae5ca9",
+      "codes_sha256": "dec1771ebafd3e5ae5393afff1e6cf726ca49fe88084abcdf5f04541455aeae3",
+      "execution_passed": true,
+      "audio_quality_accepted": false,
+      "device_memory_sampling": {
+        "samples": 553,
+        "interval_seconds": 0.2,
+        "scope": "nvidia-smi physical GPU 0 total device usage, includes desktop/other processes",
+        "first_used_mib": 890,
+        "peak_used_mib": 6865,
+        "total_mib": 8151,
+        "process_wall_seconds": 149.2970000000205
+      },
+      "run": {
+        "frames": 372,
+        "prompt_frames": 29,
+        "symbolic_frames": 540,
+        "cache_capacity": 512,
+        "guidance": 1.5,
+        "temperature": 1,
+        "top_k": 250,
+        "seed": 1701,
+        "eos": false,
+        "replay_checked": true,
+        "terminal_contract_passed": true,
+        "generator_released_before_decode": true,
+        "generation_with_checks_seconds": 127.726,
+        "weight_bytes": 2939920896,
+        "cache_bytes": 235470848,
+        "graph_bytes": 53625344,
+        "audio_samples_per_channel": 1428480,
+        "audio_peak": 1.26266,
+        "audio_rms": 0.200283,
+        "decode_seconds": 18.3437,
+        "decoder_seed": 1701,
+        "decoder_steps": 10,
+        "segment_codes": 372,
+        "decoder_guidance": 1.25,
+        "rng": "torch-cuda",
+        "rng_cuda_blocks": 288,
+        "sampler_offset_per_head": 4,
+        "sampler_final_offset": 11904,
+        "decoder_final_offset": 4,
+        "decoder_rng_windows": 1,
+        "ggml_commit": "0f2ed045"
+      },
+      "rng": "Torch CUDA Philox4x32-10, F32 exponential per head and consecutive F32 normal per codec window; explicit target grid cap",
+      "flow_model_sha256": "5c9cdbfae26ccd3e96355c541cade0feca37cfd8696746b724c294095949f523",
+      "sq_model_sha256": "2f72b85f924c629aae33004703cc02e16600abee15c01e928b2878e5d0f29ae6",
+      "audio_sha256": "154637a82a81342118d59338e91d771783d94d55a6c7a4583b59045b9a513de9"
+    },
+    "160": {
+      "ggml_revision": "0f2ed045eaff6bf01bed074878b6988248efbc22",
+      "shared_baseline": "b77ae790e628270af46a8af1eca38441c23f1252",
+      "ggml_bump_check_started": false,
+      "command": [
+        "C:\\dev\\mulacover.cpp\\build-windows-development-cuda\\bin\\Release\\mulacover-generate.exe",
+        "--model",
+        "C:\\dev\\mulacover.cpp\\models\\mulacover-q4_k_m.gguf",
+        "--input",
+        "C:\\dev\\mulacover.cpp\\refdata\\bpm-study\\tags-160\\generation\\input",
+        "--output",
+        "C:\\dev\\mulacover.cpp\\refdata\\bpm-study\\tags-160\\generation",
+        "--prompt-frames",
+        "29",
+        "--symbolic-frames",
+        "540",
+        "--qwen-index",
+        "18",
+        "--muq-index",
+        "21",
+        "--backend",
+        "cuda",
+        "--frames",
+        "372",
+        "--capacity",
+        "512",
+        "--guidance",
+        "1.5",
+        "--temperature",
+        "1",
+        "--top-k",
+        "250",
+        "--seed",
+        "1701",
+        "--decoder-seed",
+        "1701",
+        "--decoder-steps",
+        "10",
+        "--segment-codes",
+        "372",
+        "--rng",
+        "torch-cuda",
+        "--rng-cuda-blocks",
+        "288",
+        "--rng-device",
+        "0",
+        "--flow-model",
+        "C:\\dev\\heartcodec.cpp\\models\\heartcodec-flow-f32.gguf",
+        "--sq-model",
+        "C:\\dev\\heartcodec.cpp\\models\\heartcodec-sq-codec-f32.gguf"
+      ],
+      "decoder": {
+        "seed": 1701,
+        "steps": 10,
+        "segment_codes": 372,
+        "guidance": 1.25
+      },
+      "prepared_manifest_sha256": "589cc066e0e411b5012ec801a58a71d68ef970af319be6c6a30747899751239f",
+      "upstream_revision": "e27fa7fa0da7c9817879cc6210cc5693f9327946",
+      "model_sha256": "74ebd8a8537f55ea3f3566cfa17c7e28734fc555af5fbc1a254bec94a182f814",
+      "cli_sha256": "ffca5c79b7d5e8a2453d402a74d35aaa2411839dacbf463de944654d26ae5ca9",
+      "codes_sha256": "14b811c9e4cd98d5a1b3316826c7dc2d66321bb975b36b99ce065d5bd5090bc5",
+      "execution_passed": true,
+      "audio_quality_accepted": false,
+      "device_memory_sampling": {
+        "samples": 547,
+        "interval_seconds": 0.2,
+        "scope": "nvidia-smi physical GPU 0 total device usage, includes desktop/other processes",
+        "first_used_mib": 890,
+        "peak_used_mib": 6865,
+        "total_mib": 8151,
+        "process_wall_seconds": 148.21900000004098
+      },
+      "run": {
+        "frames": 372,
+        "prompt_frames": 29,
+        "symbolic_frames": 540,
+        "cache_capacity": 512,
+        "guidance": 1.5,
+        "temperature": 1,
+        "top_k": 250,
+        "seed": 1701,
+        "eos": false,
+        "replay_checked": true,
+        "terminal_contract_passed": true,
+        "generator_released_before_decode": true,
+        "generation_with_checks_seconds": 126.951,
+        "weight_bytes": 2939920896,
+        "cache_bytes": 235470848,
+        "graph_bytes": 53625344,
+        "audio_samples_per_channel": 1428480,
+        "audio_peak": 1.2211,
+        "audio_rms": 0.191971,
+        "decode_seconds": 17.8379,
+        "decoder_seed": 1701,
+        "decoder_steps": 10,
+        "segment_codes": 372,
+        "decoder_guidance": 1.25,
+        "rng": "torch-cuda",
+        "rng_cuda_blocks": 288,
+        "sampler_offset_per_head": 4,
+        "sampler_final_offset": 11904,
+        "decoder_final_offset": 4,
+        "decoder_rng_windows": 1,
+        "ggml_commit": "0f2ed045"
+      },
+      "rng": "Torch CUDA Philox4x32-10, F32 exponential per head and consecutive F32 normal per codec window; explicit target grid cap",
+      "flow_model_sha256": "5c9cdbfae26ccd3e96355c541cade0feca37cfd8696746b724c294095949f523",
+      "sq_model_sha256": "2f72b85f924c629aae33004703cc02e16600abee15c01e928b2878e5d0f29ae6",
+      "audio_sha256": "d4536b4c73f21dff9ccb4b2d5b66874db3906e0a2fdb38ff7ebfe8dec37b4ddc"
+    }
+  },
+  "listening_clips": {
+    "80": {
+      "path": "refdata\\bpm-study\\listening\\request-80.wav",
+      "sha256": "57c3cbee5e3ed4909cb35b511ac4e3659f46ad99e05f93484fc993d9e147e856"
+    },
+    "160": {
+      "path": "refdata\\bpm-study\\listening\\request-160.wav",
+      "sha256": "5a5daf78ec3ff9eecb34e1793bc5196aa3c3c22277468f0c3487d35e661611e3"
+    }
+  },
+  "shared_listening_gain": 0.7058532672475024,
+  "hard_bpm_control_supported": false,
+  "tag_bpm_control_accepted": false,
+  "study_scope": "One source, one fixed Philox seed; 80/160 tempo-only metadata ablation; two 29.76-second Q4 text-tag excerpts, not an unquantized multi-seed tag benchmark",
+  "source_audio_uploaded": false,
+  "source_modified": false,
+  "transcriber_version": "yue2-transcribe 0.3.0",
+  "transcriber_shared_ggml": "b77ae790",
+  "conclusion": "MIDI BPM metadata produces identical model tensors. Original full-song F32 output is near 131 BPM versus source near 120. Q4 tags 80/160 BPM did not achieve the requested tempo in this sample. No hard clock guarantee.",
+  "python_tests_passed": 12,
+  "ggml_bump_check_started": false
+}
