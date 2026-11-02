@@ -1,0 +1,321 @@
+{
+  "date": "2026-11-02",
+  "command": "./scripts/test-cover-windows.ps1 -CaseName billiegasm-full-acoustic -FullSong -Tags 'warm acoustic pop, soft drums, instrumental, no vocals'",
+  "source_audio_sha256": "140f18292989b1026113f02e0b6e2c9c1eaea29df05965f9404e40d76f74af9a",
+  "source_modified": false,
+  "source_duration_seconds": 69.98512471655329,
+  "source_audio_uploaded": false,
+  "full_length_cover_executed": true,
+  "listening_assessment": "pending for full song; user heard instruments only in the earlier eight-second acoustic Q4 excerpt",
+  "instrumental_controllability_accepted": false,
+  "musical_cover_fidelity_accepted": false,
+  "transcription": {
+    "event_count": 209,
+    "notes_by_track": {
+      "1": 137,
+      "0": 44
+    },
+    "midi_event_audits": {
+      "combined": {
+        "role": "combined",
+        "native_event_notes": 181,
+        "midi_notes": 181,
+        "beat_positions_pitches_durations_match": true,
+        "missing_notes": 0,
+        "extra_notes": 0
+      },
+      "vocal": {
+        "role": "vocal",
+        "native_event_notes": 44,
+        "midi_notes": 44,
+        "beat_positions_pitches_durations_match": true,
+        "missing_notes": 0,
+        "extra_notes": 0
+      },
+      "instrumental": {
+        "role": "instrumental",
+        "native_event_notes": 137,
+        "midi_notes": 137,
+        "beat_positions_pitches_durations_match": true,
+        "missing_notes": 0,
+        "extra_notes": 0
+      }
+    },
+    "melody": {
+      "notes": 137,
+      "duration_seconds": 66.61022500000001,
+      "ticks_per_beat": 960,
+      "full_song": true,
+      "last_note_step": 524.0
+    },
+    "chords": {
+      "notes": 160,
+      "duration_seconds": 68.64412500000003,
+      "ticks_per_beat": 960,
+      "full_song": true,
+      "last_note_step": 540.0
+    },
+    "warnings": [],
+    "full_midi_exports_bit_exact": true,
+    "full_source_reference_pcm_bit_exact": true,
+    "device_memory_sampling": {
+      "samples": 203,
+      "interval_seconds": 0.2,
+      "scope": "nvidia-smi physical GPU 0 total device usage, includes desktop/other processes",
+      "first_used_mib": 801,
+      "peak_used_mib": 3134,
+      "total_mib": 8151,
+      "process_wall_seconds": 54.92200000002049
+    }
+  },
+  "preparation": {
+    "upstream_revision": "e27fa7fa0da7c9817879cc6210cc5693f9327946",
+    "lyrics": "[instrumental]",
+    "tags": "warm acoustic pop, soft drums, instrumental, no vocals",
+    "requested_frames": 875,
+    "symbolic_frames": 540,
+    "drum_condition_zero": true,
+    "qwen_released": true,
+    "symbolic_midi_roundtrip_exact": true,
+    "preprocessing": {
+      "input.tokens": {
+        "file": "input.tokens.i64",
+        "shape": [
+          2,
+          25,
+          9
+        ],
+        "source_dtype": "torch.int64",
+        "stored_dtype": "int64",
+        "sha256": "cd1417b116b1f0ad66cb121e912114a883283bfb2ae1c0988b2fcdb9486a9c47"
+      },
+      "input.tokens_mask": {
+        "file": "input.tokens_mask.bool",
+        "shape": [
+          2,
+          25,
+          9
+        ],
+        "source_dtype": "torch.bool",
+        "stored_dtype": "bool",
+        "sha256": "c2cf556de3436312a5c456545931047630c1f4eaa26a0afdfda6d2de1f0adf71"
+      },
+      "input.input_pos": {
+        "file": "input.input_pos.i64",
+        "shape": [
+          2,
+          25
+        ],
+        "source_dtype": "torch.int64",
+        "stored_dtype": "int64",
+        "sha256": "6afe7098f30bdc8564526517c085e62613f6cb67194153840567974cfa6f3815"
+      },
+      "input.qwen_embedding": {
+        "file": "input.qwen_embedding.f32",
+        "shape": [
+          2,
+          1024
+        ],
+        "source_dtype": "torch.float32",
+        "stored_dtype": "float32",
+        "sha256": "7a502c3a635af554a58244128a4660fdeb0cde7f2b67098cabe7f4dab4c3bc53"
+      },
+      "input.muq_embedding": {
+        "file": "input.muq_embedding.f32",
+        "shape": [
+          2,
+          512
+        ],
+        "source_dtype": "torch.float32",
+        "stored_dtype": "float32",
+        "sha256": "ad7facb2586fc6e966c004d7d1d16b024f5805ff7cb47c7a85dabd8b48892ca7"
+      },
+      "input.qwen_indices": {
+        "file": "input.qwen_indices.i64",
+        "shape": [
+          2
+        ],
+        "source_dtype": "torch.int64",
+        "stored_dtype": "int64",
+        "sha256": "8aae6e5d7f1c8e8a3fdccd9c217fd5f13a60d20d8e92f780f1ce4529aa390320"
+      },
+      "input.muq_indices": {
+        "file": "input.muq_indices.i64",
+        "shape": [
+          2
+        ],
+        "source_dtype": "torch.int64",
+        "stored_dtype": "int64",
+        "sha256": "ed9dfc46eeec5c8cfbadb77f048af0391cdc2e80d0ac7c4d278e7fd55ea74581"
+      },
+      "input.pianoroll": {
+        "file": "input.pianoroll.f32",
+        "shape": [
+          2,
+          540,
+          256
+        ],
+        "source_dtype": "torch.float32",
+        "stored_dtype": "float32",
+        "sha256": "e9dd827e934d7e15151c57a9673dda74a9eee2bbc66e4777609d164e84963c06"
+      },
+      "input.drum_pianoroll": {
+        "file": "input.drum_pianoroll.f32",
+        "shape": [
+          2,
+          540,
+          128
+        ],
+        "source_dtype": "torch.float32",
+        "stored_dtype": "float32",
+        "sha256": "d1768af9860251b5b7bc5c43b5368761bba981c92dd8005238016b83940d5bad"
+      },
+      "input.chord": {
+        "file": "input.chord.f32",
+        "shape": [
+          2,
+          540,
+          12
+        ],
+        "source_dtype": "torch.float32",
+        "stored_dtype": "float32",
+        "sha256": "90e5b97f768f75af8e86d0b1f237e129ffa44747e6e13d70c13bbe9485ead8a3"
+      },
+      "input.context_mask": {
+        "file": "input.context_mask.bool",
+        "shape": [
+          2,
+          540
+        ],
+        "source_dtype": "torch.bool",
+        "stored_dtype": "bool",
+        "sha256": "d20d5d685a1fdb28a974551a0c8c0eed3f75410cf9055957b7a3a9790fc2e06a"
+      }
+    }
+  },
+  "generation": {
+    "ggml_revision": "0f2ed045eaff6bf01bed074878b6988248efbc22",
+    "shared_baseline": "b77ae790e628270af46a8af1eca38441c23f1252",
+    "ggml_bump_check_started": false,
+    "command": [
+      "C:\\dev\\mulacover.cpp\\build-windows-development-cuda\\bin\\Release\\mulacover-generate.exe",
+      "--model",
+      "C:\\dev\\mulacover.cpp\\models\\mulacover-q4_k_m.gguf",
+      "--input",
+      "C:\\dev\\mulacover.cpp\\refdata\\covers\\billiegasm-full-acoustic\\generation\\input",
+      "--output",
+      "C:\\dev\\mulacover.cpp\\refdata\\covers\\billiegasm-full-acoustic\\generation",
+      "--prompt-frames",
+      "25",
+      "--symbolic-frames",
+      "540",
+      "--qwen-index",
+      "14",
+      "--muq-index",
+      "17",
+      "--backend",
+      "cuda",
+      "--frames",
+      "875",
+      "--capacity",
+      "1024",
+      "--guidance",
+      "1.5",
+      "--temperature",
+      "1",
+      "--top-k",
+      "250",
+      "--seed",
+      "1701",
+      "--decoder-seed",
+      "1701",
+      "--decoder-steps",
+      "10",
+      "--segment-codes",
+      "372",
+      "--flow-model",
+      "C:\\dev\\heartcodec.cpp\\models\\heartcodec-flow-f32.gguf",
+      "--sq-model",
+      "C:\\dev\\heartcodec.cpp\\models\\heartcodec-sq-codec-f32.gguf"
+    ],
+    "decoder": {
+      "seed": 1701,
+      "steps": 10,
+      "segment_codes": 372,
+      "guidance": 1.25
+    },
+    "prepared_manifest_sha256": "9d5aa1b513c2c598c3acebc4ac283629d692ea9431ea60051dc0f4f7e63f161e",
+    "upstream_revision": "e27fa7fa0da7c9817879cc6210cc5693f9327946",
+    "model_sha256": "74ebd8a8537f55ea3f3566cfa17c7e28734fc555af5fbc1a254bec94a182f814",
+    "codes_sha256": "f5ee26f2ce830b17d52191aecfff085c6a2b32a183bdf087dd5f47879896c8c5",
+    "execution_passed": true,
+    "audio_quality_accepted": false,
+    "device_memory_sampling": {
+      "samples": 1554,
+      "interval_seconds": 0.2,
+      "scope": "nvidia-smi physical GPU 0 total device usage, includes desktop/other processes",
+      "first_used_mib": 801,
+      "peak_used_mib": 6776,
+      "total_mib": 8151,
+      "process_wall_seconds": 424.954000000027
+    },
+    "run": {
+      "frames": 875,
+      "prompt_frames": 25,
+      "symbolic_frames": 540,
+      "cache_capacity": 1024,
+      "guidance": 1.5,
+      "temperature": 1,
+      "top_k": 250,
+      "seed": 1701,
+      "eos": false,
+      "replay_checked": true,
+      "terminal_contract_passed": true,
+      "generator_released_before_decode": true,
+      "generation_with_checks_seconds": 384.939,
+      "weight_bytes": 2939920896,
+      "cache_bytes": 470351872,
+      "graph_bytes": 53535232,
+      "audio_samples_per_channel": 3360000,
+      "audio_peak": 1.01176,
+      "audio_rms": 0.149253,
+      "decode_seconds": 34.4583,
+      "decoder_seed": 1701,
+      "decoder_steps": 10,
+      "segment_codes": 372,
+      "decoder_guidance": 1.25,
+      "ggml_commit": "0f2ed045"
+    },
+    "rng": "Native SplitMix64 indexed by seed/frame/head/category, exponential race; not a PyTorch RNG seed",
+    "flow_model_sha256": "5c9cdbfae26ccd3e96355c541cade0feca37cfd8696746b724c294095949f523",
+    "sq_model_sha256": "2f72b85f924c629aae33004703cc02e16600abee15c01e928b2878e5d0f29ae6",
+    "audio_sha256": "853db8615c126d234b592fe227f7541d576ad3771acb4835ec72573a5a6cab47"
+  },
+  "audio": {
+    "path": "refdata\\covers\\billiegasm-full-acoustic\\generation\\audio.wav",
+    "duration_seconds": 70.0,
+    "channels": 2,
+    "sample_rate": 48000,
+    "finite": true,
+    "peak": 1.0117634534835815,
+    "rms": 0.14925323429212686,
+    "samples_above_full_scale": 1,
+    "fraction_above_full_scale": 1.488095238095238e-07,
+    "codec_windows": 3
+  },
+  "listening_copy": {
+    "path": "refdata\\covers\\billiegasm-full-acoustic\\generation\\audio-listening.wav",
+    "sha256": "4f1dd779e83a5b25478118a110664ebe69d37d0f493ac67c4f5c297a9249b1bb",
+    "gain": 0.8808886455278634,
+    "gain_db": -1.1015797588720024,
+    "peak": 0.8912509083747864,
+    "processing": "One constant gain across the entire track; no limiter or edits; raw WAV retained"
+  },
+  "checks": {
+    "python_tests": 10,
+    "passed": true
+  },
+  "ggml_bump_check_started": false,
+  "sibling_source_or_pins_modified": false,
+  "fully_native_preprocessing": false
+}

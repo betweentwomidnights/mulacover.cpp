@@ -36,6 +36,8 @@ the user's `billiegasm_yuey.wav`: native SheetSage2 exports are audited, then fr
 instrumental conditioning drives native generation and stereo decode. Qwen and
 prompt/MIDI preparation still use the upstream Spark Docker bridge. Listening
 acceptance for vocals and musical fidelity remains pending.
+The [full-song acoustic test](docs/FULL_SONG_TEST.md) now generates all 70 seconds
+on the laptop, with full replay checks and a sampled 6,776 MiB peak through decode.
 
 Prepared prompt/style
 and symbolic inputs are supplied by the caller; text/Qwen/MIDI preprocessing

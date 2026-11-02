@@ -2,11 +2,13 @@ param([string]$Audio,[ValidatePattern('^[A-Za-z0-9_-]+$')][string]$CaseName=('co
   [ValidateSet('instrumental','vocal','combined')][string]$MelodyRole='instrumental',
   [ValidateRange(1,5000)][int]$Sixteenths=64,[ValidateRange(1,8192)][int]$Frames=100,
   [ValidateRange(1,8192)][int]$CacheCapacity=256,
+  [switch]$FullSong,
   [string]$Lyrics='[Instrumental]',
   [string]$Tags='topic:[Instrumental]; genre:[Classical]; instrument:[Violin, Piano]; mood:[dramatic]',
   [string]$TranscriberCli,[string]$TranscriberModel,[string]$GeneratorModel,[string]$DevelopmentGgml)
 $ErrorActionPreference='Stop'
-if($Frames -gt $CacheCapacity){throw 'Frames must fit within CacheCapacity, with additional room for the prompt'}
+if($FullSong -and ($PSBoundParameters.ContainsKey('Frames') -or $PSBoundParameters.ContainsKey('Sixteenths'))){throw 'FullSong derives duration from the source; omit Frames and Sixteenths'}
+if(-not $FullSong -and $Frames -gt $CacheCapacity){throw 'Frames must fit within CacheCapacity, with additional room for the prompt'}
 $projectRoot=Split-Path -Parent $PSScriptRoot
 $siblings=Split-Path -Parent $projectRoot
 $python=Join-Path $siblings 'heartcodec.cpp/.venv/Scripts/python.exe'
@@ -22,12 +24,17 @@ if(Test-Path -LiteralPath $localRoot){throw 'Use a fresh CaseName; existing outp
 $transcription=Join-Path $localRoot 'transcription'
 $transcribeArguments=@('--audio',$Audio,'--cli',$TranscriberCli,'--model',$TranscriberModel,'--output',$transcription,
   '--melody-role',$MelodyRole,'--sixteenths',$Sixteenths,'--device','cuda')
+if($FullSong){$transcribeArguments+='--full-song'}
 if([IO.Path]::GetFullPath($Audio) -eq [IO.Path]::GetFullPath($selected.source_path)){
   $transcribeArguments+=@('--expected-audio-sha256',$selected.sha256)
 }
 & $python (Join-Path $projectRoot 'tools/transcribe-cover.py') @transcribeArguments
 if($LASTEXITCODE){throw 'Native transcription/MIDI audit failed'}
 $source=Get-Content (Join-Path $transcription 'transcription.json') -Raw|ConvertFrom-Json
+if($FullSong){
+  $Frames=[int][Math]::Ceiling($source.source_audio.frames/$source.source_audio.sample_rate/0.08)
+  if($Frames -gt 8192){throw 'Full source exceeds the native generation frame limit'}
+}
 $request=[ordered]@{lyrics=$Lyrics;tags=$Tags;melody_midi='transcription/excerpt-midi/melody.mid';
   chord_midi='transcription/excerpt-midi/chords.mid';melody_role=$MelodyRole;source_audio_sha256=$source.source_sha256}
 $requestFile=Join-Path $localRoot 'request.json'
@@ -48,6 +55,9 @@ if($LASTEXITCODE){throw 'Spark Docker conditioning preparation failed'}
 if($LASTEXITCODE){throw 'Prepared-input transfer failed'}
 $preparedManifest=Get-Content (Join-Path $localRoot 'prepared/manifest.json') -Raw|ConvertFrom-Json
 $promptFrames=$preparedManifest.preprocessing.'input.tokens'.shape[1]
+if($FullSong -and -not $PSBoundParameters.ContainsKey('CacheCapacity')){
+  $CacheCapacity=[int]([Math]::Ceiling(($promptFrames+$Frames-1)/256.0)*256)
+}
 if($promptFrames+$Frames-1 -gt $CacheCapacity){throw 'CacheCapacity must hold the prompt and requested frames'}
 & $python (Join-Path $projectRoot 'tools/generate.py') --reference (Join-Path $localRoot 'prepared') `
   --model $GeneratorModel --cli (Join-Path $projectRoot 'build-windows-development-cuda/bin/Release/mulacover-generate.exe') `

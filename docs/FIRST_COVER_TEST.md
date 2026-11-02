@@ -5,7 +5,7 @@ November 2, 2026. Source: user-selected
 `140f18292989b1026113f02e0b6e2c9c1eaea29df05965f9404e40d76f74af9a`.
 
 The first short real-input pipeline now executes. This is an excerpt integration
-test; instrumental control and musical fidelity are not yet listener-approved.
+test; instrumental control and musical fidelity are not yet generally accepted.
 The source audio, transcriptions, tensors and WAV files remain outside Git.
 
 ## Stages and provenance
@@ -89,7 +89,10 @@ Every run retains its `provenance.json`, token file and model/input/audio hashes
 Compact checked-in evidence is `validation/first-cover-test.json`. Listening must
 separately assess vocalizations, recognizability of the source melody/chords and
 musical/audio quality. No automatic vocal classifier was used. Full-length cover
-generation remains untested; the complete 70-second source transcription is saved.
+generation has now completed in the separate [whole-song test](FULL_SONG_TEST.md);
+the complete source transcription is saved.
+The user heard instruments only in the first acoustic Q4 excerpt, while noting
+that eight seconds may be too short to establish control over the whole song.
 
 ## Reproduction
 
@@ -109,6 +112,12 @@ decoding. The original audio stays on the laptop. Use a fresh `CaseName` each ti
 existing outputs are preserved. `-Lyrics`, `-Tags`, `-Frames`, `-CacheCapacity`,
 `-MelodyRole` and model/CLI paths can be overridden. The cache must accommodate
 the prompt and generated frames. Outputs live under `refdata/covers/<CaseName>`.
+
+To retain every transcribed note and request the full source duration, add
+`-FullSong` and omit `-Frames`/`-Sixteenths`. This derives the frame count by
+rounding source duration up to 80ms frames and, unless explicitly overridden,
+allocates enough cache for the prepared prompt plus generated frames. The model
+can still end early by sampling EOS; inspect the resulting frame count.
 
 The integration run `billiegasm-reproduce` regenerated all 11 prepared tensors,
 the 100-frame token stream and final WAV bit-for-bit against the earlier Alex

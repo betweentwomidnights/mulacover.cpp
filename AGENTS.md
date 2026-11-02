@@ -48,3 +48,8 @@
   Do not call the frontend fully native or mark instrumental/musical quality
   accepted without listening evidence. The source audio is unchanged; the first
   cover uses only its first four bars/eight-second excerpt.
+- User heard instruments only in the first acoustic Q4 excerpt and requested the
+  whole song. The full 70-second Q4 acoustic run now executes on the laptop;
+  see `docs/FULL_SONG_TEST.md`. All 875 frames, exact replay and terminal/reset
+  checks pass; full-song vocals/fidelity remain listener checks. Preserve the raw
+  WAV; the separate listening copy uses only a constant -1.10158 dB gain.

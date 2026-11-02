@@ -18,7 +18,6 @@
   "pending_checks": [
     "Listener assessment of instrumental request (singing/vocalizations)",
     "Musical transcription and cover fidelity against source",
-    "Full-length generation after excerpt review",
     "Native prompt/tokenizer/Qwen/MIDI preparation"
   ],
   "last_test_on": "2026-11-02",
@@ -27,7 +26,10 @@
     0,
     8
   ],
-  "full_length_cover_executed": false,
+  "full_length_cover_executed": true,
   "melody_role": "instrumental",
-  "validation_report": "first-cover-test.json"
+  "validation_report": "full-song-test.json",
+  "generated_full_song_seconds": 70,
+  "excerpt_listener_observation": "User heard instruments only in the eight-second acoustic Q4 clip; full-song listening pending",
+  "excerpt_validation_report": "first-cover-test.json"
 }

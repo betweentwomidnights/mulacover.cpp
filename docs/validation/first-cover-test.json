@@ -7,7 +7,7 @@
   "fully_native_preprocessing": false,
   "instrumental_controllability_accepted": false,
   "musical_cover_fidelity_accepted": false,
-  "listening_assessment": "pending",
+  "listening_assessment": "User heard instruments only in the first acoustic Q4 excerpt; full-song assessment pending",
   "transcription": {
     "source_path": "C:\\Users\\thegr\\Music\\billiegasm_yuey.wav",
     "source_sha256": "140f18292989b1026113f02e0b6e2c9c1eaea29df05965f9404e40d76f74af9a",
@@ -457,7 +457,7 @@
         "guidance": 1.25
       },
       "name": "billiegasm-cover/q4-laptop",
-      "vocal_presence": "not yet listener-assessed",
+      "vocal_presence": "User reports hearing instruments only in this eight-second clip",
       "audio_quality_accepted": false
     },
     {
@@ -628,5 +628,14 @@
     },
     "source_audio_uploaded": false,
     "spark_execution_inside_docker": true
-  }
+  },
+  "listener_observations": [
+    {
+      "date": "2026-11-02",
+      "case": "billiegasm-cover/q4-laptop",
+      "audio_sha256": "d2ea99d1eb8a2288685337fc20c73568c0937cfc656a21a7ec246cc429abd344",
+      "observation": "I only hear instruments, but 8 seconds may not be long enough to really know. We should probably do the whole song.",
+      "scope": "Eight-second acoustic Q4 clip only; no general instrumental-control acceptance"
+    }
+  ]
 }
