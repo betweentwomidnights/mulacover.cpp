@@ -1,8 +1,14 @@
 #include "mulacover.h"
+#include "mulacover_sampling.h"
 #include <string.h>
 int main(void) {
     const mulacover_api_v1 * api=mulacover_get_api(1);
     if(!api||api->size<MULACOVER_API_V1_SIZE||api->version!=1||mulacover_get_api(0)||mulacover_get_api(2))return 1;
+    const mulacover_sampling_api_v1 * sampling=mulacover_get_sampling_api(1);
+    if(!sampling||sampling->size<MULACOVER_SAMPLING_API_V1_SIZE||sampling->core!=api||mulacover_get_sampling_api(0)||mulacover_get_sampling_api(2))return 1;
+    struct {mulacover_sampling_config_v1 config;unsigned char tail[16];} sample;
+    memset(&sample,0xa5,sizeof(sample));sample.config.size=sizeof(sample);sampling->config_init(&sample.config);
+    if(sample.tail[0]!=0xa5||sample.config.temperature!=1||sample.config.top_k!=250||sample.config.exponential_noise)return 1;
     struct {mulacover_config_v1 config;unsigned char tail[16];} large;
     memset(&large,0xa5,sizeof(large));large.config.size=sizeof(large);api->config_init(&large.config);
     if(large.tail[0]!=0xa5||large.tail[15]!=0xa5||large.config.cache_capacity!=8192||strcmp(large.config.backend,"cpu"))return 1;

@@ -1,0 +1,531 @@
+{
+  "date": "2026-11-01",
+  "ggml_revision": "0f2ed045eaff6bf01bed074878b6988248efbc22",
+  "shared_baseline": "b77ae790e628270af46a8af1eca38441c23f1252",
+  "cross_repo_bump_testing_started": false,
+  "audio_quality_accepted": false,
+  "sampler": {
+    "upstream_revision": "e27fa7fa0da7c9817879cc6210cc5693f9327946",
+    "gates": {
+      "max_abs": 1e-06,
+      "relative_l2": 1e-05,
+      "selection": "exact with supplied exponential noise"
+    },
+    "cases": [
+      {
+        "name": "ordinary",
+        "chosen": 2922,
+        "expected": 2922,
+        "max_abs": 1.862645149230957e-09,
+        "relative_l2": 1.2576541091195016e-08,
+        "passed": true
+      },
+      {
+        "name": "warm",
+        "chosen": 7241,
+        "expected": 7241,
+        "max_abs": 1.4901161193847656e-08,
+        "relative_l2": 1.9050311684406073e-07,
+        "passed": true
+      },
+      {
+        "name": "full",
+        "chosen": 640,
+        "expected": 640,
+        "max_abs": 8.642673492431641e-07,
+        "relative_l2": 1.929428344435761e-06,
+        "passed": true
+      },
+      {
+        "name": "ties",
+        "chosen": 23,
+        "expected": 23,
+        "max_abs": 5.960464477539063e-08,
+        "relative_l2": 9.734849696440446e-08,
+        "passed": true
+      },
+      {
+        "name": "flat",
+        "chosen": 4813,
+        "expected": 4813,
+        "max_abs": 0.0,
+        "relative_l2": 0.0,
+        "passed": true
+      },
+      {
+        "name": "extreme",
+        "chosen": 8196,
+        "expected": 8196,
+        "max_abs": 1.1920928955078125e-07,
+        "relative_l2": 1.3034845525771012e-07,
+        "passed": true
+      },
+      {
+        "name": "eos",
+        "chosen": 8193,
+        "expected": 8193,
+        "max_abs": 0.0,
+        "relative_l2": 0.0,
+        "passed": true
+      },
+      {
+        "name": "padding",
+        "chosen": 8192,
+        "expected": 8192,
+        "max_abs": 0.0,
+        "relative_l2": 0.0,
+        "passed": true
+      }
+    ],
+    "passed": true
+  },
+  "original_fp32_suite": {
+    "tensors": 600,
+    "passed": true
+  },
+  "checks": {
+    "windows_cpu_native_tests": 2,
+    "windows_cuda_native_tests": 2,
+    "windows_dll_native_tests": 2,
+    "spark_native_tests": 5,
+    "native_tests_passed": true,
+    "python_tests": 7,
+    "python_tests_passed": true
+  },
+  "expanded_fp32": {
+    "reference_manifest_sha256": "42baa6800ab4ef9f1196bbf1b7322f02432978806b647d983fffff4f34447ebe",
+    "upstream_revision": "e27fa7fa0da7c9817879cc6210cc5693f9327946",
+    "checkpoint_revision": "bbbaef2b31835c2ef5172ff528dbe325230d46fb",
+    "ggml_revision": "0f2ed045eaff6bf01bed074878b6988248efbc22",
+    "cache_capacity": 159,
+    "gates": {
+      "logits_and_cache_max_abs": 0.001,
+      "relative_l2": 0.0001,
+      "activation_atol": 0.001,
+      "activation_rtol": 1e-06,
+      "activation_policy": "elementwise abs(delta)<=atol+rtol*abs(reference), plus relative L2; flat absolute diagnostic retained"
+    },
+    "execution_passed": true,
+    "fp32_parity_passed": false,
+    "model_sha256": "5f3bfcb7bd441301d272546e4bfb7ddd690df45447251100f5e223e036dab62c",
+    "cases": [
+      {
+        "name": "conditional",
+        "frames": 32,
+        "branches": 1,
+        "tensors": 400,
+        "execution_passed": true,
+        "native_reset_replay_bit_exact": true,
+        "sampling_with_injected_noise": false,
+        "stats": {
+          "weight_bytes": 17516732416,
+          "cache_bytes": 36765696,
+          "graph_bytes": 17900672,
+          "cache_capacity": 159,
+          "elapsed_seconds": 8.13695,
+          "replay_bit_exact": true,
+          "cache_tail_zero": true,
+          "ggml_commit": "0f2ed045",
+          "ggml_version": "0.27.0"
+        },
+        "device_memory_sampling": {
+          "samples": 0,
+          "interval_seconds": 0.2,
+          "scope": "nvidia-smi physical GPU 0 total device usage, includes desktop/other processes",
+          "process_wall_seconds": 27.33882823397289
+        },
+        "public_tensors": 312,
+        "public_gates_passed": true,
+        "public_max_abs": 0.00033608078956604004,
+        "public_max_relative_l2": 1.1290730431147265e-05,
+        "fp32_gate_failure_count": 2,
+        "failures": {
+          "frame0.stage.backbone.layers.27": {
+            "max_abs": 0.0023345947265625,
+            "relative_l2": 1.5141092456562445e-06,
+            "flat_absolute_gate_passed": false,
+            "activation_mixed_tolerance_passed": false,
+            "worst_reference": 73.20228576660156,
+            "worst_native": 73.20462036132812,
+            "worst_reference_float32_ulp": 7.62939453125e-06,
+            "passed": false
+          },
+          "frame0.stage.peft_layers.27.0": {
+            "max_abs": 0.002288818359375,
+            "relative_l2": 1.5180562464469302e-06,
+            "flat_absolute_gate_passed": false,
+            "activation_mixed_tolerance_passed": false,
+            "worst_reference": 71.13946533203125,
+            "worst_native": 71.14175415039062,
+            "worst_reference_float32_ulp": 7.62939453125e-06,
+            "passed": false
+          }
+        },
+        "guided_top1_agreement_mean": 1.0,
+        "guided_kl_mean": 6.3379325836354705e-12
+      },
+      {
+        "name": "cfg-1.5",
+        "frames": 32,
+        "branches": 2,
+        "tensors": 400,
+        "execution_passed": true,
+        "native_reset_replay_bit_exact": true,
+        "sampling_with_injected_noise": false,
+        "stats": {
+          "weight_bytes": 17516732416,
+          "cache_bytes": 73531392,
+          "graph_bytes": 17900672,
+          "cache_capacity": 159,
+          "elapsed_seconds": 15.6738,
+          "replay_bit_exact": true,
+          "cache_tail_zero": true,
+          "ggml_commit": "0f2ed045",
+          "ggml_version": "0.27.0"
+        },
+        "device_memory_sampling": {
+          "samples": 0,
+          "interval_seconds": 0.2,
+          "scope": "nvidia-smi physical GPU 0 total device usage, includes desktop/other processes",
+          "process_wall_seconds": 22.316365499980748
+        },
+        "public_tensors": 312,
+        "public_gates_passed": true,
+        "public_max_abs": 0.00033608078956604004,
+        "public_max_relative_l2": 9.735119658229503e-06,
+        "fp32_gate_failure_count": 2,
+        "failures": {
+          "frame0.stage.backbone.layers.27": {
+            "max_abs": 0.0023345947265625,
+            "relative_l2": 4.3872367277675174e-07,
+            "flat_absolute_gate_passed": false,
+            "activation_mixed_tolerance_passed": false,
+            "worst_reference": 73.20228576660156,
+            "worst_native": 73.20462036132812,
+            "worst_reference_float32_ulp": 7.62939453125e-06,
+            "passed": false
+          },
+          "frame0.stage.peft_layers.27.0": {
+            "max_abs": 0.00244140625,
+            "relative_l2": 4.572768971619989e-07,
+            "flat_absolute_gate_passed": false,
+            "activation_mixed_tolerance_passed": false,
+            "worst_reference": -4548.724609375,
+            "worst_native": -4548.72216796875,
+            "worst_reference_float32_ulp": 0.00048828125,
+            "passed": false
+          }
+        },
+        "guided_top1_agreement_mean": 1.0,
+        "guided_kl_mean": 1.2790116925023457e-11
+      },
+      {
+        "name": "sample-cfg",
+        "frames": 8,
+        "branches": 2,
+        "tensors": 300,
+        "execution_passed": true,
+        "native_reset_replay_bit_exact": true,
+        "sampling_with_injected_noise": true,
+        "stats": {
+          "weight_bytes": 17516732416,
+          "cache_bytes": 73531392,
+          "graph_bytes": 17900672,
+          "cache_capacity": 159,
+          "elapsed_seconds": 4.53696,
+          "replay_bit_exact": true,
+          "cache_tail_zero": true,
+          "ggml_commit": "0f2ed045",
+          "ggml_version": "0.27.0"
+        },
+        "device_memory_sampling": {
+          "samples": 0,
+          "interval_seconds": 0.2,
+          "scope": "nvidia-smi physical GPU 0 total device usage, includes desktop/other processes",
+          "process_wall_seconds": 11.383401888015214
+        },
+        "public_tensors": 234,
+        "public_gates_passed": true,
+        "public_max_abs": 0.00033608078956604004,
+        "public_max_relative_l2": 9.735119658229503e-06,
+        "fp32_gate_failure_count": 2,
+        "failures": {
+          "frame0.stage.backbone.layers.27": {
+            "max_abs": 0.0023345947265625,
+            "relative_l2": 4.3872367277675174e-07,
+            "flat_absolute_gate_passed": false,
+            "activation_mixed_tolerance_passed": false,
+            "worst_reference": 73.20228576660156,
+            "worst_native": 73.20462036132812,
+            "worst_reference_float32_ulp": 7.62939453125e-06,
+            "passed": false
+          },
+          "frame0.stage.peft_layers.27.0": {
+            "max_abs": 0.00244140625,
+            "relative_l2": 4.572768971619989e-07,
+            "flat_absolute_gate_passed": false,
+            "activation_mixed_tolerance_passed": false,
+            "worst_reference": -4548.724609375,
+            "worst_native": -4548.72216796875,
+            "worst_reference_float32_ulp": 0.00048828125,
+            "passed": false
+          }
+        },
+        "guided_top1_agreement_mean": 1.0,
+        "guided_kl_mean": 1.8589600307342636e-11
+      }
+    ]
+  },
+  "expanded_q4_laptop": {
+    "reference_manifest_sha256": "42baa6800ab4ef9f1196bbf1b7322f02432978806b647d983fffff4f34447ebe",
+    "upstream_revision": "e27fa7fa0da7c9817879cc6210cc5693f9327946",
+    "checkpoint_revision": "bbbaef2b31835c2ef5172ff528dbe325230d46fb",
+    "ggml_revision": "0f2ed045eaff6bf01bed074878b6988248efbc22",
+    "cache_capacity": 159,
+    "gates": {
+      "logits_and_cache_max_abs": 0.001,
+      "relative_l2": 0.0001,
+      "activation_atol": 0.001,
+      "activation_rtol": 1e-06,
+      "activation_policy": "elementwise abs(delta)<=atol+rtol*abs(reference), plus relative L2; flat absolute diagnostic retained"
+    },
+    "execution_passed": true,
+    "fp32_parity_passed": false,
+    "model_sha256": "74ebd8a8537f55ea3f3566cfa17c7e28734fc555af5fbc1a254bec94a182f814",
+    "cases": [
+      {
+        "name": "conditional",
+        "frames": 32,
+        "branches": 1,
+        "tensors": 400,
+        "execution_passed": true,
+        "native_reset_replay_bit_exact": true,
+        "sampling_with_injected_noise": false,
+        "stats": {
+          "weight_bytes": 2939920896,
+          "cache_bytes": 36765696,
+          "graph_bytes": 17900672,
+          "cache_capacity": 159,
+          "elapsed_seconds": 4.77905,
+          "replay_bit_exact": true,
+          "cache_tail_zero": true,
+          "ggml_commit": "0f2ed045",
+          "ggml_version": "0.27.0"
+        },
+        "device_memory_sampling": {
+          "samples": 32,
+          "interval_seconds": 0.2,
+          "scope": "nvidia-smi physical GPU 0 total device usage, includes desktop/other processes",
+          "first_used_mib": 654,
+          "peak_used_mib": 3687,
+          "total_mib": 8151,
+          "process_wall_seconds": 8.436999999976251
+        },
+        "public_tensors": 312,
+        "public_gates_passed": false,
+        "public_max_abs": 10.43433952331543,
+        "public_max_relative_l2": 0.5878805496444982,
+        "fp32_gate_failure_count": 400,
+        "guided_top1_agreement_mean": 0.78125,
+        "guided_kl_mean": 0.05611859757672127
+      },
+      {
+        "name": "cfg-1.5",
+        "frames": 32,
+        "branches": 2,
+        "tensors": 400,
+        "execution_passed": true,
+        "native_reset_replay_bit_exact": true,
+        "sampling_with_injected_noise": false,
+        "stats": {
+          "weight_bytes": 2939920896,
+          "cache_bytes": 73531392,
+          "graph_bytes": 17900672,
+          "cache_capacity": 159,
+          "elapsed_seconds": 9.18463,
+          "replay_bit_exact": true,
+          "cache_tail_zero": true,
+          "ggml_commit": "0f2ed045",
+          "ggml_version": "0.27.0"
+        },
+        "device_memory_sampling": {
+          "samples": 46,
+          "interval_seconds": 0.2,
+          "scope": "nvidia-smi physical GPU 0 total device usage, includes desktop/other processes",
+          "first_used_mib": 654,
+          "peak_used_mib": 3719,
+          "total_mib": 8151,
+          "process_wall_seconds": 12.40600000001723
+        },
+        "public_tensors": 312,
+        "public_gates_passed": false,
+        "public_max_abs": 10.43433952331543,
+        "public_max_relative_l2": 0.5317024870636895,
+        "fp32_gate_failure_count": 400,
+        "guided_top1_agreement_mean": 0.71875,
+        "guided_kl_mean": 0.10087226206636003
+      }
+    ]
+  },
+  "generation": [
+    {
+      "ggml_revision": "0f2ed045eaff6bf01bed074878b6988248efbc22",
+      "shared_baseline": "b77ae790e628270af46a8af1eca38441c23f1252",
+      "ggml_bump_check_started": false,
+      "prepared_manifest_sha256": "a42129fa97f295a3241bf46efb2a1a16937321d61723315b56391cfff8c0380a",
+      "upstream_revision": "e27fa7fa0da7c9817879cc6210cc5693f9327946",
+      "model_sha256": "74ebd8a8537f55ea3f3566cfa17c7e28734fc555af5fbc1a254bec94a182f814",
+      "codes_sha256": "180b4496ee3c3362d50cb0a3120816dd140c2bf10482db4a00cada2989b8f124",
+      "execution_passed": true,
+      "audio_quality_accepted": false,
+      "device_memory_sampling": {
+        "samples": 155,
+        "interval_seconds": 0.2,
+        "scope": "nvidia-smi physical GPU 0 total device usage, includes desktop/other processes",
+        "first_used_mib": 654,
+        "peak_used_mib": 6629,
+        "total_mib": 8151,
+        "process_wall_seconds": 41.92200000002049
+      },
+      "run": {
+        "frames": 100,
+        "prompt_frames": 37,
+        "symbolic_frames": 16,
+        "cache_capacity": 256,
+        "guidance": 1.5,
+        "temperature": 1,
+        "top_k": 250,
+        "seed": 1701,
+        "eos": false,
+        "replay_checked": true,
+        "terminal_contract_passed": true,
+        "generator_released_before_decode": true,
+        "generation_with_checks_seconds": 21.938,
+        "weight_bytes": 2939920896,
+        "cache_bytes": 118030336,
+        "graph_bytes": 4504448,
+        "audio_samples_per_channel": 384000,
+        "audio_peak": 0.139474,
+        "audio_rms": 0.0299462,
+        "decode_seconds": 16.8417,
+        "ggml_commit": "0f2ed045"
+      },
+      "rng": "Native SplitMix64 indexed by seed/frame/head/category, exponential race; not a PyTorch RNG seed",
+      "flow_model_sha256": "5c9cdbfae26ccd3e96355c541cade0feca37cfd8696746b724c294095949f523",
+      "sq_model_sha256": "2f72b85f924c629aae33004703cc02e16600abee15c01e928b2878e5d0f29ae6",
+      "audio_sha256": "60cbc209749bab87614475300bf6c0b9cd05881a561f2c287c6d3381ac49543b",
+      "name": "generate-q4-laptop",
+      "decoder": {
+        "seed": 1701,
+        "steps": 10,
+        "guidance": 1.25,
+        "segment_codes": 372,
+        "notes": "Recorded invocation defaults; native decoder-noise RNG is not cross-platform seed-equivalent"
+      }
+    },
+    {
+      "ggml_revision": "0f2ed045eaff6bf01bed074878b6988248efbc22",
+      "shared_baseline": "b77ae790e628270af46a8af1eca38441c23f1252",
+      "ggml_bump_check_started": false,
+      "prepared_manifest_sha256": "a42129fa97f295a3241bf46efb2a1a16937321d61723315b56391cfff8c0380a",
+      "upstream_revision": "e27fa7fa0da7c9817879cc6210cc5693f9327946",
+      "model_sha256": "5f3bfcb7bd441301d272546e4bfb7ddd690df45447251100f5e223e036dab62c",
+      "codes_sha256": "db03a779c9197c79b44456f638bdfad1621ff3627472235b93a1b2f487db217b",
+      "execution_passed": true,
+      "audio_quality_accepted": false,
+      "device_memory_sampling": {
+        "samples": 0,
+        "interval_seconds": 0.2,
+        "scope": "nvidia-smi physical GPU 0 total device usage, includes desktop/other processes",
+        "process_wall_seconds": 69.70616769502521
+      },
+      "run": {
+        "frames": 100,
+        "prompt_frames": 37,
+        "symbolic_frames": 16,
+        "cache_capacity": 256,
+        "guidance": 1.5,
+        "temperature": 1,
+        "top_k": 250,
+        "seed": 1701,
+        "eos": false,
+        "replay_checked": true,
+        "terminal_contract_passed": true,
+        "generator_released_before_decode": true,
+        "generation_with_checks_seconds": 47.2622,
+        "weight_bytes": 17516732416,
+        "cache_bytes": 118030336,
+        "graph_bytes": 4504448,
+        "audio_samples_per_channel": 384000,
+        "audio_peak": 0.228464,
+        "audio_rms": 0.0466435,
+        "decode_seconds": 16.1426,
+        "ggml_commit": "0f2ed045"
+      },
+      "rng": "Native SplitMix64 indexed by seed/frame/head/category, exponential race; not a PyTorch RNG seed",
+      "flow_model_sha256": "5c9cdbfae26ccd3e96355c541cade0feca37cfd8696746b724c294095949f523",
+      "sq_model_sha256": "2f72b85f924c629aae33004703cc02e16600abee15c01e928b2878e5d0f29ae6",
+      "audio_sha256": "ca98eb8db1ebd42c585a9781384168d9c77ddaaf661b38338f05488a6162604a",
+      "name": "generate-f32-spark",
+      "decoder": {
+        "seed": 1701,
+        "steps": 10,
+        "guidance": 1.25,
+        "segment_codes": 372,
+        "notes": "Recorded invocation defaults; native decoder-noise RNG is not cross-platform seed-equivalent"
+      }
+    },
+    {
+      "ggml_revision": "0f2ed045eaff6bf01bed074878b6988248efbc22",
+      "shared_baseline": "b77ae790e628270af46a8af1eca38441c23f1252",
+      "ggml_bump_check_started": false,
+      "prepared_manifest_sha256": "a42129fa97f295a3241bf46efb2a1a16937321d61723315b56391cfff8c0380a",
+      "upstream_revision": "e27fa7fa0da7c9817879cc6210cc5693f9327946",
+      "model_sha256": "74ebd8a8537f55ea3f3566cfa17c7e28734fc555af5fbc1a254bec94a182f814",
+      "codes_sha256": "a4b8eebc73a7a86a0528579d5067d3680d8de56bbaff7c901d417423cd1a38a4",
+      "execution_passed": true,
+      "audio_quality_accepted": false,
+      "device_memory_sampling": {
+        "samples": 0,
+        "interval_seconds": 0.2,
+        "scope": "nvidia-smi physical GPU 0 total device usage, includes desktop/other processes",
+        "process_wall_seconds": 27.517112236993853
+      },
+      "run": {
+        "frames": 100,
+        "prompt_frames": 37,
+        "symbolic_frames": 16,
+        "cache_capacity": 256,
+        "guidance": 1.5,
+        "temperature": 1,
+        "top_k": 250,
+        "seed": 1701,
+        "eos": false,
+        "replay_checked": true,
+        "terminal_contract_passed": true,
+        "generator_released_before_decode": true,
+        "generation_with_checks_seconds": 13.8541,
+        "weight_bytes": 2939920896,
+        "cache_bytes": 118030336,
+        "graph_bytes": 4504448,
+        "audio_samples_per_channel": 384000,
+        "audio_peak": 0.396972,
+        "audio_rms": 0.0604246,
+        "decode_seconds": 10.8587,
+        "ggml_commit": "0f2ed045"
+      },
+      "rng": "Native SplitMix64 indexed by seed/frame/head/category, exponential race; not a PyTorch RNG seed",
+      "flow_model_sha256": "5c9cdbfae26ccd3e96355c541cade0feca37cfd8696746b724c294095949f523",
+      "sq_model_sha256": "2f72b85f924c629aae33004703cc02e16600abee15c01e928b2878e5d0f29ae6",
+      "audio_sha256": "1f8d2de836b2ceea6c60e649b6c39376b44bc4253a65f9f93e00bf619593c004",
+      "name": "generate-q4-spark",
+      "decoder": {
+        "seed": 1701,
+        "steps": 10,
+        "guidance": 1.25,
+        "segment_codes": 372,
+        "notes": "Recorded invocation defaults; native decoder-noise RNG is not cross-platform seed-equivalent"
+      }
+    }
+  ]
+}

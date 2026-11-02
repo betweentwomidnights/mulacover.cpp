@@ -1,5 +1,6 @@
 #pragma once
 #include "mulacover.h"
+#include "mulacover_sampling.h"
 #include "ggml.h"
 #include "ggml-backend.h"
 #include "ggml-alloc.h"
@@ -77,11 +78,12 @@ struct Session {
     Cache backbone,decoder;
     Condition condition;
     int capacity=8192,branches=0,position=0,frame_index=0;
+    bool stopped=false;
     std::array<int32_t,8> previous{};
     explicit Session(const mulacover_config_v1 &);
     void begin(const mulacover_condition_v1 &);
     void reset();
-    void frame(const int32_t *,const char *,mulacover_frame_v1 &);
+    void frame(const int32_t *,const char *,mulacover_frame_v1 &,const mulacover_sampling_config_v1 * sampling=nullptr,int32_t * stop=nullptr);
 };
 void write_f32(const std::string &,const std::vector<float> &);
 }

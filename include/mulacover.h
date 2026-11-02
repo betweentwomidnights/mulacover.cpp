@@ -55,7 +55,7 @@ typedef struct mulacover_frame_v1 {
     uint32_t size;
     float * raw_logits; /* library-owned [8,branches,8197], C then U */
     float * logits; /* library-owned [8,8197], after guidance */
-    int32_t codes[8]; /* teacher-forced codes, not sampled outputs */
+    int32_t codes[8]; /* teacher-forced or selected codes; see sampling extension */
     int32_t branches;
     int64_t cache_position; /* active backbone cache length after this frame */
 } mulacover_frame_v1;

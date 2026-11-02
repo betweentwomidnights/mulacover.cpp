@@ -13,7 +13,7 @@ revision_args=()
 if [[ "$command" == *-development ]]; then
   command="${command%-development}"
   development="${MULACOVER_DEVELOPMENT_GGML_DIR:-$(dirname "$project_root")/ggml-review-b77}"
-  revision="$(sed -n 's/^  "revision": "\([a-f0-9]*\)",/\1/p' "$project_root/dependencies/ggml-development.json")"
+  revision="$(sed -n 's/^  "revision": "\([a-f0-9]*\)",[[:space:]]*$/\1/p' "$project_root/dependencies/ggml-development.json")"
   [[ ${#revision} == 40 && "$(git -C "$development" rev-parse HEAD)" == "$revision" && -z "$(git -C "$development" status --porcelain)" ]] || {
     echo 'Development GGML checkout does not match the clean pinned profile' >&2; exit 1;
   }
@@ -67,6 +67,34 @@ case "$command" in
       --cli "$build/bin/mulacover-parity" --output "refdata/development-$mix-cuda-cap$capacity" \
       --backend cuda --ggml-source /codec/ggml "${revision_args[@]}" --capacity "$capacity" --measure-quantization
     ;;
+  sampling-oracle|sequence-oracle)
+    exporter=export-sampling.py
+    oracle_args=(--output refdata/sampling-upstream)
+    if [[ "$command" == sequence-oracle ]]; then
+      exporter=export-sequence.py
+      oracle_args=(--prepared refdata/upstream-f32 --output refdata/sequence-f32)
+    fi
+    docker run "${common[@]}" --gpus all --network none -v "$refs:/refs:ro" "$image" \
+      /opt/sa3-venv/bin/python "reference/$exporter" --upstream /refs/MuLaCover "${oracle_args[@]}"
+    ;;
+  sampling)
+    docker run "${common[@]}" --network none "$image" /opt/sa3-venv/bin/python tools/compare-sampling.py \
+      --reference refdata/sampling-upstream --cli "$build/bin/mulacover-sampling-check" --output refdata/sampling-native
+    ;;
+  sequence)
+    docker run "${common[@]}" --gpus all --network none -v "$codec:/codec:ro" "${development_mount[@]}" "$image" \
+      /opt/sa3-venv/bin/python tools/run-parity.py --reference refdata/sequence-f32 --model models/mulacover-f32.gguf \
+      --cli "$build/bin/mulacover-parity" --output refdata/sequence-native-f32 --backend cuda --ggml-source /codec/ggml \
+      "${revision_args[@]}" --capacity 159 --cases conditional,cfg-1.5,sample-cfg
+    ;;
+  generate)
+    generator_mix="${MULACOVER_GENERATOR_MIX:-q4_k_m}"
+    docker run "${common[@]}" --gpus all --network none -v "$codec:/codec:ro" "${development_mount[@]}" "$image" \
+      /opt/sa3-venv/bin/python tools/generate.py --reference refdata/upstream-f32 --model "models/mulacover-$generator_mix.gguf" \
+      --cli "$build/bin/mulacover-generate" --ggml-source /codec/ggml --frames "${MULACOVER_GENERATION_FRAMES:-100}" \
+      --capacity "${MULACOVER_GENERATION_CAPACITY:-256}" --output "${MULACOVER_GENERATION_OUTPUT:-refdata/generate-$generator_mix-spark}" \
+      --flow-model /codec/models/heartcodec-flow-f32.gguf --sq-model /codec/models/heartcodec-sq-codec-f32.gguf
+    ;;
   prepare)
     docker run "${common[@]}" -e HF_HUB_OFFLINE=0 -e HF_HUB_DISABLE_XET=1 \
       -e HF_HOME=/workspace/.cache/huggingface "$image" /opt/sa3-venv/bin/python reference/prepare_models.py
@@ -78,5 +106,5 @@ case "$command" in
       "$image" /opt/sa3-venv/bin/python reference/export_reference.py --upstream /refs/MuLaCover \
       --output "refdata/upstream-$suffix" --dtype "$1"
     ;;
-  *) echo 'Usage: bash reference/run-spark.sh prepare|float32|bfloat16|convert|build|parity|build-development|parity-development|quantize-development|measure-development' >&2; exit 2 ;;
+  *) echo 'Usage: bash reference/run-spark.sh prepare|float32|bfloat16|convert|sampling-oracle|sequence-oracle|build-development|parity-development|quantize-development|measure-development|sampling-development|sequence-development|generate-development (build/parity also support the shared baseline)' >&2; exit 2 ;;
 esac

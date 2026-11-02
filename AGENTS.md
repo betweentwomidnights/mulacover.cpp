@@ -16,8 +16,12 @@
 - Use the FP32 oracle for F32 math; BF16 reference fixtures are a separate suite.
   Preserve the strict logit/cache gates and the recorded flat-absolute activation
   diagnostics. Q4_K_M is an experimental measured policy, not quality-approved.
-  Free-running sampling and native preprocessing are not implemented. The C ABI
-  currently accepts prepared conditioning and teacher codes.
+  Native top-k sampling and staged HeartCodec decoding now work from prepared
+  conditioning through a separate sampling capability API. Native preprocessing
+  is still absent. See `docs/SAMPLING_AND_AUDIO.md` for eight-second clips and
+  long-context tests. The original 600-tensor suite passes; the 128-prompt suite
+  passes public logits/KV but retains two prefill activation gate failures per
+  case. Do not relax those gates or call the complete expanded suite passed.
 - GGML is shared across repositories. Keep the agreed pin and working tree intact.
   Try the existing in-tree target/API before proposing infrastructure changes.
   An essential GGML change belongs in an isolated worktree/branch and a focused

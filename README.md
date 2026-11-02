@@ -25,7 +25,13 @@ at 7,331 MiB including the desktop (3,771 MiB with capacity 256). Only three act
 teacher-forced frames are tested. [Quantization results](docs/QUANTIZATION.md)
 record substantial logit drift; execution success is not quality acceptance.
 
-Free-running sampling is not implemented yet. Prepared prompt/style
+**Native sampling now produces eight-second 48kHz stereo clips on the laptop.**
+The sampler selects each RVQ head before computing the next and handles CFG,
+EOS/padding, deterministic native seeds and reset/replay. The generator unloads
+before staged FP32 HeartCodec decoding. See [sampling/audio results](docs/SAMPLING_AND_AUDIO.md),
+including the remaining longer-context hidden-activation tolerance gap.
+
+Prepared prompt/style
 and symbolic inputs are supplied by the caller; text/Qwen/MIDI preprocessing
 currently comes from the upstream fixture harness. The laptop is the primary C++
 workspace; full FP32 native/reference execution stays in Spark Docker containers.
@@ -85,8 +91,9 @@ the MuLaCover development profile. Local Python checks use `requirements-dev.txt
 (NumPy/GGUF), then `python -m unittest discover -s tests -v`. Full FP32 weights
 remain on Spark; the experimental Q4_K_M model is present on both machines.
 
-Next: extend quantization quality/context tests, native sampling and prompt/style
-preprocessing using the isolated fix. The user deferred ggml-bump-check and
+Next: resolve the longer-context prefill activation gap, extend quantization/audio
+quality checks and implement prompt/style preprocessing using the isolated fix.
+The user deferred ggml-bump-check and
 coordinated updates to sa3.cpp, yuey.cpp, acestep.cpp, stems.cpp and audiocraft.cpp
 until MuLaCover works. Existing yue2.cpp SheetSage2 melody/chord MIDI
 exports provide a later [transcription integration seam](docs/TRANSCRIPTION_INTEGRATION.md).

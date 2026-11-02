@@ -126,7 +126,12 @@ def main():
         command=[str(a.cli.resolve()),'--model',str(a.model.resolve()),'--input',str(inp.resolve()),'--output',str(native.resolve()),
             '--prompt-frames',str(prepared['input.tokens'].shape[1]),'--symbolic-frames',str(prepared['input.pianoroll'].shape[1]),
             '--qwen-index',str(prepared['input.qwen_indices'][0]),'--muq-index',str(prepared['input.muq_indices'][0]),
-            '--backend',a.backend,'--guidance',str(case['guidance']),'--capacity',str(a.capacity)]
+            '--backend',a.backend,'--guidance',str(case['guidance']),'--capacity',str(a.capacity),'--frames',str(case['frames'])]
+        if 'checkpoints' in case:command+=['--dump-frames',','.join(map(str,case['checkpoints']))]
+        if 'sampling_noise' in case['files']:
+            noise=load(expected_root,case['files']['sampling_noise'])
+            np.ascontiguousarray(noise,np.float32).tofile(inp/'sampling-noise.f32')
+            command+=['--sampling-noise',str((inp/'sampling-noise.f32').resolve())]
         memory_sampling=None
         if not a.reuse:
             env=dict(os.environ,GGML_CUDA_TF32='0',GGML_CUDA_CUBLAS_COMPUTE_TYPE='auto')
@@ -135,7 +140,7 @@ def main():
             if run.returncode:raise RuntimeError(f"Native CLI failed ({run.returncode}): {(root/'stderr.txt').read_text()[-4000:]}")
         results={};exact_replay=True
         for name,item in case['files'].items():
-            if name=='teacher_frames':continue
+            if name in ('teacher_frames','sampling_noise'):continue
             expected=load(expected_root,item).reshape(-1)
             path=native/(name+'.f32')
             actual=np.fromfile(path,np.float32)
@@ -152,6 +157,7 @@ def main():
         if stats.get('cache_capacity',8192)!=a.capacity:raise ValueError('Native output cache capacity does not match the requested run')
         execution_ok=bool(exact_replay and stats['cache_tail_zero'] and all('reason' not in v for v in results.values()))
         result=dict(name=case['name'],frames=case['frames'],branches=case['batch'],tensors=results,execution_passed=execution_ok,
+                    sampling_with_injected_noise='sampling_noise' in case['files'],
                     device_memory_sampling=memory_sampling,
                     native_reset_replay_bit_exact=bool(exact_replay),stats=stats,
                     flat_absolute_diagnostic_failures=[n for n,v in results.items() if not v.get('flat_absolute_gate_passed',False)],

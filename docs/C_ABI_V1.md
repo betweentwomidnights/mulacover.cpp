@@ -6,7 +6,12 @@ Unsupported versions return null. Set every argument/result `size = sizeof(value
 configuration and frame initializers preserve larger caller tails. The v1 table
 prefix ends at `get_memory`. Direct C exports remain available.
 
-`create` loads a strict F32 MuLaCover GGUF using the exact `cpu` or `cuda` backend;
+Native sampling is a separate capability in `include/mulacover_sampling.h`,
+resolved through `mulacover_get_sampling_api(1)`. It leaves this frozen table and
+its layouts unchanged; see [sampling/audio](SAMPLING_AND_AUDIO.md).
+
+`create` loads a MuLaCover GGUF with validated F32 or declared experimental
+[quantization policy](QUANTIZATION.md), using the exact `cpu` or `cuda` backend;
 there is no silent fallback. `session_begin` copies prepared prompt, style and
 symbolic buffers and clears persistent state. The initial frame consumes the
 entire prompt; later frames consume the preceding eight teacher-forced audio

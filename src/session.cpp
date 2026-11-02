@@ -1,4 +1,5 @@
 #include "internal.h"
+#include "sampling.h"
 #include <algorithm>
 #include <cmath>
 #include <filesystem>
@@ -54,7 +55,7 @@ std::vector<float> embed(Session & s,int branch) {
     }
     return values;
 }
-std::vector<float> run_backbone(Session & s,int branch,Dumps * dumps) {
+std::vector<float> run_backbone(Session & s,int branch,Dumps * dumps,std::vector<float> & first_logits) {
     const auto embedding=embed(s,branch);const int n=s.frame_index==0?s.condition.prompt:1;
     Graph g(s.model);auto * x=g.input(embedding,3072,n);
     auto * style=ggml_silu(g.ctx,g.input(branch_input(s.condition.qwen,branch),1024,1));
@@ -100,10 +101,10 @@ std::vector<float> run_backbone(Session & s,int branch,Dumps * dumps) {
             }
         }
     }
-    x=g.norm("backbone.norm",x);g.keep("stage.backbone.norm",x);
+    x=g.norm("backbone.norm",x);if(dumps)x=g.keep("stage.backbone.norm",x);
     auto * last=ggml_view_2d(g.ctx,x,3072,1,x->nb[1],size_t(n-1)*x->nb[1]);
     g.keep("last_hidden",last);g.keep("raw_logits",g.linear("codebook0_head",last));
-    g.execute();if(dumps)collect(g,*dumps);
+    g.execute();first_logits=g.read("raw_logits");if(dumps)collect(g,*dumps);
     return g.read("last_hidden");
 }
 }
@@ -134,30 +135,44 @@ void Session::begin(const mulacover_condition_v1 & c) {
     }
     condition=std::move(next);branches=batch;reset();
 }
-void Session::reset(){backbone.clear();decoder.clear();position=0;frame_index=0;previous.fill(0);}
-void Session::frame(const int32_t * codes,const char * dump,mulacover_frame_v1 & result) {
-    if(!branches||!codes)throw std::invalid_argument("Begin a session and supply teacher codes first");
-    for(int q=0;q<8;++q)if(codes[q]<0||codes[q]>=8192)throw std::invalid_argument("Teacher RVQ code outside [0,8191]");
+void Session::reset(){backbone.clear();decoder.clear();position=0;frame_index=0;stopped=false;previous.fill(0);}
+void Session::frame(const int32_t * codes,const char * dump,mulacover_frame_v1 & result,
+        const mulacover_sampling_config_v1 * sampling,int32_t * stop) {
+    if(!branches||(!codes&&!sampling)||stopped)throw std::invalid_argument("Begin/reset a nonterminal session before requesting frames");
+    if(codes)for(int q=0;q<8;++q)if(codes[q]<0||codes[q]>=8192)throw std::invalid_argument("Teacher RVQ code outside [0,8191]");
     const int n=frame_index==0?condition.prompt:1;
     if(position+n>capacity)throw std::invalid_argument("Backbone cache capacity exhausted");
     const bool dumping=dump&&*dump;Dumps collected;
-    std::vector<float> raw(size_t(8*branches*8197));decoder.clear();
+    std::vector<float> raw(size_t(8*branches*8197)),guided(8*8197);decoder.clear();
+    std::array<int32_t,8> selected{};if(codes)std::copy_n(codes,8,selected.begin());
+    std::array<std::vector<float>,2> hidden;
     for(int branch=0;branch<branches;++branch) {
         Dumps branch_stages;
-        // Raw logits are an output even when stage dumping is disabled.
-        auto hidden=run_backbone(*this,branch,&branch_stages);
-        const auto & first=branch_stages.at("raw_logits");
+        std::vector<float> first;
+        hidden[size_t(branch)]=run_backbone(*this,branch,dumping?&branch_stages:nullptr,first);
         std::copy(first.begin(),first.end(),raw.begin()+branch*8197);
         for(auto & stage:branch_stages)if(dumping&&stage.first!="raw_logits"&&stage.first!="last_hidden") {
             auto & data=collected[stage.first];data.insert(data.end(),stage.second.begin(),stage.second.end());
         }
-        for(int q=1;q<8;++q) {
+    }
+    auto guide_and_select=[&](int q) {
+        for(int v=0;v<8197;++v) {
+            const float cond=raw[size_t(q*branches*8197+v)];
+            if(branches==2) {const float uncond=raw[size_t((q*branches+1)*8197+v)];guided[size_t(q*8197+v)]=uncond+(cond-uncond)*condition.guidance;}
+            else guided[size_t(q*8197+v)]=cond;
+        }
+        if(sampling)selected[size_t(q)]=sample_logits(guided.data()+q*8197,*sampling,frame_index,q);
+    };
+    guide_and_select(0);
+    for(int q=1;q<8;++q) {
+        for(int branch=0;branch<branches;++branch) {
             Graph g(model);
-            auto * audio=ggml_get_rows(g.ctx,model.get("audio_embeddings.weight"),g.ids({codes[q-1]+(q-1)*8197}));
-            auto * input=q==1?ggml_concat(g.ctx,g.input(hidden,3072,1),audio,1):audio;
-            auto * x=g.keep("local."+std::to_string(q)+".projection",g.linear("projection",input));
+            auto * audio=ggml_get_rows(g.ctx,model.get("audio_embeddings.weight"),g.ids({selected[size_t(q-1)]+(q-1)*8197}));
+            auto * input=q==1?ggml_concat(g.ctx,g.input(hidden[size_t(branch)],3072,1),audio,1):audio;
+            auto * x=g.linear("projection",input);
+            if(dumping)x=g.keep("local."+std::to_string(q)+".projection",x);
             for(int layer=0;layer<3;++layer)x=g.transformer("decoder.layers."+std::to_string(layer),x,8,4,q==1?0:q,true,{},&decoder,layer,branch);
-            x=g.keep("local."+std::to_string(q)+".decoder",g.norm("decoder.norm",x));
+            x=g.norm("decoder.norm",x);if(dumping)x=g.keep("local."+std::to_string(q)+".decoder",x);
             auto * last=ggml_view_2d(g.ctx,x,3072,1,x->nb[1],size_t(x->ne[1]-1)*x->nb[1]);
             g.keep("logits",g.linear("audio_head."+std::to_string(q-1),last));g.execute();
             auto values=g.read("logits");std::copy(values.begin(),values.end(),raw.begin()+(q*branches+branch)*8197);
@@ -165,12 +180,7 @@ void Session::frame(const int32_t * codes,const char * dump,mulacover_frame_v1 &
                 auto data=g.read(item.first);auto & dest=collected[item.first];dest.insert(dest.end(),data.begin(),data.end());
             }
         }
-    }
-    std::vector<float> guided(8*8197);
-    for(int q=0;q<8;++q)for(int v=0;v<8197;++v) {
-        const float cond=raw[size_t(q*branches*8197+v)];
-        if(branches==2) {const float uncond=raw[size_t((q*branches+1)*8197+v)];guided[size_t(q*8197+v)]=uncond+(cond-uncond)*condition.guidance;}
-        else guided[size_t(q*8197+v)]=cond;
+        guide_and_select(q);
     }
     if(!std::all_of(guided.begin(),guided.end(),[](float x){return std::isfinite(x);}))throw std::runtime_error("Nonfinite guided logits");
     auto raw_owned=std::make_unique<float[]>(raw.size()),guided_owned=std::make_unique<float[]>(guided.size());
@@ -185,7 +195,8 @@ void Session::frame(const int32_t * codes,const char * dump,mulacover_frame_v1 &
         backbone.dump(prefix,"backbone",position+n,24);decoder.dump(prefix,"decoder",8,8);
     }
     result.raw_logits=raw_owned.release();result.logits=guided_owned.release();result.branches=branches;
-    std::copy_n(codes,8,result.codes);previous=std::array<int32_t,8>{};std::copy_n(codes,8,previous.begin());
+    std::copy(selected.begin(),selected.end(),result.codes);previous=selected;
     position+=n;result.cache_position=position;++frame_index;
+    if(sampling){*stop=stop_reason(selected.data());stopped=*stop!=MULACOVER_CONTINUE_V1;}
 }
 }

@@ -1,4 +1,5 @@
 #include "internal.h"
+#include "sampling.h"
 #include <algorithm>
 #include <cstdio>
 #include <cstring>
@@ -64,6 +65,26 @@ const mulacover_api_v1 * MULACOVER_CALL mulacover_get_api(uint32_t version) {
     static const mulacover_api_v1 api={uint32_t(MULACOVER_API_V1_SIZE),1,mulacover_config_init_v1,mulacover_frame_init_v1,
         mulacover_frame_free_v1,mulacover_create_v1,mulacover_destroy_v1,mulacover_session_begin_v1,
         mulacover_session_reset_v1,mulacover_teacher_frame_v1,mulacover_get_memory_v1};
+    return version==1?&api:nullptr;
+}
+void MULACOVER_CALL mulacover_sampling_config_init_v1(mulacover_sampling_config_v1 * c) {
+    if(!c||c->size<sizeof(*c))return;init(c);c->temperature=1;c->top_k=250;c->seed=1701;
+}
+int MULACOVER_CALL mulacover_sample_frame_v1(mulacover_context * c,const mulacover_sampling_config_v1 * config,
+        const char * dump,mulacover_frame_v1 * frame,int32_t * stop,mulacover_error_v1 * e) {
+    return guard(e,[&]{
+        context(c);
+        if(!config||!stop||!frame||frame->size<sizeof(*frame)||frame->raw_logits||frame->logits)
+            throw std::invalid_argument("Invalid sampling arguments or occupied frame result");
+        mula::validate_sampling(*config);
+        try{c->session->frame(nullptr,dump,*frame,config,stop);}
+        catch(const std::invalid_argument &){throw;}
+        catch(...){c->session->reset();throw;}
+    });
+}
+const mulacover_sampling_api_v1 * MULACOVER_CALL mulacover_get_sampling_api(uint32_t version) {
+    static const mulacover_sampling_api_v1 api={uint32_t(MULACOVER_SAMPLING_API_V1_SIZE),1,mulacover_get_api(1),
+        mulacover_sampling_config_init_v1,mulacover_sample_frame_v1};
     return version==1?&api:nullptr;
 }
 }
