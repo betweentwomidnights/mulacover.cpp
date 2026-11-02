@@ -37,3 +37,8 @@
   and `dependencies/ggml-development.json`; leave HeartCodec's recorded GGML pin
   at `b77ae79`. Do not run ggml-bump-check or update sa3.cpp, yuey.cpp, acestep.cpp,
   stems.cpp or audiocraft.cpp until the user starts that process after MuLaCover works.
+- User selected `C:/Users/thegr/Music/billiegasm_yuey.wav` for the first real
+  transcription-to-cover test. See `docs/TRANSCRIPTION_INTEGRATION.md` and the
+  input manifest; keep the audio outside Git and unchanged. Instrumental control
+  must be tested explicitly with regenerated prompt/style conditioning. The
+  initial eight-second demo used lyrics and a "clear voice" tag, so it was vocal.

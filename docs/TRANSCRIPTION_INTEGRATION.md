@@ -18,6 +18,37 @@ separate source. Native generator parity initially uses frozen synthetic MIDI
 fixtures, allowing transcription integration to be validated separately later.
 
 Model libraries should share one GGML target and release transcription model
-weights before loading the generator on an 8GB GPU. The present FP32 generator
-parity runtime is Spark Docker; a laptop GPU deployment depends on later generator
-quantization and cache measurements.
+weights before loading the generator on an 8GB GPU. Full FP32 generator inference
+stays in Spark Docker. Q4_K_M generation and staged HeartCodec decoding now run
+on the laptop; see `SAMPLING_AND_AUDIO.md`. Native prompt/Qwen/MIDI preparation
+and the real transcription adapter are still outstanding.
+
+## User-selected real-audio test
+
+Use `C:/Users/thegr/Music/billiegasm_yuey.wav` when the transcription-to-cover path
+is ready. The user selected this source on November 1, 2026. It is approximately
+69.985 seconds, 44.1kHz stereo, signed 16-bit PCM. The file is referenced in
+`validation/transcription-cover-input.json` by path and SHA-256; the audio remains
+unchanged outside the repository. Do not substitute an unrelated source or infer
+its musical content from its filename.
+
+The first eight-second generator demo was explicitly vocal: lyrics were
+`[Verse]` followed by "A lantern swings beside the rain / We count the lights
+along the train", with tags `warm acoustic pop, soft drums, clear voice`. It is
+not evidence for or against instrumental controllability.
+
+For the real test, retain SheetSage2's aligned melody/chord MIDI and expose which
+melody role is used. Keep drum conditioning optional. First validate the MIDI
+timing/contents against the source, then generate a short excerpt before a full
+length attempt. Release transcription weights before generator loading, and
+generator weights before codec loading.
+
+Instrumental control is an explicit pending acceptance test. A candidate request
+uses nonempty `[Instrumental]` text and instrumental style tags without "clear
+voice"; this is a test input, not a demonstrated recipe. The pinned upstream
+preprocessor rejects empty lyrics. Rebuild both prompt tokens and Qwen/style
+embeddings for the new request; reusing the demo's vocal style embedding would
+confound the test. Use the same transcribed MIDI and controlled sampling settings
+for F32/Q4 comparisons. Record audible singing/vocalizations separately from MIDI
+fidelity, audio quality and numerical execution success. A successful WAV decode
+does not establish that an instrumental request was respected.

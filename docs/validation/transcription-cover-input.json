@@ -1,0 +1,26 @@
+{
+  "selected_by": "user",
+  "selected_on": "2026-11-01",
+  "purpose": "First real-audio transcription-to-cover integration test",
+  "source_path": "C:/Users/thegr/Music/billiegasm_yuey.wav",
+  "sha256": "140f18292989b1026113f02e0b6e2c9c1eaea29df05965f9404e40d76f74af9a",
+  "file_bytes": 12345456,
+  "duration_seconds": 69.98512471655329,
+  "sample_rate": 44100,
+  "channels": 2,
+  "bits_per_sample": 16,
+  "encoding": "RIFF WAVE PCM",
+  "audio_kept_outside_git": true,
+  "source_modified": false,
+  "transcription_executed": false,
+  "cover_test_executed": false,
+  "instrumental_controllability_verified": false,
+  "pending_checks": [
+    "SheetSage2 aligned melody/chord export and source fidelity",
+    "Prepared conditioning from actual exported MIDI",
+    "Instrumental request with new prompt tokens and regenerated style embedding",
+    "Audible vocals evaluated separately from decode success",
+    "Short excerpt before full-length generation",
+    "Staged transcription, generator and codec memory residency"
+  ]
+}
