@@ -16,7 +16,7 @@
   "cover_test_executed": true,
   "instrumental_controllability_verified": false,
   "pending_checks": [
-    "Matched-Philox listening and decoder numerical diagnostics; unchanged full-song strict waveform gate fails",
+    "Q4 matched-Philox listening and decoder numerical diagnostics; unchanged full-song strict waveform gate fails",
     "Preservation of the confirmed vocal melody through generation; no F32 vocal-lane control yet",
     "Remaining transcription lanes and generated musical/audio quality",
     "Native prompt/tokenizer/Qwen/MIDI preparation"
@@ -44,5 +44,7 @@
   "upstream_fp32_listener_observation": "Guitar melody played by horns, no vocalizations",
   "philox_validation_report": "philox-parity.json",
   "native_f32_token_parity_with_upstream": true,
-  "native_full_waveform_parity_accepted": false
+  "native_full_waveform_parity_accepted": false,
+  "matched_philox_native_f32_listener_observation": "Matches upstream horns, no vocalizations",
+  "matched_philox_native_f32_instrumental_request_accepted_for_this_run": true
 }

@@ -72,10 +72,12 @@
   oracles (85,205,452 values) bit-for-bit on Spark and laptop with target cap 288.
   The matched-RNG native F32 full-song run reproduces all 6,888 upstream codes
   across 861 frames and EOS exactly. See `docs/PHILOX_PARITY.md`.
+  User confirms this matched-Philox native F32 clip matches the upstream horns
+  with no vocalizations. Listener acceptance applies to this F32 case only.
   Decoded audio cosine is 0.999995528, but strict waveform gates still FAIL
   (max_abs 0.0827555 vs 0.01; relative L2 0.00299061 vs 0.001). Do not relax them,
   infer an SQ-level exception without diagnostics, or claim waveform parity.
-  Q4 Philox runs 70s on the laptop (6,865 MiB peak); new listening is pending.
+  Q4 Philox runs 70s on the laptop (6,865 MiB peak); Q4 listening is pending.
   Use `--rng torch-cuda --rng-cuda-blocks 288` for new Spark/laptop parity
   comparisons; the legacy default exists for historical replay.
   Do not blame transcription or quantization

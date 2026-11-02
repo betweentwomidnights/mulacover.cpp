@@ -10,6 +10,10 @@ requested sa3.cpp-style Philox control and reruns the real source.
 Native F32 on Spark now reproduces **all 6,888 upstream codes across 861 frames**
 bit-for-bit, including EOS at the same position. Both produce 68.88 seconds.
 The native run also passes exact reset/replay and terminal sampling checks.
+The user confirms that this matched-Philox native F32 output sounds like the
+upstream horns, without vocalizations. The instrumental request is listener-
+accepted for this particular case; that does not accept every prompt/seed or
+change any numerical waveform gate.
 All 11 prepared tensors are identical to the official control. Both generator
 caches are configured for 8,192 positions. The selected lane remains instrumental;
 the separately confirmed vocal MIDI is not part of this case.
@@ -26,7 +30,7 @@ The Q4 laptop run also completes 70 seconds with matched streams, cache capacity
 1,024, reset/replay and terminal checks, and a sampled 6,865 MiB peak including
 desktop usage. Q4 model drift remains separate from RNG identity; its tokens and
 audio are not expected to match unquantized inference. Listening acceptance of
-these new clips remains pending.
+the Q4 clip remains pending.
 
 ## Implementation and oracle
 

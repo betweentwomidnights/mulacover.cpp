@@ -356,7 +356,7 @@
   "conclusion": "Exact RNG and full-song native FP32 token/EOS parity achieved. Decoded waveform is close but fails unchanged strict waveform limits; decoder diagnostics remain open. No gates relaxed.",
   "full_waveform_parity_accepted": false,
   "q4_audio_quality_accepted": false,
-  "listener_assessment": "pending for matched-Philox outputs",
+  "listener_assessment": "User confirms matched-Philox native FP32 sounds like upstream horns with no vocalizations; Q4 listening remains pending",
   "ggml_bump_check_started": false,
   "sibling_source_or_pins_modified": false,
   "rng_cases_details": [
@@ -764,5 +764,14 @@
       "grid_blocks": 33
     }
   ],
-  "heartcodec_revision": "3d0e379678b8551953a4cb0fc30889493143af03"
+  "heartcodec_revision": "3d0e379678b8551953a4cb0fc30889493143af03",
+  "native_f32_listener_observation": {
+    "date": "2026-11-02",
+    "question": "Does this matched-Philox native FP32 version now sound like the upstream horns, without vocalizations?",
+    "answer": "Yes\u2014horns, no vocalizations",
+    "listening_audio_sha256": "2093d11238fff0eab9644ed6fb62b51822aa9dca4399c426cc15865e1f117552",
+    "vocal_presence": "none heard by user",
+    "instrumental_request_accepted_for_this_run": true,
+    "scope": "This matched-Philox native FP32 instrumental-lane case only; no change to numerical waveform gates or Q4 acceptance"
+  }
 }
