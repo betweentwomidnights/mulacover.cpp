@@ -1,0 +1,9 @@
+{
+  "lyrics": "[Instrumental]",
+  "tags": "warm acoustic pop, soft drums, instrumental, no vocals",
+  "melody_midi": "../refdata/billiegasm-cover/transcription/excerpt-midi/melody.mid",
+  "chord_midi": "../refdata/billiegasm-cover/transcription/excerpt-midi/chords.mid",
+  "case": "billiegasm-instrumental",
+  "melody_role": "instrumental",
+  "source_audio_sha256": "140f18292989b1026113f02e0b6e2c9c1eaea29df05965f9404e40d76f74af9a"
+}

@@ -12,15 +12,22 @@
   "encoding": "RIFF WAVE PCM",
   "audio_kept_outside_git": true,
   "source_modified": false,
-  "transcription_executed": false,
-  "cover_test_executed": false,
+  "transcription_executed": true,
+  "cover_test_executed": true,
   "instrumental_controllability_verified": false,
   "pending_checks": [
-    "SheetSage2 aligned melody/chord export and source fidelity",
-    "Prepared conditioning from actual exported MIDI",
-    "Instrumental request with new prompt tokens and regenerated style embedding",
-    "Audible vocals evaluated separately from decode success",
-    "Short excerpt before full-length generation",
-    "Staged transcription, generator and codec memory residency"
-  ]
+    "Listener assessment of instrumental request (singing/vocalizations)",
+    "Musical transcription and cover fidelity against source",
+    "Full-length generation after excerpt review",
+    "Native prompt/tokenizer/Qwen/MIDI preparation"
+  ],
+  "last_test_on": "2026-11-02",
+  "generated_excerpt_seconds": 8,
+  "source_excerpt_seconds": [
+    0,
+    8
+  ],
+  "full_length_cover_executed": false,
+  "melody_role": "instrumental",
+  "validation_report": "first-cover-test.json"
 }

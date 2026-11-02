@@ -1,0 +1,632 @@
+{
+  "date": "2026-11-02",
+  "shared_ggml_baseline": "b77ae790e628270af46a8af1eca38441c23f1252",
+  "mulacover_development_ggml": "0f2ed045eaff6bf01bed074878b6988248efbc22",
+  "ggml_bump_check_started": false,
+  "sibling_source_or_pins_modified": false,
+  "fully_native_preprocessing": false,
+  "instrumental_controllability_accepted": false,
+  "musical_cover_fidelity_accepted": false,
+  "listening_assessment": "pending",
+  "transcription": {
+    "source_path": "C:\\Users\\thegr\\Music\\billiegasm_yuey.wav",
+    "source_sha256": "140f18292989b1026113f02e0b6e2c9c1eaea29df05965f9404e40d76f74af9a",
+    "source_modified": false,
+    "source_audio": {
+      "channels": 2,
+      "sample_rate": 44100,
+      "sample_width": 2,
+      "frames": 3086344
+    },
+    "command": [
+      "C:\\dev\\yue2.cpp\\build-ggml027-cuda\\bin\\Release\\yue2-transcribe.exe",
+      "--model",
+      "C:\\dev\\yue2.cpp\\models\\sheetsage2-mert2-f16.gguf",
+      "--audio",
+      "C:\\Users\\thegr\\Music\\billiegasm_yuey.wav",
+      "--output",
+      "C:\\dev\\mulacover.cpp\\refdata\\billiegasm-cover\\transcription\\score.abc",
+      "--midi-dir",
+      "C:\\dev\\mulacover.cpp\\refdata\\billiegasm-cover\\transcription\\whole-midi",
+      "--events",
+      "C:\\dev\\mulacover.cpp\\refdata\\billiegasm-cover\\transcription\\events.json",
+      "--full",
+      "--device",
+      "cuda"
+    ],
+    "transcriber_version": "yue2-transcribe 0.3.0",
+    "transcriber_binary_sha256": "439746648e0a3038017f62e4d41d30c4ca70b58eebf53638f49b7684af16e51c",
+    "transcriber_model_sha256": "29902ab4c24a5dd4571673210af4c93f9e70f3ad9fcd18dc5b923a839d4bcad0",
+    "linked_transcriber_ggml": "b77ae790",
+    "device_memory_sampling": {
+      "samples": 21,
+      "interval_seconds": 0.2,
+      "scope": "nvidia-smi physical GPU 0 total device usage, includes desktop/other processes",
+      "first_used_mib": 801,
+      "peak_used_mib": 3134,
+      "total_mib": 8151,
+      "process_wall_seconds": 5.48399999999674
+    },
+    "duration_seconds": 69.98512472,
+    "event_count": 209,
+    "native_notes_by_track": {
+      "1": 137,
+      "0": 44
+    },
+    "warnings": [],
+    "midi_event_audits": {
+      "combined": {
+        "role": "combined",
+        "native_event_notes": 181,
+        "midi_notes": 181,
+        "beat_positions_pitches_durations_match": true,
+        "missing_notes": 0,
+        "extra_notes": 0
+      },
+      "vocal": {
+        "role": "vocal",
+        "native_event_notes": 44,
+        "midi_notes": 44,
+        "beat_positions_pitches_durations_match": true,
+        "missing_notes": 0,
+        "extra_notes": 0
+      },
+      "instrumental": {
+        "role": "instrumental",
+        "native_event_notes": 137,
+        "midi_notes": 137,
+        "beat_positions_pitches_durations_match": true,
+        "missing_notes": 0,
+        "extra_notes": 0
+      }
+    },
+    "melody_role": "instrumental",
+    "melody_excerpt": {
+      "notes": 23,
+      "duration_seconds": 8.135600000000002,
+      "ticks_per_beat": 960,
+      "sixteenths": 64,
+      "last_note_step": 64.0
+    },
+    "chord_excerpt": {
+      "notes": 19,
+      "duration_seconds": 8.1356,
+      "ticks_per_beat": 960,
+      "sixteenths": 64,
+      "last_note_step": 64.0
+    },
+    "source_excerpt_start_seconds": 0,
+    "source_excerpt_end_seconds": 8.0,
+    "timing_note": "MuLaCover consumes MIDI beat positions; MIDI render tempo and source timestamp interpolation are distinct, and generated tempo is not fixed",
+    "files": {
+      "events.json": "4b6af91b98c6d86d71d750846bae1bd7823f2918c3ec10cb407a1e109f2484bb",
+      "score.abc": "1d7069544a496413e060963826bab51bf651a130b31c65927c1311c43bbd8082",
+      "source-excerpt.wav": "fcf2b40a2ec28df65ecbea8dfb7296d2ef6401ec5ec10deb98925e31cc419836",
+      "whole-midi\\chords.mid": "80020974ac4d00215f1fbdd655d61358a0ab4c5dcbc4e3e1b7568706657ee752",
+      "whole-midi\\melody.mid": "7a92063d87640e3c007abafa67d1310ee3b57429703329391c27b8d222f30f16",
+      "whole-midi\\melody_instrumental.mid": "0fbef0ef0b8aa7b50c4c922f527510562d8ff856b42220328a00681b87f95107",
+      "whole-midi\\melody_vocal.mid": "abfd185b8357076fdac7ba2140c6687f1ce7cb401839eb17795143c48010e0cb",
+      "whole-midi\\transcription.mid": "25de0fc9ccc0906d20e7f9c5c0a12cde097fe9fbc46ba21397c69c0ee403a1c1",
+      "excerpt-midi\\chords.mid": "7a457e22b480f13c286156ad0e13588c19b42ab9fe1c7da52a834106f2da7f36",
+      "excerpt-midi\\melody.mid": "b964b7c5ba08b1c6cb2e530b5fc605226a9696ab519cd574cfc42cc9c8f57ae8"
+    },
+    "execution_passed": true,
+    "musical_transcription_quality_accepted": false
+  },
+  "preparation": {
+    "instrumental-synthetic": {
+      "request": {
+        "lyrics": "[Instrumental]",
+        "tags": "warm acoustic pop, soft drums, instrumental, no vocals",
+        "melody_midi": "../upstream-f32/melody.mid",
+        "chord_midi": "../upstream-f32/chord.mid",
+        "drum_midi": "../upstream-f32/drum.mid",
+        "case": "instrumental-synthetic"
+      },
+      "input_files": {
+        "melody_midi": {
+          "file": "/workspace/refdata/upstream-f32/melody.mid",
+          "sha256": "50db5f8346a11cbf7632bd381de3881b4e7f3140f8dbf11232975f3701fc62ed"
+        },
+        "chord_midi": {
+          "file": "/workspace/refdata/upstream-f32/chord.mid",
+          "sha256": "fc35c8db07c41f7b65ff4e720cc4b04dcc64fbbb20dca78dcdff0dcf6ea6885f"
+        },
+        "drum_midi": {
+          "file": "/workspace/refdata/upstream-f32/drum.mid",
+          "sha256": "5859901d5741cbb86f4f5ccca98255361e8564ea9d7f56e8e939722937aa3286"
+        }
+      },
+      "request_sha256": "181fda2e3187da6b1c40e92f824b1307b3fb37e5fce2aeefa8e05d302751028b",
+      "prepared_manifest_sha256": "ec2cd4d544dabbcabf5fe896d9d65850a0d26865bb4c64e13db4b1639fbd231a",
+      "upstream_revision": "e27fa7fa0da7c9817879cc6210cc5693f9327946",
+      "models": {
+        "generator": {
+          "repo": "HeartMuLa/MuLaCover",
+          "revision": "bbbaef2b31835c2ef5172ff528dbe325230d46fb"
+        },
+        "style": {
+          "repo": "Qwen/Qwen3-Embedding-0.6B",
+          "revision": "97b0c614be4d77ee51c0cef4e5f07c00f9eb65b3"
+        }
+      },
+      "symbolic_frames": 16,
+      "prompt_frames": 25,
+      "style_regenerated": true,
+      "qwen_released": true,
+      "symbolic_midi_roundtrip_exact": true,
+      "drum_condition_zero": false,
+      "style_tensor_sha256": "7a502c3a635af554a58244128a4660fdeb0cde7f2b67098cabe7f4dab4c3bc53",
+      "old_vocal_style_tensor_sha256": "b3b1458a4f576779f100f08dd77ecbf53379bc133c7499bd8d544292c89badfb",
+      "cosine_to_vocal_style": 0.8857378363609314
+    },
+    "billiegasm-instrumental": {
+      "request": {
+        "lyrics": "[Instrumental]",
+        "tags": "warm acoustic pop, soft drums, instrumental, no vocals",
+        "melody_midi": "../billiegasm-cover/transcription/excerpt-midi/melody.mid",
+        "chord_midi": "../billiegasm-cover/transcription/excerpt-midi/chords.mid",
+        "case": "billiegasm-instrumental",
+        "melody_role": "instrumental",
+        "source_audio_sha256": "140f18292989b1026113f02e0b6e2c9c1eaea29df05965f9404e40d76f74af9a"
+      },
+      "input_files": {
+        "melody_midi": {
+          "file": "/workspace/refdata/billiegasm-cover/transcription/excerpt-midi/melody.mid",
+          "sha256": "b964b7c5ba08b1c6cb2e530b5fc605226a9696ab519cd574cfc42cc9c8f57ae8"
+        },
+        "chord_midi": {
+          "file": "/workspace/refdata/billiegasm-cover/transcription/excerpt-midi/chords.mid",
+          "sha256": "7a457e22b480f13c286156ad0e13588c19b42ab9fe1c7da52a834106f2da7f36"
+        }
+      },
+      "request_sha256": "a168efc6942e9be366a80fb9c4432d5f6f1e93ea85f89ae8829c12e14faec35c",
+      "prepared_manifest_sha256": "4eb5e026746a13fe45666ba03dfda2afcac49393975f7371689f5938e9244841",
+      "upstream_revision": "e27fa7fa0da7c9817879cc6210cc5693f9327946",
+      "models": {
+        "generator": {
+          "repo": "HeartMuLa/MuLaCover",
+          "revision": "bbbaef2b31835c2ef5172ff528dbe325230d46fb"
+        },
+        "style": {
+          "repo": "Qwen/Qwen3-Embedding-0.6B",
+          "revision": "97b0c614be4d77ee51c0cef4e5f07c00f9eb65b3"
+        }
+      },
+      "symbolic_frames": 64,
+      "prompt_frames": 25,
+      "style_regenerated": true,
+      "qwen_released": true,
+      "symbolic_midi_roundtrip_exact": true,
+      "drum_condition_zero": true,
+      "style_tensor_sha256": "7a502c3a635af554a58244128a4660fdeb0cde7f2b67098cabe7f4dab4c3bc53",
+      "old_vocal_style_tensor_sha256": "b3b1458a4f576779f100f08dd77ecbf53379bc133c7499bd8d544292c89badfb",
+      "cosine_to_vocal_style": 0.8857378363609314
+    },
+    "billiegasm-alex-instrumental": {
+      "request": {
+        "lyrics": "[Instrumental]",
+        "tags": "topic:[Instrumental]; genre:[Classical]; instrument:[Violin, Piano]; mood:[dramatic]",
+        "melody_midi": "../billiegasm-cover/transcription/excerpt-midi/melody.mid",
+        "chord_midi": "../billiegasm-cover/transcription/excerpt-midi/chords.mid",
+        "case": "billiegasm-alex-instrumental",
+        "melody_role": "instrumental",
+        "source_audio_sha256": "140f18292989b1026113f02e0b6e2c9c1eaea29df05965f9404e40d76f74af9a",
+        "recipe_source": "https://github.com/HeartMuLa/MuLaCover/issues/1#issuecomment-6251041772"
+      },
+      "input_files": {
+        "melody_midi": {
+          "file": "/workspace/refdata/billiegasm-cover/transcription/excerpt-midi/melody.mid",
+          "sha256": "b964b7c5ba08b1c6cb2e530b5fc605226a9696ab519cd574cfc42cc9c8f57ae8"
+        },
+        "chord_midi": {
+          "file": "/workspace/refdata/billiegasm-cover/transcription/excerpt-midi/chords.mid",
+          "sha256": "7a457e22b480f13c286156ad0e13588c19b42ab9fe1c7da52a834106f2da7f36"
+        }
+      },
+      "request_sha256": "29c83c32431dfad08f83ac3638c8de73b30eecb4a89a3b91b41e088b9ed8b413",
+      "prepared_manifest_sha256": "96cbfdece53439f974461978f496ac7f58e3659513f12c629fa694daf2ebb56b",
+      "upstream_revision": "e27fa7fa0da7c9817879cc6210cc5693f9327946",
+      "models": {
+        "generator": {
+          "repo": "HeartMuLa/MuLaCover",
+          "revision": "bbbaef2b31835c2ef5172ff528dbe325230d46fb"
+        },
+        "style": {
+          "repo": "Qwen/Qwen3-Embedding-0.6B",
+          "revision": "97b0c614be4d77ee51c0cef4e5f07c00f9eb65b3"
+        }
+      },
+      "symbolic_frames": 64,
+      "prompt_frames": 37,
+      "style_regenerated": true,
+      "qwen_released": true,
+      "symbolic_midi_roundtrip_exact": true,
+      "drum_condition_zero": true,
+      "style_tensor_sha256": "81d0d3fefbd9ce87845062f5d191aab1a4330170969f199dd4f6a4390ea87bb8",
+      "old_vocal_style_tensor_sha256": "b3b1458a4f576779f100f08dd77ecbf53379bc133c7499bd8d544292c89badfb",
+      "cosine_to_vocal_style": 0.3829312324523926
+    }
+  },
+  "generation": [
+    {
+      "ggml_revision": "0f2ed045eaff6bf01bed074878b6988248efbc22",
+      "prepared_manifest_sha256": "ec2cd4d544dabbcabf5fe896d9d65850a0d26865bb4c64e13db4b1639fbd231a",
+      "model_sha256": "5f3bfcb7bd441301d272546e4bfb7ddd690df45447251100f5e223e036dab62c",
+      "codes_sha256": "7e5f21b73d7b5ab20392cf27b7347e4e0f810f9494d4474bb18dcc4360dfafc8",
+      "audio_sha256": "435e7f192df2100c056e09bd10eaf23eacbca1ccb330468a29d4fdc5a68d71bf",
+      "execution_passed": true,
+      "device_memory_sampling": {
+        "samples": 0,
+        "interval_seconds": 0.2,
+        "scope": "nvidia-smi physical GPU 0 total device usage, includes desktop/other processes",
+        "process_wall_seconds": 82.48290034400998
+      },
+      "run": {
+        "frames": 100,
+        "prompt_frames": 25,
+        "symbolic_frames": 16,
+        "cache_capacity": 256,
+        "guidance": 1.5,
+        "temperature": 1,
+        "top_k": 250,
+        "seed": 1701,
+        "eos": false,
+        "replay_checked": true,
+        "terminal_contract_passed": true,
+        "generator_released_before_decode": true,
+        "generation_with_checks_seconds": 46.8998,
+        "weight_bytes": 17516732416,
+        "cache_bytes": 118030336,
+        "graph_bytes": 3389312,
+        "audio_samples_per_channel": 384000,
+        "audio_peak": 0.361068,
+        "audio_rms": 0.0981504,
+        "decode_seconds": 15.5258,
+        "decoder_seed": 1701,
+        "decoder_steps": 10,
+        "segment_codes": 372,
+        "decoder_guidance": 1.25,
+        "ggml_commit": "0f2ed045"
+      },
+      "flow_model_sha256": "5c9cdbfae26ccd3e96355c541cade0feca37cfd8696746b724c294095949f523",
+      "sq_model_sha256": "2f72b85f924c629aae33004703cc02e16600abee15c01e928b2878e5d0f29ae6",
+      "decoder": {
+        "seed": 1701,
+        "steps": 10,
+        "segment_codes": 372,
+        "guidance": 1.25
+      },
+      "name": "instrumental-control/f32-spark",
+      "vocal_presence": "not yet listener-assessed",
+      "audio_quality_accepted": false
+    },
+    {
+      "ggml_revision": "0f2ed045eaff6bf01bed074878b6988248efbc22",
+      "prepared_manifest_sha256": "ec2cd4d544dabbcabf5fe896d9d65850a0d26865bb4c64e13db4b1639fbd231a",
+      "model_sha256": "74ebd8a8537f55ea3f3566cfa17c7e28734fc555af5fbc1a254bec94a182f814",
+      "codes_sha256": "35b0b4928877dd6e1c971a02d3caf0c6bb14e28249c5b64e60ea1d07c1129373",
+      "audio_sha256": "37926c8cc9aeb2f47b8dd83626a777f34e783072ed02d6b2d65ed4269857c563",
+      "execution_passed": true,
+      "device_memory_sampling": {
+        "samples": 0,
+        "interval_seconds": 0.2,
+        "scope": "nvidia-smi physical GPU 0 total device usage, includes desktop/other processes",
+        "process_wall_seconds": 27.168018043012125
+      },
+      "run": {
+        "frames": 100,
+        "prompt_frames": 25,
+        "symbolic_frames": 16,
+        "cache_capacity": 256,
+        "guidance": 1.5,
+        "temperature": 1,
+        "top_k": 250,
+        "seed": 1701,
+        "eos": false,
+        "replay_checked": true,
+        "terminal_contract_passed": true,
+        "generator_released_before_decode": true,
+        "generation_with_checks_seconds": 13.5374,
+        "weight_bytes": 2939920896,
+        "cache_bytes": 118030336,
+        "graph_bytes": 3389312,
+        "audio_samples_per_channel": 384000,
+        "audio_peak": 0.957551,
+        "audio_rms": 0.111654,
+        "decode_seconds": 10.2233,
+        "decoder_seed": 1701,
+        "decoder_steps": 10,
+        "segment_codes": 372,
+        "decoder_guidance": 1.25,
+        "ggml_commit": "0f2ed045"
+      },
+      "flow_model_sha256": "5c9cdbfae26ccd3e96355c541cade0feca37cfd8696746b724c294095949f523",
+      "sq_model_sha256": "2f72b85f924c629aae33004703cc02e16600abee15c01e928b2878e5d0f29ae6",
+      "decoder": {
+        "seed": 1701,
+        "steps": 10,
+        "segment_codes": 372,
+        "guidance": 1.25
+      },
+      "name": "instrumental-control/q4-spark",
+      "vocal_presence": "not yet listener-assessed",
+      "audio_quality_accepted": false
+    },
+    {
+      "ggml_revision": "0f2ed045eaff6bf01bed074878b6988248efbc22",
+      "prepared_manifest_sha256": "4eb5e026746a13fe45666ba03dfda2afcac49393975f7371689f5938e9244841",
+      "model_sha256": "5f3bfcb7bd441301d272546e4bfb7ddd690df45447251100f5e223e036dab62c",
+      "codes_sha256": "7e341ee0a99faecae29030574ecaf1514e2f0a6a0e812354c940a917325e8017",
+      "audio_sha256": "d5ede4234aec2b178a762147228393d7dab70989f8381246201a764205bc5142",
+      "execution_passed": true,
+      "device_memory_sampling": {
+        "samples": 0,
+        "interval_seconds": 0.2,
+        "scope": "nvidia-smi physical GPU 0 total device usage, includes desktop/other processes",
+        "process_wall_seconds": 67.23029226498329
+      },
+      "run": {
+        "frames": 100,
+        "prompt_frames": 25,
+        "symbolic_frames": 64,
+        "cache_capacity": 256,
+        "guidance": 1.5,
+        "temperature": 1,
+        "top_k": 250,
+        "seed": 1701,
+        "eos": false,
+        "replay_checked": true,
+        "terminal_contract_passed": true,
+        "generator_released_before_decode": true,
+        "generation_with_checks_seconds": 49.1453,
+        "weight_bytes": 17516732416,
+        "cache_bytes": 118030336,
+        "graph_bytes": 5054592,
+        "audio_samples_per_channel": 384000,
+        "audio_peak": 0.365523,
+        "audio_rms": 0.0469261,
+        "decode_seconds": 10.6145,
+        "decoder_seed": 1701,
+        "decoder_steps": 10,
+        "segment_codes": 372,
+        "decoder_guidance": 1.25,
+        "ggml_commit": "0f2ed045"
+      },
+      "flow_model_sha256": "5c9cdbfae26ccd3e96355c541cade0feca37cfd8696746b724c294095949f523",
+      "sq_model_sha256": "2f72b85f924c629aae33004703cc02e16600abee15c01e928b2878e5d0f29ae6",
+      "decoder": {
+        "seed": 1701,
+        "steps": 10,
+        "segment_codes": 372,
+        "guidance": 1.25
+      },
+      "name": "billiegasm-cover/f32-spark",
+      "vocal_presence": "not yet listener-assessed",
+      "audio_quality_accepted": false
+    },
+    {
+      "ggml_revision": "0f2ed045eaff6bf01bed074878b6988248efbc22",
+      "prepared_manifest_sha256": "4eb5e026746a13fe45666ba03dfda2afcac49393975f7371689f5938e9244841",
+      "model_sha256": "74ebd8a8537f55ea3f3566cfa17c7e28734fc555af5fbc1a254bec94a182f814",
+      "codes_sha256": "47aad50f0fc8c77e351d93e2fbb3db5ee61bcc5a0faa2d13ef8c52e0a1eda8da",
+      "audio_sha256": "d2ea99d1eb8a2288685337fc20c73568c0937cfc656a21a7ec246cc429abd344",
+      "execution_passed": true,
+      "device_memory_sampling": {
+        "samples": 167,
+        "interval_seconds": 0.2,
+        "scope": "nvidia-smi physical GPU 0 total device usage, includes desktop/other processes",
+        "first_used_mib": 801,
+        "peak_used_mib": 6776,
+        "total_mib": 8151,
+        "process_wall_seconds": 45.29700000002049
+      },
+      "run": {
+        "frames": 100,
+        "prompt_frames": 25,
+        "symbolic_frames": 64,
+        "cache_capacity": 256,
+        "guidance": 1.5,
+        "temperature": 1,
+        "top_k": 250,
+        "seed": 1701,
+        "eos": false,
+        "replay_checked": true,
+        "terminal_contract_passed": true,
+        "generator_released_before_decode": true,
+        "generation_with_checks_seconds": 22.3799,
+        "weight_bytes": 2939920896,
+        "cache_bytes": 118030336,
+        "graph_bytes": 5054592,
+        "audio_samples_per_channel": 384000,
+        "audio_peak": 0.611019,
+        "audio_rms": 0.0588124,
+        "decode_seconds": 19.76,
+        "decoder_seed": 1701,
+        "decoder_steps": 10,
+        "segment_codes": 372,
+        "decoder_guidance": 1.25,
+        "ggml_commit": "0f2ed045"
+      },
+      "flow_model_sha256": "5c9cdbfae26ccd3e96355c541cade0feca37cfd8696746b724c294095949f523",
+      "sq_model_sha256": "2f72b85f924c629aae33004703cc02e16600abee15c01e928b2878e5d0f29ae6",
+      "decoder": {
+        "seed": 1701,
+        "steps": 10,
+        "segment_codes": 372,
+        "guidance": 1.25
+      },
+      "name": "billiegasm-cover/q4-laptop",
+      "vocal_presence": "not yet listener-assessed",
+      "audio_quality_accepted": false
+    },
+    {
+      "ggml_revision": "0f2ed045eaff6bf01bed074878b6988248efbc22",
+      "prepared_manifest_sha256": "96cbfdece53439f974461978f496ac7f58e3659513f12c629fa694daf2ebb56b",
+      "model_sha256": "5f3bfcb7bd441301d272546e4bfb7ddd690df45447251100f5e223e036dab62c",
+      "codes_sha256": "cbe861549cd9ff9142197ee60e7881aca9cca97fcdce7d17086967a104d10b24",
+      "audio_sha256": "ae616dacc858b8d577e82de4095656144d0c4112a842d9d2e4e9c743aad197c5",
+      "execution_passed": true,
+      "device_memory_sampling": {
+        "samples": 0,
+        "interval_seconds": 0.2,
+        "scope": "nvidia-smi physical GPU 0 total device usage, includes desktop/other processes",
+        "process_wall_seconds": 66.1123800239875
+      },
+      "run": {
+        "frames": 100,
+        "prompt_frames": 37,
+        "symbolic_frames": 64,
+        "cache_capacity": 256,
+        "guidance": 1.5,
+        "temperature": 1,
+        "top_k": 250,
+        "seed": 1701,
+        "eos": false,
+        "replay_checked": true,
+        "terminal_contract_passed": true,
+        "generator_released_before_decode": true,
+        "generation_with_checks_seconds": 48.837,
+        "weight_bytes": 17516732416,
+        "cache_bytes": 118030336,
+        "graph_bytes": 5604480,
+        "audio_samples_per_channel": 384000,
+        "audio_peak": 0.689996,
+        "audio_rms": 0.0959062,
+        "decode_seconds": 10.117,
+        "decoder_seed": 1701,
+        "decoder_steps": 10,
+        "segment_codes": 372,
+        "decoder_guidance": 1.25,
+        "ggml_commit": "0f2ed045"
+      },
+      "flow_model_sha256": "5c9cdbfae26ccd3e96355c541cade0feca37cfd8696746b724c294095949f523",
+      "sq_model_sha256": "2f72b85f924c629aae33004703cc02e16600abee15c01e928b2878e5d0f29ae6",
+      "decoder": {
+        "seed": 1701,
+        "steps": 10,
+        "segment_codes": 372,
+        "guidance": 1.25
+      },
+      "name": "billiegasm-cover/alex-f32-spark",
+      "vocal_presence": "not yet listener-assessed",
+      "audio_quality_accepted": false
+    },
+    {
+      "ggml_revision": "0f2ed045eaff6bf01bed074878b6988248efbc22",
+      "prepared_manifest_sha256": "96cbfdece53439f974461978f496ac7f58e3659513f12c629fa694daf2ebb56b",
+      "model_sha256": "74ebd8a8537f55ea3f3566cfa17c7e28734fc555af5fbc1a254bec94a182f814",
+      "codes_sha256": "6f4bf165d20a93a07befa5c77af80ca824a80e3d8609732e8d1f5d1234378748",
+      "audio_sha256": "746ec1a9de0d7c45d798be344ff0e8ebe3ba785e0fde4b62252176a701de1b9b",
+      "execution_passed": true,
+      "device_memory_sampling": {
+        "samples": 161,
+        "interval_seconds": 0.2,
+        "scope": "nvidia-smi physical GPU 0 total device usage, includes desktop/other processes",
+        "first_used_mib": 801,
+        "peak_used_mib": 6776,
+        "total_mib": 8151,
+        "process_wall_seconds": 43.32799999997951
+      },
+      "run": {
+        "frames": 100,
+        "prompt_frames": 37,
+        "symbolic_frames": 64,
+        "cache_capacity": 256,
+        "guidance": 1.5,
+        "temperature": 1,
+        "top_k": 250,
+        "seed": 1701,
+        "eos": false,
+        "replay_checked": true,
+        "terminal_contract_passed": true,
+        "generator_released_before_decode": true,
+        "generation_with_checks_seconds": 22.5015,
+        "weight_bytes": 2939920896,
+        "cache_bytes": 118030336,
+        "graph_bytes": 5604480,
+        "audio_samples_per_channel": 384000,
+        "audio_peak": 0.201014,
+        "audio_rms": 0.0363099,
+        "decode_seconds": 17.6806,
+        "decoder_seed": 1701,
+        "decoder_steps": 10,
+        "segment_codes": 372,
+        "decoder_guidance": 1.25,
+        "ggml_commit": "0f2ed045"
+      },
+      "flow_model_sha256": "5c9cdbfae26ccd3e96355c541cade0feca37cfd8696746b724c294095949f523",
+      "sq_model_sha256": "2f72b85f924c629aae33004703cc02e16600abee15c01e928b2878e5d0f29ae6",
+      "decoder": {
+        "seed": 1701,
+        "steps": 10,
+        "segment_codes": 372,
+        "guidance": 1.25
+      },
+      "name": "billiegasm-cover/alex-q4-laptop",
+      "vocal_presence": "not yet listener-assessed",
+      "audio_quality_accepted": false
+    }
+  ],
+  "checks": {
+    "python_tests": 10,
+    "passed": true,
+    "prepared_example_reproduction_tensors_bit_exact": true
+  },
+  "preparation_versions": {
+    "torch": "2.7.1+cu128",
+    "transformers": "4.57.6",
+    "torchtune": "0.4.0",
+    "tokenizers": "0.22.1",
+    "numpy": "2.0.2",
+    "mido": "1.3.3"
+  },
+  "one_command_reproduction": {
+    "command": "./scripts/test-cover-windows.ps1 -CaseName billiegasm-reproduce",
+    "execution_passed": true,
+    "prepared_tensors_count": 11,
+    "prepared_tensors_bit_exact": true,
+    "codes_sha256": "6f4bf165d20a93a07befa5c77af80ca824a80e3d8609732e8d1f5d1234378748",
+    "codes_bit_exact": true,
+    "audio_sha256": "746ec1a9de0d7c45d798be344ff0e8ebe3ba785e0fde4b62252176a701de1b9b",
+    "audio_bit_exact": true,
+    "device_memory_sampling": {
+      "samples": 158,
+      "interval_seconds": 0.2,
+      "scope": "nvidia-smi physical GPU 0 total device usage, includes desktop/other processes",
+      "first_used_mib": 801,
+      "peak_used_mib": 6776,
+      "total_mib": 8151,
+      "process_wall_seconds": 42.84399999998277
+    },
+    "run": {
+      "frames": 100,
+      "prompt_frames": 37,
+      "symbolic_frames": 64,
+      "cache_capacity": 256,
+      "guidance": 1.5,
+      "temperature": 1,
+      "top_k": 250,
+      "seed": 1701,
+      "eos": false,
+      "replay_checked": true,
+      "terminal_contract_passed": true,
+      "generator_released_before_decode": true,
+      "generation_with_checks_seconds": 22.3726,
+      "weight_bytes": 2939920896,
+      "cache_bytes": 118030336,
+      "graph_bytes": 5604480,
+      "audio_samples_per_channel": 384000,
+      "audio_peak": 0.201014,
+      "audio_rms": 0.0363099,
+      "decode_seconds": 17.3829,
+      "decoder_seed": 1701,
+      "decoder_steps": 10,
+      "segment_codes": 372,
+      "decoder_guidance": 1.25,
+      "ggml_commit": "0f2ed045"
+    },
+    "source_audio_uploaded": false,
+    "spark_execution_inside_docker": true
+  }
+}

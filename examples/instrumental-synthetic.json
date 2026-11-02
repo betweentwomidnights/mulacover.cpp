@@ -1,0 +1,8 @@
+{
+  "lyrics": "[Instrumental]",
+  "tags": "warm acoustic pop, soft drums, instrumental, no vocals",
+  "melody_midi": "../refdata/upstream-f32/melody.mid",
+  "chord_midi": "../refdata/upstream-f32/chord.mid",
+  "drum_midi": "../refdata/upstream-f32/drum.mid",
+  "case": "instrumental-synthetic"
+}

@@ -31,6 +31,12 @@ EOS/padding, deterministic native seeds and reset/replay. The generator unloads
 before staged FP32 HeartCodec decoding. See [sampling/audio results](docs/SAMPLING_AND_AUDIO.md),
 including the remaining longer-context hidden-activation tolerance gap.
 
+The first [real transcription-to-cover excerpt](docs/FIRST_COVER_TEST.md) now uses
+the user's `billiegasm_yuey.wav`: native SheetSage2 exports are audited, then fresh
+instrumental conditioning drives native generation and stereo decode. Qwen and
+prompt/MIDI preparation still use the upstream Spark Docker bridge. Listening
+acceptance for vocals and musical fidelity remains pending.
+
 Prepared prompt/style
 and symbolic inputs are supplied by the caller; text/Qwen/MIDI preprocessing
 currently comes from the upstream fixture harness. The laptop is the primary C++
@@ -88,7 +94,7 @@ The Windows static/DLL smoke tests build with `scripts/build-windows.ps1` and
 `scripts/build-windows.ps1 -Shared`; they use the unchanged in-tree CPU backend.
 Use `-Backend cuda -DevelopmentGgml C:/dev/_ggml_reviews/cuda-f32-source-b77` for
 the MuLaCover development profile. Local Python checks use `requirements-dev.txt`
-(NumPy/GGUF), then `python -m unittest discover -s tests -v`. Full FP32 weights
+(NumPy/GGUF/Mido), then `python -m unittest discover -s tests -v`. Full FP32 weights
 remain on Spark; the experimental Q4_K_M model is present on both machines.
 
 Next: resolve the longer-context prefill activation gap, extend quantization/audio
@@ -96,4 +102,6 @@ quality checks and implement prompt/style preprocessing using the isolated fix.
 The user deferred ggml-bump-check and
 coordinated updates to sa3.cpp, yuey.cpp, acestep.cpp, stems.cpp and audiocraft.cpp
 until MuLaCover works. Existing yue2.cpp SheetSage2 melody/chord MIDI
-exports provide a later [transcription integration seam](docs/TRANSCRIPTION_INTEGRATION.md).
+exports now feed the [excerpt bridge](docs/TRANSCRIPTION_INTEGRATION.md).
+Run `scripts/test-cover-windows.ps1 -CaseName my-first-cover` for the documented
+local transcription -> Spark Docker preparation -> local Q4/decode workflow.

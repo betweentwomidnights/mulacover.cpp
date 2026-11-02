@@ -42,3 +42,9 @@
   input manifest; keep the audio outside Git and unchanged. Instrumental control
   must be tested explicitly with regenerated prompt/style conditioning. The
   initial eight-second demo used lyrics and a "clear voice" tag, so it was vocal.
+- The first real excerpt bridge now works: native SheetSage2 on the laptop ->
+  audited instrument/chord MIDI -> upstream conditioning/Qwen in Spark Docker ->
+  native F32/Q4 generator and staged codec. See `docs/FIRST_COVER_TEST.md`.
+  Do not call the frontend fully native or mark instrumental/musical quality
+  accepted without listening evidence. The source audio is unchanged; the first
+  cover uses only its first four bars/eight-second excerpt.

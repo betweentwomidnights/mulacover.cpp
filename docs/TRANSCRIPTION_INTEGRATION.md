@@ -21,7 +21,8 @@ Model libraries should share one GGML target and release transcription model
 weights before loading the generator on an 8GB GPU. Full FP32 generator inference
 stays in Spark Docker. Q4_K_M generation and staged HeartCodec decoding now run
 on the laptop; see `SAMPLING_AND_AUDIO.md`. Native prompt/Qwen/MIDI preparation
-and the real transcription adapter are still outstanding.
+remain outstanding as native primitives. A working reference bridge now joins
+the native transcription exports to native generation; see `FIRST_COVER_TEST.md`.
 
 ## User-selected real-audio test
 
@@ -52,3 +53,19 @@ confound the test. Use the same transcribed MIDI and controlled sampling setting
 for F32/Q4 comparisons. Record audible singing/vocalizations separately from MIDI
 fidelity, audio quality and numerical execution success. A successful WAV decode
 does not establish that an instrumental request was respected.
+
+On November 2, 2026, the first excerpt test completed. SheetSage2 transcribed the
+full source into 209 events / 181 notes, with no warnings. All 181 melody MIDI
+notes (44 vocal, 137 instrumental) match the decoded events in pitch, beat onset
+and duration. The first 64 sixteenth-note positions of the instrumental lane and
+chords supply the test: 23 melody notes and 19 voiced chord notes. Their source
+timestamp span is 0..8 seconds; their MIDI rendering lasts 8.1356 seconds at its
+inferred 118 BPM. MuLaCover conditioning uses beat positions, so this is not a
+promise that generated tempo or waveform time will follow the source exactly.
+
+Both the free-form instrumental request and Alex's exact structured-tag recipe
+have fresh Qwen/style conditioning and F32/Q4 listening clips. Their numeric
+execution/replay checks pass; instrumental controllability and musical fidelity
+are still listener acceptance checks. The integration uses the existing Yuey
+binary on `b77ae79` in a separate process, without changing that sibling or its
+pin. The native MuLaCover process uses the authorized isolated CUDA-fix profile.
