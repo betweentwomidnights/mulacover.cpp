@@ -371,11 +371,18 @@
         "peak": 0.8857024312019348,
         "samples_above_full_scale": 0
       },
-      "listener_assessment": "pending",
+      "listener_assessment": "User reports vocalizations following the guitar melody in this native FP32 control",
       "listening_copy": {
         "path": "refdata\\covers\\billiegasm-controls-listening\\instrumental-f32-spark.wav",
         "sha256": "58999572e52c0e6e43cb517f16fac1225711b24191fe4b20883ae33de5e600f3",
         "peak": 0.6815407276153564
+      },
+      "listener_observation": {
+        "date": "2026-11-02",
+        "observation": "Yeah I still hear vocalizations following the guitar melody",
+        "question_audio_sha256": "eff9d5af1e438f8c61a2fcd793bf77c48e6782999dc827799861bc574b0fad84",
+        "vocal_presence": "user-reported vocalizations",
+        "instrumental_request_accepted": false
       }
     },
     "instrumental-q4-spark": {
@@ -540,5 +547,11 @@
     "MIDI-preview correctness is listener-confirmed for this vocal melody, not all transcription outputs"
   ],
   "ggml_bump_check_started": false,
-  "sibling_source_or_pins_modified": false
+  "sibling_source_or_pins_modified": false,
+  "precision_interpretation": "The reported guitar-melody vocalization also occurs in native FP32, so it is not exclusive to Q4. This does not distinguish underlying model/prompt behavior from native implementation differences, and does not resolve vocal-lane melody preservation.",
+  "remaining_listening_and_controls": [
+    "Same-platform Q4 Spark instrumental-lane listening",
+    "Official upstream full-song control with the same input before attributing the result to the model or the port",
+    "Vocal-lane F32 comparison for preservation of the confirmed vocal MIDI melody"
+  ]
 }

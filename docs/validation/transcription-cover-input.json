@@ -16,7 +16,7 @@
   "cover_test_executed": true,
   "instrumental_controllability_verified": false,
   "pending_checks": [
-    "Listener assessment of the same-platform Spark F32/Q4 instrumental-lane controls",
+    "Listener assessment of Q4 Spark control; official upstream comparison to distinguish native implementation and model/prompt behavior",
     "Preservation of the confirmed vocal melody through generation; no F32 vocal-lane control yet",
     "Remaining transcription lanes and generated musical/audio quality",
     "Native prompt/tokenizer/Qwen/MIDI preparation"
@@ -36,5 +36,6 @@
   "full_song_listener_observation": "User reports vocalization of the guitar melody and no audible original vocal melody; input selected instrumental lane and excluded 44 vocal notes",
   "followup_validation_report": "full-song-controls.json",
   "vocal_midi_listener_confirmed": true,
-  "vocal_source_q4_generated_melody_recognized": false
+  "vocal_source_q4_generated_melody_recognized": false,
+  "fp32_instrumental_lane_listener_observation": "User still hears vocalizations following the guitar melody"
 }

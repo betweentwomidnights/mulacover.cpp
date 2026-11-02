@@ -62,7 +62,15 @@ The F32 run tests instrumental-request behavior on the original instrumental-lan
 case. It is not an F32 vocal-lane control; preservation of the listener-confirmed
 vocal melody through F32 generation would be a separate comparison. Do not assign
 the Q4 vocal-lane melody failure to transcription or quantization from these
-observations alone. Spark-pair listening remains pending.
+observations alone.
+
+The user subsequently confirmed vocalizations following the guitar melody in the
+native FP32 instrumental-lane control as well. This demonstrates that the reported
+behavior is not exclusive to Q4 quantization. Instrumental control is not accepted
+for that F32 run either. Q4 Spark listening remains pending. No matching official
+upstream full-song generation has been auditioned, so this finding does not yet
+distinguish the underlying model/prompt behavior from native implementation
+differences. The separate vocal-lane melody-preservation question remains open.
 
 All 11 prepared tensors are hash-checked. Between the original and vocal-source
 runs, only `input.pianoroll` differs; the other ten tensors are byte-identical.
