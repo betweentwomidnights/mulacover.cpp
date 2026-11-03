@@ -2932,5 +2932,53 @@
     "spark_cuda": 7,
     "windows_cpu_dll": 7,
     "python": 14
+  },
+  "listener_feedback": {
+    "assessment": "Positive for Q4 continuation and encoding quality; user identifies this as the intended DAW use case",
+    "scope": "Source-guided Q4 continuation only; no explicit exact-melody or hard-beat-lock acceptance"
+  },
+  "guide_selection_validation": {
+    "offline": {
+      "selected_8s_matches_listened_guide": true,
+      "export_matches_listened_continuation": true,
+      "selection": {
+        "source_codes_sha256": "bdbeab789d35496a3744f41410ab4ffeaecf91e7a0a9759dd1a9e7ae075ab342",
+        "source_frames": 372,
+        "requested_start_seconds": "0",
+        "requested_guide_seconds": "8",
+        "source_start_frame": 0,
+        "source_start_seconds": 0.0,
+        "guide_frames": 100,
+        "guide_seconds": 8.0,
+        "rounding": "Start and duration independently rounded down to complete 80-ms frames"
+      },
+      "continuation_sha256": "669d45730bbd30d2706e9ddbed08f033e4c4cb9d3b1b9511dd482fd3eebcc3a4"
+    },
+    "native_resume": {
+      "all_1024_codes_match_baseline": true,
+      "guide_frames": 99,
+      "new_frames": 29,
+      "cache_capacity": 1024,
+      "codes_sha256": "158e6f4e606c9ab1824fdf346b637103dd009fe57090d95b662b5d70d54627cd",
+      "selection": {
+        "source_codes_sha256": "47b83f66148c432a313a1cb6f8156a65b9ae62d161ab87a5af54f624ca57f443",
+        "source_frames": 875,
+        "requested_start_seconds": "0",
+        "requested_guide_seconds": "7.92",
+        "source_start_frame": 0,
+        "source_start_seconds": 0.0,
+        "guide_frames": 99,
+        "guide_seconds": 7.92,
+        "rounding": "Start and duration independently rounded down to complete 80-ms frames"
+      },
+      "requested_timeline": {
+        "total_frames": 128,
+        "guide_frames": 99,
+        "new_frames": 29,
+        "continuation_seconds": "2.32"
+      }
+    },
+    "windows_python_tests": 17,
+    "spark_docker_selection_tests": 3
   }
 }

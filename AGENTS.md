@@ -106,3 +106,12 @@
   output includes teacher-forced guide frames, which must be excluded from
   continuation tempo/quality measurements. Teacher-forced frames draw no RNG;
   an explicit sampler offset can resume an existing Philox stream.
+- User positively assessed the source-guided Q4 continuation and encoding and
+  identifies continuation as the intended DAW use case. Do not keep treating
+  the source lead-in as a blocker to that workflow, or infer exact melody/beat
+  lock acceptance from this feedback. The prepared-input driver now selects
+  cached guide start/duration with `--guide-start-seconds` / `--guide-seconds`
+  and independently requests new audio with `--continuation-seconds` (80-ms
+  resolution). It automatically sizes the cache unless explicitly configured
+  and exports `continuation.wav` without the guide. Encoder context and guide
+  duration are separate: the accepted example encodes 29.76s and feeds 8s.

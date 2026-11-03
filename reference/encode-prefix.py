@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Encode a short tempo-guide excerpt with the pinned official HeartCodec encoder.
+"""Encode audio for continuation guides with the pinned official HeartCodec encoder.
 
 Only this input guide may be tempo-scaled to create a counterfactual conditioning
 control. Generated continuations are never stretched. Run in Spark Docker.
@@ -28,7 +28,7 @@ def main():
     p.add_argument('--upstream',type=Path);p.add_argument('--codec-snapshot',type=Path)
     p.add_argument('--audio',type=Path);p.add_argument('--output',type=Path)
     p.add_argument('--device',choices=('cpu','cuda'),default='cpu')
-    p.add_argument('--factors',type=float,nargs='+',default=[1.,.75,1.25])
+    p.add_argument('--factors',type=float,nargs='+',default=[1.],help='Guide speed factors; default source speed only. Extra factors are research controls.')
     a=p.parse_args();source_path=Path('refdata/bpm-prefix/encoder-source.json')
     if a.download:
         from huggingface_hub import snapshot_download
@@ -37,6 +37,7 @@ def main():
             allow_patterns=['encoder.safetensors','config.json','encoder_config.json','SHA256SUMS','LICENSE','README.md']))
         checksum=digest(path/'encoder.safetensors')
         if checksum!=(path/'SHA256SUMS').read_text().split()[0]:raise ValueError('Encoder checksum mismatch')
+        source_path.parent.mkdir(parents=True,exist_ok=True)
         source_path.write_text(json.dumps(dict(repository='HeartMuLa/HeartCodec-oss-encoder',revision=revision,snapshot=str(path),weights_sha256=checksum),indent=2)+'\n')
         print(revision,checksum,flush=True);return
     if any(v is None for v in (a.upstream,a.codec_snapshot,a.audio,a.output)):p.error('Encoding needs upstream, codec snapshot, audio and output')
@@ -56,7 +57,7 @@ def main():
     if digest(Path(encoder['snapshot'])/'encoder.safetensors')!=encoder['weights_sha256']:raise ValueError('Encoder weights changed')
     a.output.mkdir(parents=True)
     waveform,rate=sf.read(a.audio,dtype='float32',always_2d=True)
-    if len(waveform)/rate>30.01:raise ValueError('Prefix probe accepts at most a thirty-second source excerpt')
+    if not len(waveform) or waveform.shape[1] not in (1,2):raise ValueError('Input audio must be nonempty mono or stereo')
     # Model arithmetic remains FP32, including the shared decoder RVQ.
     model=HeartCodec.from_encoder_decoder_pretrained(a.codec_snapshot,encoder['snapshot'],local_files_only=True,dtype=torch.float32).to(a.device).eval()
     cases=[]

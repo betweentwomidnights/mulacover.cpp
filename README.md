@@ -28,6 +28,9 @@ and audio-token guides; see [the experiment](docs/SCORE_CLOCK_EXPERIMENT.md).
 Audio priming follows the source's roughly 120 BPM in full-length F32/Q4 tests,
 with eight guided seconds and 62 new seconds. It remains an experimental
 continuation mode; arbitrary BPM, complete restyling and a hard lock are unproven.
+The user reports that this continuation fits the intended DAW use case.
+Guide start/duration and new-audio duration are independently selectable in the
+prepared-input driver; it also exports a guide-free `continuation.wav`.
 
 **Native FP32 teacher-forced frame/logit/cache parity passed on Spark CUDA at `07b77b0`.**
 The coordinated baseline is now `b77ae79`; its CUDA parity currently fails due to
