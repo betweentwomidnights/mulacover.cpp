@@ -63,6 +63,9 @@ std::vector<float> run_backbone(Session & s,int branch,Dumps * dumps,std::vector
     auto * drum=g.input(branch_input(s.condition.drum,branch),128,s.condition.symbolic);
     auto * chord=g.input(branch_input(s.condition.chord,branch),12,s.condition.symbolic);
     auto * one=g.input({1.0f},1,1);
+    const auto clock=tempo_bias(s.tempo,s.position,n,s.condition.prompt,s.condition.context_mask,branch);
+    const auto score_padding=tempo_padding(s.tempo,s.frame_index==0?s.condition.prompt-1:s.position,
+                                         s.condition.prompt,s.condition.context_mask,branch);
     ggml_tensor * previous_context=nullptr;
     for(int layer=0;layer<28;++layer) {
         const auto l=std::to_string(layer),p="peft_layers."+l;
@@ -83,17 +86,17 @@ std::vector<float> run_backbone(Session & s,int branch,Dumps * dumps,std::vector
             auto * cd=g.linear(a+".drum_pianoroll_proj",drum,true);
             auto * cc=g.linear(a+".chord_proj",chord,true);
             auto * context=g.linear(a+".fusion_proj",ggml_concat(g.ctx,ggml_concat(g.ctx,cp,cd,0),cc,0),true);
-            for(int i=0;i<2;++i)context=g.transformer(a+".decoder.layers."+std::to_string(i),context,8,8,0,false,s.condition.context_mask);
+            for(int i=0;i<2;++i)context=g.transformer(a+".decoder.layers."+std::to_string(i),context,8,8,0,false,score_padding);
             context=g.norm(a+".decoder.norm",context);
             context=g.linear(a+".out_proj",context,true);
             if(previous_context)context=ggml_add(g.ctx,previous_context,context);
             previous_context=context;
             const auto c=p+".cross_attn";
             auto * normalized=g.norm(c+".norm",x);
-            auto * attended=g.attention(c+".attn",normalized,context,8,8,s.position,false,s.condition.context_mask);
+            auto * attended=g.attention(c+".attn",normalized,context,8,8,s.position,false,score_padding,nullptr,0,branch,clock);
             auto * gate_x=g.linear(c+".x_gate_proj",normalized,true);
             auto * gate_context=g.linear(c+".context_gate_proj",context,true);
-            auto * gate=g.attention(c+".gate",gate_x,gate_context,1,1,s.position,false,s.condition.context_mask);
+            auto * gate=g.attention(c+".gate",gate_x,gate_context,1,1,s.position,false,score_padding,nullptr,0,branch,clock);
             gate=ggml_tanh(g.ctx,g.linear(c+".gate_proj",gate,true));
             x=ggml_add(g.ctx,x,ggml_mul(g.ctx,attended,gate));
             if(dumps&&layer==27) {

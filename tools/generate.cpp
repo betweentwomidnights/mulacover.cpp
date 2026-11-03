@@ -1,4 +1,5 @@
 #include "mulacover_sampling.h"
+#include "mulacover_tempo.h"
 #include "heartcodec.h"
 #include "heartcodec_rng.h"
 #include "ggml.h"
@@ -38,7 +39,8 @@ int main(int argc,char ** argv) {
             const auto & k=pair.first;
             if(k!="--model"&&k!="--input"&&k!="--output"&&k!="--prompt-frames"&&k!="--symbolic-frames"&&k!="--qwen-index"&&k!="--muq-index"&&
                k!="--frames"&&k!="--capacity"&&k!="--backend"&&k!="--guidance"&&k!="--temperature"&&k!="--top-k"&&k!="--seed"&&k!="--replay"&&
-               k!="--flow-model"&&k!="--sq-model"&&k!="--decoder-seed"&&k!="--decoder-steps"&&k!="--segment-codes"&&k!="--rng"&&k!="--rng-cuda-blocks"&&k!="--rng-device")throw std::runtime_error("Unknown option: "+k);
+               k!="--flow-model"&&k!="--sq-model"&&k!="--decoder-seed"&&k!="--decoder-steps"&&k!="--segment-codes"&&k!="--rng"&&k!="--rng-cuda-blocks"&&k!="--rng-device"&&
+               k!="--experimental-bpm"&&k!="--tempo-width-beats"&&k!="--tempo-offset-beats"&&k!="--tempo-local-window"&&k!="--audio-prefix"&&k!="--sampler-offset")throw std::runtime_error("Unknown option: "+k);
         }
         auto get=[&](const char * k,const char * d){return a.count(k)?a.at(k):std::string(d);};
         const std::filesystem::path input(a.at("--input")),output(a.at("--output"));
@@ -48,8 +50,19 @@ int main(int argc,char ** argv) {
         if(prompt<1||symbolic<1||symbolic>5000||frames<1||frames>8192||int64_t(prompt)+frames-1>capacity)
             throw std::runtime_error("Invalid dimensions or insufficient cache capacity");
         if(a.count("--flow-model")!=a.count("--sq-model"))throw std::runtime_error("Supply both codec models or neither");
+        std::vector<int32_t> prefix;size_t prefix_frames=0;
+        if(a.count("--audio-prefix")) {
+            const auto bytes=std::filesystem::file_size(a.at("--audio-prefix"));
+            if(bytes==0||bytes%32||bytes/32>=uint64_t(frames))throw std::runtime_error("Prefix must contain complete frames and leave room for generated audio");
+            prefix=read<int32_t>(a.at("--audio-prefix"),size_t(bytes/4));prefix_frames=prefix.size()/8;
+            if(std::any_of(prefix.begin(),prefix.end(),[](int32_t x){return x<0||x>=8192;}))throw std::runtime_error("Invalid audio-prefix RVQ code");
+        }
         const std::string rng=get("--rng","native");
         if(rng!="native"&&rng!="torch-cuda")throw std::runtime_error("RNG must be native or torch-cuda");
+        const auto sampler_offset_text=get("--sampler-offset","0");
+        if(sampler_offset_text.empty()||sampler_offset_text.find_first_not_of("0123456789")!=std::string::npos)throw std::runtime_error("Invalid sampler offset");
+        const auto sampler_start_offset=std::stoull(sampler_offset_text);
+        if(sampler_start_offset%4||(rng!="torch-cuda"&&sampler_start_offset))throw std::runtime_error("Sampler offset requires Torch CUDA mode and a multiple of four");
         const auto * rng_api=heartcodec_get_rng_api(1);
         const auto rng_blocks=std::stoull(get("--rng-cuda-blocks","0"));
         if(rng_blocks>1048576)throw std::runtime_error("Invalid target CUDA RNG grid cap");
@@ -70,16 +83,26 @@ int main(int argc,char ** argv) {
         condition.qwen=qwen.data();condition.muq=muq.data();condition.qwen_index=std::stoll(a.at("--qwen-index"));condition.muq_index=std::stoll(a.at("--muq-index"));
         condition.pianoroll=piano.data();condition.drum_pianoroll=drum.data();condition.chord=chord.data();condition.context_mask=padding.data();condition.symbolic_frames=symbolic;condition.guidance=std::stof(get("--guidance","1.5"));
         if(api->session_begin(context,&condition,&error))throw std::runtime_error(error.message);
+        const auto * tempo_api=mulacover_get_tempo_api(1);
+        mulacover_tempo_config_v1 tempo{};tempo.size=sizeof(tempo);tempo_api->config_init(&tempo);
+        tempo.bpm=std::stod(get("--experimental-bpm","0"));tempo.width_beats=std::stod(get("--tempo-width-beats","1"));
+        tempo.offset_beats=std::stod(get("--tempo-offset-beats","0"));
+        const auto local_window=get("--tempo-local-window","0");
+        if(local_window!="0"&&local_window!="1")throw std::runtime_error("Local score window must be 0 or 1");
+        tempo.local_window=local_window=="1";
+        if(!a.count("--experimental-bpm")&&(a.count("--tempo-width-beats")||a.count("--tempo-offset-beats")||a.count("--tempo-local-window")))throw std::runtime_error("Tempo options require --experimental-bpm");
+        if(tempo_api->set(context,&tempo,&error))throw std::runtime_error(error.message);
         mulacover_sampling_config_v1 options{};options.size=sizeof(options);sampling->config_init(&options);
         options.temperature=std::stof(get("--temperature","1"));options.top_k=std::stoi(get("--top-k","250"));options.seed=std::stoull(get("--seed","1701"));
         if(rng=="torch-cuda") {
             if(!rng_api||rng_api->size<HEARTCODEC_RNG_API_V1_SIZE)throw std::runtime_error("Torch CUDA RNG capability unavailable");
             heartcodec_rng_config_v1 rc{};rc.size=sizeof(rc);rng_api->config_init(&rc);
-            rc.distribution=HEARTCODEC_RNG_EXPONENTIAL_V1;rc.seed=options.seed;rc.count=8197;rc.draws=int64_t(frames)*8;
+            rc.distribution=HEARTCODEC_RNG_EXPONENTIAL_V1;rc.seed=options.seed;rc.count=8197;rc.draws=(int64_t(frames)-int64_t(prefix_frames))*8;
+            rc.offset=sampler_start_offset;
             rc.max_blocks=uint32_t(rng_blocks);rc.device=std::stoi(get("--rng-device","0"));
             heartcodec_error_v1 re{};re.size=sizeof(re);if(rng_api->generate(&rc,&random,&re))throw std::runtime_error(re.message);
             target_rng_blocks=rc.max_blocks?rc.max_blocks:random.device_max_blocks;options.noise_count=8*8197;
-            sampler_offset_per_head=random.next_offset/uint64_t(rc.draws);
+            sampler_offset_per_head=(random.next_offset-sampler_start_offset)/uint64_t(rc.draws);
         }
         std::vector<int32_t> codes;int32_t final_stop=0;
         const auto started=std::chrono::steady_clock::now();
@@ -87,10 +110,17 @@ int main(int argc,char ** argv) {
             if(run&&api->session_reset(context,&error))throw std::runtime_error(error.message);
             std::vector<int32_t> selected;int32_t stop=0;
             for(int f=0;f<frames;++f) {
-                if(random.data)options.exponential_noise=random.data+size_t(f)*8*8197;
-                if(sampling->sample_frame(context,&options,nullptr,&frame,&stop,&error))throw std::runtime_error(error.message);
+                if(size_t(f)<prefix_frames) {
+                    if(api->teacher_frame(context,prefix.data()+size_t(f)*8,nullptr,&frame,&error))throw std::runtime_error(error.message);
+                    stop=0;
+                }else {
+                    if(random.data)options.exponential_noise=random.data+(size_t(f)-prefix_frames)*8*8197;
+                    if(sampling->sample_frame(context,&options,nullptr,&frame,&stop,&error))throw std::runtime_error(error.message);
+                }
                 if(frame.cache_position!=prompt+f)throw std::runtime_error("Wrong generation cache position");
                 if(run==0&&f==0) {
+                    if(tempo_api->set(context,&tempo,&error)!=MULACOVER_INVALID_ARGUMENT_V1)
+                        throw std::runtime_error("Running session accepted score-clock change");
                     mulacover_frame_v1 probe{};probe.size=sizeof(probe);int32_t sentinel=123;auto bad=options;bad.top_k=0;
                     if(sampling->sample_frame(context,&bad,nullptr,&probe,&sentinel,&error)!=MULACOVER_INVALID_ARGUMENT_V1||sentinel!=123||probe.logits)
                         throw std::runtime_error("Invalid sample options consumed state/output");
@@ -105,6 +135,7 @@ int main(int argc,char ** argv) {
             else if(codes!=selected||final_stop!=stop)throw std::runtime_error("Seeded generation did not replay exactly");
         }
         if(codes.empty())throw std::runtime_error("Generator emitted EOS before any audio");
+        if(codes.size()/8<=prefix_frames)throw std::runtime_error("Generator emitted EOS before any new audio after the guide");
         // Force both terminal outcomes with supplied noise, without changing the
         // sampled sequence. All eight heads are computed, including after EOS.
         for(int token:{8193,8192}) {
@@ -120,7 +151,9 @@ int main(int argc,char ** argv) {
         }
         if(api->session_reset(context,&error))throw std::runtime_error(error.message);int32_t restart_stop=-1;
         if(random.data)options.exponential_noise=random.data;
-        if(sampling->sample_frame(context,&options,nullptr,&frame,&restart_stop,&error)||restart_stop||!std::equal(frame.codes,frame.codes+8,codes.begin()))
+        const int restart_status=prefix_frames?api->teacher_frame(context,prefix.data(),nullptr,&frame,&error):sampling->sample_frame(context,&options,nullptr,&frame,&restart_stop,&error);
+        if(prefix_frames)restart_stop=0;
+        if(restart_status||restart_stop||!std::equal(frame.codes,frame.codes+8,codes.begin()))
             throw std::runtime_error("Reset after terminal state did not rewind generation");
         api->frame_free(&frame);
         mulacover_memory_v1 memory{};memory.size=sizeof(memory);if(api->get_memory(context,&memory,&error))throw std::runtime_error(error.message);
@@ -159,7 +192,10 @@ int main(int argc,char ** argv) {
         }
         std::ofstream report(output/"run.json");
         report<<"{\"frames\":"<<codes.size()/8<<",\"prompt_frames\":"<<prompt<<",\"symbolic_frames\":"<<symbolic<<",\"cache_capacity\":"<<capacity
+            <<",\"audio_prefix_frames\":"<<prefix_frames<<",\"newly_generated_frames\":"<<(codes.size()/8-prefix_frames)
             <<",\"guidance\":"<<condition.guidance<<",\"temperature\":"<<options.temperature<<",\"top_k\":"<<options.top_k<<",\"seed\":"<<options.seed
+            <<",\"experimental_tempo\":{\"method\":\"conditional-cross-attention-gaussian-v1\",\"bpm\":"<<tempo.bpm
+            <<",\"width_beats\":"<<tempo.width_beats<<",\"offset_beats\":"<<tempo.offset_beats<<",\"local_window\":"<<tempo.local_window<<"}"
             <<",\"eos\":"<<(final_stop==MULACOVER_EOS_V1?"true":"false")<<",\"replay_checked\":"<<(replay?"true":"false")
             <<",\"terminal_contract_passed\":true,\"generator_released_before_decode\":true,\"generation_with_checks_seconds\":"<<generation_seconds
             <<",\"weight_bytes\":"<<memory.weight_bytes<<",\"cache_bytes\":"<<memory.cache_bytes<<",\"graph_bytes\":"<<memory.graph_bytes
@@ -168,7 +204,8 @@ int main(int argc,char ** argv) {
             <<",\"decoder_steps\":"<<std::stoi(get("--decoder-steps","10"))<<",\"segment_codes\":"<<std::stoll(get("--segment-codes","372"))
             <<",\"decoder_guidance\":1.25,\"rng\":\""<<rng<<"\",\"rng_cuda_blocks\":"<<target_rng_blocks
             <<",\"sampler_offset_per_head\":"<<sampler_offset_per_head
-            <<",\"sampler_final_offset\":"<<((codes.size()/8+uint64_t(final_stop==MULACOVER_EOS_V1))*8*sampler_offset_per_head)
+            <<",\"sampler_start_offset\":"<<sampler_start_offset
+            <<",\"sampler_final_offset\":"<<(sampler_start_offset+(codes.size()/8-prefix_frames+uint64_t(final_stop==MULACOVER_EOS_V1))*8*sampler_offset_per_head)
             <<",\"decoder_final_offset\":"<<decoder_final_offset<<",\"decoder_rng_windows\":"<<decoder_rng_windows
             <<",\"ggml_commit\":\""<<ggml_commit()<<"\"}\n";
         if(!report)throw std::runtime_error("Cannot write run report");

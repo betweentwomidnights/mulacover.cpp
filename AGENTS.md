@@ -95,3 +95,14 @@
   fixture and build exclusions. HeartCodec's GitHub-initialized MIT LICENSE
   commit is preserved in local history; MulaCover uses matching own-source MIT
   with separate upstream source/model notices. Shared-GGML adoption stays deferred.
+- BPM intervention work is isolated on `experiment/score-clock`.
+  `docs/SCORE_CLOCK_EXPERIMENT.md` records conditional Gaussian score-attention
+  bias and optional local symbolic masks. The initial 1,404 public logit/KV
+  oracle comparisons pass unchanged gates; attention did not reliably control
+  tempo. Audio priming follows the source's ~120 BPM in full F32/Q4 runs (eight
+  guided seconds + 62 new seconds) and one shorter Q4 seed-1702 replication.
+  Slow-guide control misses its target; no arbitrary-BPM or hard-lock claim.
+  Do not enable these controls by default. Audio-token priming is experimental:
+  output includes teacher-forced guide frames, which must be excluded from
+  continuation tempo/quality measurements. Teacher-forced frames draw no RNG;
+  an explicit sampler offset can resume an existing Philox stream.

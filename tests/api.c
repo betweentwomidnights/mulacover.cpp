@@ -1,11 +1,17 @@
 #include "mulacover.h"
 #include "mulacover_sampling.h"
+#include "mulacover_tempo.h"
 #include <string.h>
 int main(void) {
     const mulacover_api_v1 * api=mulacover_get_api(1);
     if(!api||api->size<MULACOVER_API_V1_SIZE||api->version!=1||mulacover_get_api(0)||mulacover_get_api(2))return 1;
     const mulacover_sampling_api_v1 * sampling=mulacover_get_sampling_api(1);
     if(!sampling||sampling->size<MULACOVER_SAMPLING_API_V1_SIZE||sampling->core!=api||mulacover_get_sampling_api(0)||mulacover_get_sampling_api(2))return 1;
+    const mulacover_tempo_api_v1 * tempo=mulacover_get_tempo_api(1);
+    if(!tempo||tempo->size<MULACOVER_TEMPO_API_V1_SIZE||tempo->core!=api||mulacover_get_tempo_api(0)||mulacover_get_tempo_api(2))return 1;
+    struct {mulacover_tempo_config_v1 config;unsigned char tail[16];} clock;
+    memset(&clock,0xa5,sizeof(clock));clock.config.size=sizeof(clock);tempo->config_init(&clock.config);
+    if(clock.tail[0]!=0xa5||clock.tail[15]!=0xa5||clock.config.bpm!=0||clock.config.width_beats!=1||clock.config.offset_beats!=0)return 1;
     struct {mulacover_sampling_config_v1 config;unsigned char tail[16];} sample;
     memset(&sample,0xa5,sizeof(sample));sample.config.size=sizeof(sample);sampling->config_init(&sample.config);
     if(sample.tail[0]!=0xa5||sample.config.temperature!=1||sample.config.top_k!=250||sample.config.exponential_noise)return 1;

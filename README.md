@@ -23,6 +23,11 @@ Q4 quality and the remaining numerical gaps are documented below.
 that MIDI tempo metadata leaves every model input unchanged; 80/160-BPM text
 requests also missed their targets in the tested Q4 excerpts. Plan downstream
 timing separately rather than treating BPM tags as a guarantee.
+The `experiment/score-clock` branch investigates inference-time score attention
+and audio-token guides; see [the experiment](docs/SCORE_CLOCK_EXPERIMENT.md).
+Audio priming follows the source's roughly 120 BPM in full-length F32/Q4 tests,
+with eight guided seconds and 62 new seconds. It remains an experimental
+continuation mode; arbitrary BPM, complete restyling and a hard lock are unproven.
 
 **Native FP32 teacher-forced frame/logit/cache parity passed on Spark CUDA at `07b77b0`.**
 The coordinated baseline is now `b77ae79`; its CUDA parity currently fails due to

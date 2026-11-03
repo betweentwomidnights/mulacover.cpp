@@ -17,6 +17,11 @@ p.add_argument('--capacity',type=int,default=256);p.add_argument('--guidance',ty
 p.add_argument('--temperature',type=float,default=1);p.add_argument('--top-k',type=int,default=250);p.add_argument('--seed',type=int,default=1701)
 p.add_argument('--decoder-seed',type=int,default=1701);p.add_argument('--decoder-steps',type=int,default=10);p.add_argument('--segment-codes',type=int,default=372)
 p.add_argument('--rng',choices=('native','torch-cuda'),default='native');p.add_argument('--rng-cuda-blocks',type=int,default=0);p.add_argument('--rng-device',type=int,default=0)
+p.add_argument('--experimental-bpm',type=float,default=None,help='Experimental moving score-attention prior; not a guaranteed tempo')
+p.add_argument('--tempo-width-beats',type=float,default=1);p.add_argument('--tempo-offset-beats',type=float,default=0)
+p.add_argument('--tempo-local-window',action='store_true',help='Also restrict symbolic adaptor and score-attention keys')
+p.add_argument('--audio-prefix',type=Path,help='Experimental frame-major int32[frames,8] guide. Output includes this teacher-forced prefix; measure continuation separately.')
+p.add_argument('--sampler-offset',type=int,default=0,help='Explicit initial Torch CUDA Philox offset; teacher-forced guide frames do not draw random numbers')
 a=p.parse_args();root=Path(__file__).resolve().parents[1]
 profile=json.loads((root/'dependencies/ggml-development.json').read_text())
 revision=subprocess.check_output(['git','-C',str(a.ggml_source),'rev-parse','HEAD'],text=True).strip()
@@ -42,8 +47,14 @@ command=[str(a.cli.resolve()),'--model',str(a.model.resolve()),'--input',str(inp
     '--temperature',str(a.temperature),'--top-k',str(a.top_k),'--seed',str(a.seed),
     '--decoder-seed',str(a.decoder_seed),'--decoder-steps',str(a.decoder_steps),'--segment-codes',str(a.segment_codes)]
 command+=['--rng',a.rng]
+if a.audio_prefix:command+=['--audio-prefix',str(a.audio_prefix.resolve())]
+if a.experimental_bpm is not None:
+    command+=['--experimental-bpm',str(a.experimental_bpm),'--tempo-width-beats',str(a.tempo_width_beats),'--tempo-offset-beats',str(a.tempo_offset_beats)]
+    if a.tempo_local_window:command+=['--tempo-local-window','1']
+elif a.tempo_width_beats!=1 or a.tempo_offset_beats!=0 or a.tempo_local_window:raise ValueError('Tempo options require --experimental-bpm')
 if a.rng=='torch-cuda':command+=['--rng-cuda-blocks',str(a.rng_cuda_blocks),'--rng-device',str(a.rng_device)]
-elif a.rng_cuda_blocks or a.rng_device:raise ValueError('CUDA RNG options require torch-cuda mode')
+elif a.rng_cuda_blocks or a.rng_device or a.sampler_offset:raise ValueError('CUDA RNG options require torch-cuda mode')
+if a.sampler_offset:command+=['--sampler-offset',str(a.sampler_offset)]
 if bool(a.flow_model)!=bool(a.sq_model):raise ValueError('Supply both codec models or neither')
 if a.flow_model:command+=['--flow-model',str(a.flow_model.resolve()),'--sq-model',str(a.sq_model.resolve())]
 spec=importlib.util.spec_from_file_location('native_parity',root/'tools/run-parity.py');helper=importlib.util.module_from_spec(spec);spec.loader.exec_module(helper)
@@ -66,6 +77,12 @@ report=dict(ggml_revision=revision,shared_baseline=profile['shared_baseline'],gg
     audio_quality_accepted=False,device_memory_sampling=memory,run=result,
     rng=('Torch CUDA Philox4x32-10, F32 exponential per head and consecutive F32 normal per codec window; explicit target grid cap'
         if a.rng=='torch-cuda' else 'Native SplitMix64 indexed by seed/frame/head/category, exponential race; not a PyTorch RNG seed'))
+if a.audio_prefix:
+    if result['newly_generated_frames']<1:raise ValueError('No newly generated audio after the prefix')
+    prefix=np.fromfile(a.audio_prefix,np.int32)
+    if prefix.size!=result['audio_prefix_frames']*8 or not np.array_equal(codes[:prefix.size],prefix):raise ValueError('Output prefix does not equal the forced guide')
+    report.update(audio_prefix_sha256=digest(a.audio_prefix),audio_prefix_included_in_output=True,
+        continuation_start_seconds=result['audio_prefix_frames']*.08,continuation_seconds=result['newly_generated_frames']*.08)
 if a.flow_model:
     if (a.output/'audio.wav').stat().st_size!=44+result['audio_samples_per_channel']*8:raise ValueError('WAV length mismatch')
     report.update(flow_model_sha256=digest(a.flow_model),sq_model_sha256=digest(a.sq_model),audio_sha256=digest(a.output/'audio.wav'))
