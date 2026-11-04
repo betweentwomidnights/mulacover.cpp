@@ -386,7 +386,7 @@
     "consumer_pins_changed": false
   },
   "limitations": [
-    "One source, one seed, Q4 generator; musical assessment pending.",
+    "One source, one seed, Q4 generator; user finds score-free output wilder and wants its primitives retained. General quality and precise source preservation remain unestablished.",
     "Same eight-second guide from 29.76-second encoding preserves the controlled A/B but may include encoder lookahead.",
     "Not a strict cursor-only DAW fixture; next use a tail guide ending at available audio boundary.",
     "Upstream frontend requires a score. Combining dropped score with retained text/style is experimental; training coverage is not established.",
@@ -402,8 +402,11 @@
     "raw_waveform_preserved": true
   },
   "listener_feedback": {
-    "status": "initial_source_preservation_concern; matched opening comparison pending",
-    "assessment": "User does not hear the input at the beginning of the score-free clip and reports close reproduction in the prior score-guided version.",
+    "status": "matched opening comparison heard; retain experimental score-free primitives",
+    "assessment": "After clarifying the omitted guide and hearing matched openings, the user finds score-free output wilder and wants to keep its primitives available alongside score-guided continuation.",
+    "initial_feedback": "The continuation-only clip appeared to omit the source opening; the prior score-guided version reproduced it closely.",
+    "retain_primitives": true,
+    "score_free_opt_in": true,
     "presented_score_free_file": "continuation-listen.wav",
     "presented_file_start_seconds_in_full_decode": 8,
     "encoding_changed": false,

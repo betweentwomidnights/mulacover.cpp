@@ -68,7 +68,12 @@ and musical usefulness require listening. Initial listener feedback reports that
 the source is not recognizable at the start of the score-free listening clip,
 whereas the earlier score-guided version reproduced it closely. The clip sent
 was the suffix starting at eight seconds, not the full guide-plus-new waveform;
-a matched opening comparison is required before attributing this to encoding.
+the matched opening comparison below resolves the clip-boundary confusion.
+After hearing those openings, the user describes the score-free version as
+wilder and explicitly wants to keep its primitives available. Retain both
+workflows, with score-free mode opt-in. This supports retaining the experiment;
+it does not establish faithful melody preservation, general quality or hard
+BPM lock.
 
 The original float WAV is preserved. Its full render peak is 1.07852; a separate
 `continuation-listen.wav` applies only constant -1 dB gain via native FFmpeg,

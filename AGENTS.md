@@ -127,9 +127,13 @@
   `docs/SCORE_FREE_CONTINUATION.md`. A strict DAW baseline must use only
   pre-cursor audio/transcription and a tail guide: the prior demo has a whole-song
   score and encoder lookahead beyond the selected beginning-of-song guide.
-  Initial score-free listener feedback reports missing source character at the
-  opening; the presented clip excluded the first eight guide seconds. Guide
+  Initial score-free listener feedback concerned the missing source opening;
+  the presented clip excluded the first eight guide seconds. After comparing
+  full openings, the user understands that distinction, finds score-free output
+  wilder, and explicitly wants to retain its primitives. Keep score-free mode
+  available and opt-in; do not infer precise source preservation or hard BPM
+  lock acceptance. Guide
   codes are identical in both runs, but joint noncausal 29.76-second decoding
-  changes even their guide waveform when later generated codes differ. Compare
-  matched full openings and independent source-token reconstruction before
-  diagnosing encoding or accepting score-free musical preservation.
+  changes even their guide waveform when later generated codes differ. Matched
+  full openings and independent source-token reconstruction are now available;
+  the observed difference does not establish changed source encoding.
