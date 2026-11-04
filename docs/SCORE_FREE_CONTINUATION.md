@@ -64,8 +64,11 @@ score, versus 119.65 with the score and roughly 120 in the source. Half/double-t
 aliases remain visible in the report. These estimates do not establish a hard
 clock lock: 15-second windows at starts 0 and 10 seconds give about 119.5 BPM,
 falling to about 118.0 and 117.7 at starts 30 and 40 seconds. Melody preservation
-and musical usefulness require listening. Listener assessment of
-the score-free version is pending.
+and musical usefulness require listening. Initial listener feedback reports that
+the source is not recognizable at the start of the score-free listening clip,
+whereas the earlier score-guided version reproduced it closely. The clip sent
+was the suffix starting at eight seconds, not the full guide-plus-new waveform;
+a matched opening comparison is required before attributing this to encoding.
 
 The original float WAV is preserved. Its full render peak is 1.07852; a separate
 `continuation-listen.wav` applies only constant -1 dB gain via native FFmpeg,
@@ -78,3 +81,37 @@ Private ignored audio/fixtures stay under `refdata/native-continuation/`.
 The compact report is `docs/validation/score-free-continuation.json`. No new
 Python files are introduced; the existing NumPy tempo analysis is an offline
 measurement, separate from the native inference command.
+
+## Opening investigation
+
+The encoder was not rerun for the score-free experiment. Both outputs contain
+exactly the same first 100 RVQ frames (800 codes), identical to the selected
+cached source encoding. Their first code difference is frame 100, where new
+sampling begins. Score-free source encoding did not change in this comparison.
+
+Nevertheless the decoded guide waveforms are not identical. The first window
+of native token-to-audio decoding receives 372 frames (29.76 seconds), comprising
+100 guide frames and 272 newly generated frames. The flow transformer uses
+noncausal attention over that window; different future codes can therefore
+change reconstruction before the eight-second boundary. Identical guide tokens
+do not imply an unchanged guide waveform in this joint decode path.
+
+Against the score-guided decode, score-free waveform relative L2 differences
+are 0.482 over seconds 0--1, 0.429 over 1--4, and 0.355 over 4--8; corresponding
+cosines are 0.914, 0.947 and 0.968. This is a separate contextual reconstruction
+difference, not the existing strict native/upstream waveform-parity case.
+Numerical comparison alone does not establish musical recognizability.
+
+Matched listening previews now include the first eight decoded guide seconds
+and twelve generated seconds, both with constant -1 dB gain. An unchanged-source
+eight-second preview is supplied separately. No original PCM is spliced into the
+generated outputs. Any future DAW policy preserving the host's existing PCM
+must be explicit; it must not be used to hide this reconstruction difference.
+
+An independent native reconstruction also decodes all 372 cached original-source
+frames, with no generated tokens, ten flow steps, guidance 1.25 and first-window
+Torch CUDA normal noise (seed 1701, offset 0, cap 288). Decode takes 9.537 seconds.
+Its separate eight-second preview provides an encoder/codec listening control.
+The shared first 100 codes are unchanged in all three inputs. This control's
+musical accuracy still requires listening; waveform differences among differently
+conditioned decode windows are not an encoding-parity verdict.
