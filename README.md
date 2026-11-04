@@ -38,6 +38,10 @@ The native CLI also accepts experimental `--score-mode none` to remove symbolic
 conditioning while retaining the audio guide, text and style. Both score-guided
 transformation and score-free continuation are useful workflows to evaluate;
 see [the controlled comparison](docs/SCORE_FREE_CONTINUATION.md).
+The [cursor-ending guide baseline](docs/CURSOR_CONTINUATION.md) tests 4/8/16-second
+tail guides using only available past audio, plus a 50-second context probe.
+Guide length and new audio share a finite cache budget; the model may emit EOS
+before the requested end.
 
 **Native FP32 teacher-forced frame/logit/cache parity passed on Spark CUDA at `07b77b0`.**
 The coordinated baseline is now `b77ae79`; its CUDA parity currently fails due to

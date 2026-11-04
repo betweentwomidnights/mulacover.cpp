@@ -137,3 +137,19 @@
   changes even their guide waveform when later generated codes differ. Matched
   full openings and independent source-token reconstruction are now available;
   the observed difference does not establish changed source encoding.
+- The cursor-ending test uses the cached encoding of exactly source seconds
+  0--29.76, with 4/8/16-second tail guides and no score. In the eight-second case,
+  the user hears a seamless transition into a wilder but interesting continuation.
+  This is listener acceptance of that handoff, not precise melody or BPM lock.
+  See `docs/CURSOR_CONTINUATION.md`. The user also requests exploring 50 seconds
+  of context: official encoding supports multiple 29.76-second chunks; guide and
+  new frames share the finite native cache budget. The `encode-prefix` action in
+  `reference/run-spark.sh` runs the existing FP32 CPU encoder only in dedicated
+  Spark Docker. Native raw-PCM encoding remains unported.
+  All tail runs replay exactly: 4s and 8s guides yield 32 new seconds; 16s yields
+  31.84 seconds then EOS. The 50s guide accepts all 625 frames/5,000 codes and
+  yields 6.8 new seconds then EOS despite a 16s request and sufficient cache.
+  Do not claim unlimited context or guaranteed continuation length. The user
+  hears the long-guide model produce an ending; that probe changes cursor and
+  requested length, so it is not an isolated length comparison. Source encoder inputs are frozen
+  independently: the longer input changes five earlier RVQ code positions.

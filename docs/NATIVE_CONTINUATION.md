@@ -102,15 +102,16 @@ does not perform production guide slicing or write the continuation WAV.
 
 ## Next gates, in order
 
-1. **Evaluate both musical workflows and freeze a past-only DAW baseline.** The
-   existing musical demonstration uses the beginning of a longer encoded clip
-   and a whole-song symbolic score.
-   The user finds that score-guided transformation useful in its own right;
-   preserve it as a separate workflow. It is not a strict cursor-only experiment.
-   For the next fixture, place the cursor at the end of available audio; encode
-   and transcribe only that audio, use its last selected guide frames, and
-   generate beyond the cursor. No future waveform or future score is supplied.
-   Compare 4/8/16-second guides and keep encoder analysis context explicit.
+1. **Retain the frozen past-only baseline and broaden musical validation.** The
+   original score-guided transformation remains a useful separate workflow.
+   A new score-free baseline uses only source seconds 0--29.76 and compares
+   4/8/16-second tail guides ending at that cursor. The user hears a seamless,
+   wilder but interesting handoff in the eight-second case. A follow-up also
+   accepts a full 50-second guide and generates 6.8 new seconds before EOS.
+   See [the cursor-ending guide experiment](CURSOR_CONTINUATION.md) for exact
+   boundaries, native commands, frozen reports and remaining limitations.
+   Expand listening across sources and seeds; these cases establish neither
+   precise melody preservation nor a hard BPM lock.
 
 2. **Port the full waveform-to-RVQ encoder into HeartCodec.** SQ encoding is a
    different representation and does not replace this missing stage. Freeze
