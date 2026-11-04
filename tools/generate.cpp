@@ -1,5 +1,7 @@
 #include "mulacover_sampling.h"
 #include "mulacover_tempo.h"
+#include "mulacover_continuation.h"
+#include "continuation-time.h"
 #include "heartcodec.h"
 #include "heartcodec_rng.h"
 #include "ggml.h"
@@ -19,7 +21,7 @@ template<class T>static std::vector<T> read(const std::filesystem::path & path,s
     std::vector<T> v(n);std::ifstream f(path,std::ios::binary);
     if(!f.read(reinterpret_cast<char *>(v.data()),std::streamsize(n*sizeof(T))))throw std::runtime_error("Cannot read input");return v;
 }
-static void wav(const std::filesystem::path & path,const heartcodec_stereo_v1 & audio) {
+template<class T>static void wav(const std::filesystem::path & path,const T & audio) {
     const uint64_t bytes=uint64_t(audio.num_samples)*8;if(bytes>UINT32_MAX-36)throw std::runtime_error("WAV is too large");
     std::ofstream f(path,std::ios::binary);auto u32=[&](uint32_t x){f.write(reinterpret_cast<const char *>(&x),4);};
     auto u16=[&](uint16_t x){f.write(reinterpret_cast<const char *>(&x),2);};
@@ -32,6 +34,7 @@ int main(int argc,char ** argv) {
     mulacover_context * context=nullptr;heartcodec_context * codec=nullptr;
     mulacover_frame_v1 frame{};frame.size=sizeof(frame);heartcodec_stereo_v1 audio{};audio.size=sizeof(audio);
     heartcodec_rng_result_v1 random{};random.size=sizeof(random);
+    mulacover_continuation_audio_v1 suffix{};suffix.size=sizeof(suffix);
     try {
         std::map<std::string,std::string> a;
         for(int i=1;i<argc;i+=2)if(i+1>=argc||!a.emplace(argv[i],argv[i+1]).second)throw std::runtime_error("Missing/duplicate option");
@@ -40,23 +43,51 @@ int main(int argc,char ** argv) {
             if(k!="--model"&&k!="--input"&&k!="--output"&&k!="--prompt-frames"&&k!="--symbolic-frames"&&k!="--qwen-index"&&k!="--muq-index"&&
                k!="--frames"&&k!="--capacity"&&k!="--backend"&&k!="--guidance"&&k!="--temperature"&&k!="--top-k"&&k!="--seed"&&k!="--replay"&&
                k!="--flow-model"&&k!="--sq-model"&&k!="--decoder-seed"&&k!="--decoder-steps"&&k!="--segment-codes"&&k!="--rng"&&k!="--rng-cuda-blocks"&&k!="--rng-device"&&
-               k!="--experimental-bpm"&&k!="--tempo-width-beats"&&k!="--tempo-offset-beats"&&k!="--tempo-local-window"&&k!="--audio-prefix"&&k!="--sampler-offset")throw std::runtime_error("Unknown option: "+k);
+               k!="--experimental-bpm"&&k!="--tempo-width-beats"&&k!="--tempo-offset-beats"&&k!="--tempo-local-window"&&k!="--audio-prefix"&&k!="--sampler-offset"&&
+               k!="--guide-seconds"&&k!="--guide-start-seconds"&&k!="--continuation-seconds")throw std::runtime_error("Unknown option: "+k);
         }
         auto get=[&](const char * k,const char * d){return a.count(k)?a.at(k):std::string(d);};
         const std::filesystem::path input(a.at("--input")),output(a.at("--output"));
         if(std::filesystem::exists(output/"run.json"))throw std::runtime_error("Use a fresh generation output directory");
-        const int prompt=std::stoi(a.at("--prompt-frames")),symbolic=std::stoi(a.at("--symbolic-frames")),frames=std::stoi(get("--frames","100"));
-        const int capacity=std::stoi(get("--capacity","256"));const bool replay=get("--replay","1")=="1";
-        if(prompt<1||symbolic<1||symbolic>5000||frames<1||frames>8192||int64_t(prompt)+frames-1>capacity)
-            throw std::runtime_error("Invalid dimensions or insufficient cache capacity");
+        const int prompt=std::stoi(a.at("--prompt-frames")),symbolic=std::stoi(a.at("--symbolic-frames"));
+        const bool replay=get("--replay","1")=="1";
+        if(prompt<1||prompt>8192||symbolic<1||symbolic>5000)throw std::runtime_error("Invalid conditioning dimensions");
+        if(a.count("--frames")&&a.count("--continuation-seconds"))throw std::runtime_error("Choose --frames or --continuation-seconds");
         if(a.count("--flow-model")!=a.count("--sq-model"))throw std::runtime_error("Supply both codec models or neither");
         std::vector<int32_t> prefix;size_t prefix_frames=0;
         if(a.count("--audio-prefix")) {
             const auto bytes=std::filesystem::file_size(a.at("--audio-prefix"));
-            if(bytes==0||bytes%32||bytes/32>=uint64_t(frames))throw std::runtime_error("Prefix must contain complete frames and leave room for generated audio");
+            if(bytes==0||bytes%32)throw std::runtime_error("Prefix must contain complete RVQ frames");
             prefix=read<int32_t>(a.at("--audio-prefix"),size_t(bytes/4));prefix_frames=prefix.size()/8;
             if(std::any_of(prefix.begin(),prefix.end(),[](int32_t x){return x<0||x>=8192;}))throw std::runtime_error("Invalid audio-prefix RVQ code");
         }
+        if(!a.count("--audio-prefix")&&(a.count("--guide-seconds")||a.count("--guide-start-seconds")))throw std::runtime_error("Guide selection requires --audio-prefix");
+        const auto * continuation=mulacover_get_continuation_api(1);
+        if(!continuation||continuation->size<MULACOVER_CONTINUATION_API_V1_SIZE)throw std::runtime_error("Continuation capability unavailable");
+        mulacover_error_v1 error{};error.size=sizeof(error);
+        mulacover_continuation_config_v1 timeline{};timeline.size=sizeof(timeline);continuation->config_init(&timeline);
+        timeline.source_frames=int64_t(prefix_frames);timeline.source_start_frame=mula::duration_frames(get("--guide-start-seconds","0"));
+        timeline.guide_frames=a.count("--guide-seconds")?mula::duration_frames(a.at("--guide-seconds")):0;
+        if(a.count("--guide-seconds")&&timeline.guide_frames==0)throw std::runtime_error("Guide duration must include an 80-ms frame");
+        if(timeline.source_start_frame>timeline.source_frames||timeline.guide_frames>timeline.source_frames-timeline.source_start_frame)
+            throw std::runtime_error("Guide selection exceeds encoded audio");
+        const int64_t guide=timeline.guide_frames?timeline.guide_frames:timeline.source_frames-timeline.source_start_frame;
+        if(guide>8192)throw std::runtime_error("Guide exceeds the model context");
+        if(a.count("--continuation-seconds"))timeline.new_frames=mula::duration_frames(a.at("--continuation-seconds"));
+        else {
+            const int64_t requested=std::stoll(get("--frames","100"));
+            if(requested<1||requested>8192)throw std::runtime_error("Invalid total frame count");
+            timeline.new_frames=requested-guide;
+        }
+        timeline.prompt_frames=prompt;timeline.cache_capacity=std::stoi(get("--capacity","0"));
+        mulacover_continuation_plan_v1 plan{};plan.size=sizeof(plan);continuation->plan_init(&plan);
+        if(continuation->plan(&timeline,&plan,&error))throw std::runtime_error(error.message);
+        const int frames=int(plan.total_frames),capacity=plan.cache_capacity;
+        if(!prefix.empty()) {
+            const auto first=prefix.begin()+size_t(plan.source_start_frame)*8;
+            std::vector<int32_t> selected(first,first+size_t(plan.guide_frames)*8);prefix.swap(selected);
+        }
+        prefix_frames=size_t(plan.guide_frames);
         const std::string rng=get("--rng","native");
         if(rng!="native"&&rng!="torch-cuda")throw std::runtime_error("RNG must be native or torch-cuda");
         const auto sampler_offset_text=get("--sampler-offset","0");
@@ -77,7 +108,6 @@ int main(int argc,char ** argv) {
         if(!api||api->size<MULACOVER_API_V1_SIZE||!sampling||sampling->size<MULACOVER_SAMPLING_API_V1_SIZE)throw std::runtime_error("Required ABI capability unavailable");
         mulacover_config_v1 config{};config.size=sizeof(config);api->config_init(&config);
         config.model_path=a.at("--model").c_str();const std::string backend=get("--backend","cuda");config.backend=backend.c_str();config.cache_capacity=capacity;
-        mulacover_error_v1 error{};error.size=sizeof(error);
         if(api->create(&config,&context,&error))throw std::runtime_error(error.message);
         mulacover_condition_v1 condition{};condition.size=sizeof(condition);condition.tokens=tokens.data();condition.tokens_mask=mask.data();condition.prompt_frames=prompt;
         condition.qwen=qwen.data();condition.muq=muq.data();condition.qwen_index=std::stoll(a.at("--qwen-index"));condition.muq_index=std::stoll(a.at("--muq-index"));
@@ -187,12 +217,19 @@ int main(int argc,char ** argv) {
             samples=uint64_t(audio.num_samples);
             if(samples!=uint64_t(codes.size()/8)*3840||audio.sample_rate!=48000)throw std::runtime_error("Unexpected decoded duration/rate");
             for(uint64_t i=0;i<samples*2;++i){double x=audio.samples[i];if(!std::isfinite(x))throw std::runtime_error("Nonfinite waveform");peak=std::max(peak,std::fabs(x));sum+=x*x;}
-            wav(output/"audio.wav",audio);heartcodec_stereo_free_v1(&audio);heartcodec_context_destroy_v1(codec);codec=nullptr;
+            wav(output/"audio.wav",audio);
+            if(prefix_frames) {
+                if(continuation->copy_audio(audio.samples,audio.num_samples,audio.sample_rate,int64_t(prefix_frames),&suffix,&error))throw std::runtime_error(error.message);
+                wav(output/"continuation.wav",suffix);continuation->audio_free(&suffix);
+            }
+            heartcodec_stereo_free_v1(&audio);heartcodec_context_destroy_v1(codec);codec=nullptr;
             decode_seconds=std::chrono::duration<double>(std::chrono::steady_clock::now()-decode_started).count();
         }
         std::ofstream report(output/"run.json");
         report<<"{\"frames\":"<<codes.size()/8<<",\"prompt_frames\":"<<prompt<<",\"symbolic_frames\":"<<symbolic<<",\"cache_capacity\":"<<capacity
             <<",\"audio_prefix_frames\":"<<prefix_frames<<",\"newly_generated_frames\":"<<(codes.size()/8-prefix_frames)
+            <<",\"guide_source_frames\":"<<timeline.source_frames<<",\"guide_source_start_frame\":"<<plan.source_start_frame
+            <<",\"requested_new_frames\":"<<plan.new_frames<<",\"continuation_samples_per_channel\":"<<(samples?uint64_t(codes.size()/8-prefix_frames)*3840:0)
             <<",\"guidance\":"<<condition.guidance<<",\"temperature\":"<<options.temperature<<",\"top_k\":"<<options.top_k<<",\"seed\":"<<options.seed
             <<",\"experimental_tempo\":{\"method\":\"conditional-cross-attention-gaussian-v1\",\"bpm\":"<<tempo.bpm
             <<",\"width_beats\":"<<tempo.width_beats<<",\"offset_beats\":"<<tempo.offset_beats<<",\"local_window\":"<<tempo.local_window<<"}"
@@ -210,5 +247,5 @@ int main(int argc,char ** argv) {
             <<",\"ggml_commit\":\""<<ggml_commit()<<"\"}\n";
         if(!report)throw std::runtime_error("Cannot write run report");
         std::cout<<"Generated "<<codes.size()/8<<" frames; "<<samples<<" stereo samples/channel\n";return 0;
-    }catch(const std::exception & e){std::cerr<<e.what()<<'\n';heartcodec_rng_result_free_v1(&random);mulacover_frame_free_v1(&frame);mulacover_destroy_v1(context);heartcodec_stereo_free_v1(&audio);heartcodec_context_destroy_v1(codec);return 1;}
+    }catch(const std::exception & e){std::cerr<<e.what()<<'\n';mulacover_continuation_audio_free_v1(&suffix);heartcodec_rng_result_free_v1(&random);mulacover_frame_free_v1(&frame);mulacover_destroy_v1(context);heartcodec_stereo_free_v1(&audio);heartcodec_context_destroy_v1(codec);return 1;}
 }

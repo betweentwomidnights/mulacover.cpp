@@ -115,3 +115,11 @@
   resolution). It automatically sizes the cache unless explicitly configured
   and exports `continuation.wav` without the guide. Encoder context and guide
   duration are separate: the accepted example encodes 29.76s and feeds 8s.
+- Native continuation controls and suffix export now live in
+  `mulacover_continuation.h` / `src/continuation.cpp` and the C++ generator CLI;
+  `tools/generate.py` delegates them and independently validates outputs. Core
+  and existing capability layouts are frozen. See `docs/NATIVE_CONTINUATION.md`.
+  The audio-to-RVQ encoder and Qwen/prompt preprocessing remain reference Python;
+  do not call raw-PCM continuation fully native. Next validation must use only
+  pre-cursor audio/transcription and a tail guide: the prior demo has a whole-song
+  score and encoder lookahead beyond the selected beginning-of-song guide.

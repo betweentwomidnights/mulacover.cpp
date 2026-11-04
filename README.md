@@ -31,6 +31,9 @@ continuation mode; arbitrary BPM, complete restyling and a hard lock are unprove
 The user reports that this continuation fits the intended DAW use case.
 Guide start/duration and new-audio duration are independently selectable in the
 prepared-input driver; it also exports a guide-free `continuation.wav`.
+These controls and waveform export now run directly in the C++ CLI and a
+negotiated C capability. See [native continuation and the encoder roadmap](docs/NATIVE_CONTINUATION.md)
+for the prepared-input runtime boundary and remaining Python reference bridge.
 
 **Native FP32 teacher-forced frame/logit/cache parity passed on Spark CUDA at `07b77b0`.**
 The coordinated baseline is now `b77ae79`; its CUDA parity currently fails due to

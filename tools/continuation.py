@@ -1,4 +1,4 @@
-"""Select encoded audio guides and plan the 80-ms continuation timeline."""
+"""Independent reference oracle for native guide selection, timeline and PCM suffix tests."""
 from decimal import Decimal, InvalidOperation, ROUND_FLOOR
 import hashlib
 from pathlib import Path

@@ -184,8 +184,8 @@ exact melody/timing agreement and decoder waveform parity remain unaccepted.
 
 ## Choosing input and continuation lengths
 
-Guide length and requested new-audio length are independent. The Python driver
-now accepts, for example:
+Guide length and requested new-audio length are independent. The native C++ CLI
+and its optional reference Python harness accept, for example:
 
 ```
 --audio-prefix encoded/guide-1.i32 --guide-seconds 8 --continuation-seconds 30
@@ -218,5 +218,8 @@ research controls requested explicitly through `--factors`.
 
 When codec models are supplied, the driver writes both `audio.wav` (guide plus
 new audio) and `continuation.wav` (new audio only), without changing samples.
-The latter is the clip to place after the guide in the DAW. Encoding remains
-the Spark Docker reference bridge; native Q4 continuation runs on the laptop.
+The latter is the clip to place after the guide in the DAW. The native CLI now
+performs selection, cache planning and suffix export directly; the Python
+harness independently validates the results. Encoding remains the Spark Docker
+reference bridge; native Q4 continuation runs on the laptop. See
+[the native boundary and remaining ports](NATIVE_CONTINUATION.md).

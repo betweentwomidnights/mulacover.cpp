@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Prepared-input native generation and staged HeartCodec decode with provenance."""
+"""Reference input/provenance harness around the standalone native continuation CLI."""
 import argparse
 import hashlib
 import importlib.util
@@ -8,7 +8,7 @@ from pathlib import Path
 import os
 import subprocess
 import numpy as np
-from continuation import select_guide,plan_frames,frames_for_seconds,write_continuation
+from continuation import select_guide,plan_frames,frames_for_seconds
 
 p=argparse.ArgumentParser(description=__doc__)
 for name in ('reference','model','cli','output','ggml-source'):p.add_argument('--'+name,type=Path,required=True)
@@ -36,13 +36,10 @@ manifest=json.loads((a.reference/'manifest.json').read_text())
 prefix=None;selection=None
 if a.audio_prefix:prefix,selection=select_guide(a.audio_prefix,a.guide_seconds,a.guide_start_seconds)
 elif a.guide_seconds is not None or frames_for_seconds(a.guide_start_seconds,allow_zero=True):raise ValueError('Guide selection needs --audio-prefix')
+requested_frames,requested_capacity=a.frames,a.capacity
 a.frames,a.capacity=plan_frames(manifest['preprocessing']['input.tokens']['shape'][1],len(prefix) if prefix is not None else 0,
     a.frames,a.continuation_seconds,a.capacity)
 a.output.mkdir(parents=True,exist_ok=True);inp=a.output/'input';inp.mkdir(exist_ok=True)
-prefix_file=inp/'audio-prefix.i32'
-if prefix is not None:
-    if prefix_file.resolve()==a.audio_prefix.resolve():raise ValueError('Output directory must differ from the encoded guide source')
-    prefix.tofile(prefix_file)
 def load(key):
     item=manifest['preprocessing'][key];data=(a.reference/item['file']).read_bytes()
     if hashlib.sha256(data).hexdigest()!=item['sha256']:raise ValueError('Prepared input hash mismatch')
@@ -56,11 +53,16 @@ for name,(key,dtype) in mapping.items():
 command=[str(a.cli.resolve()),'--model',str(a.model.resolve()),'--input',str(inp.resolve()),'--output',str(a.output.resolve()),
     '--prompt-frames',str(load('input.tokens').shape[1]),'--symbolic-frames',str(load('input.pianoroll').shape[1]),
     '--qwen-index',str(load('input.qwen_indices')[0]),'--muq-index',str(load('input.muq_indices')[0]),
-    '--backend',a.backend,'--frames',str(a.frames),'--capacity',str(a.capacity),'--guidance',str(a.guidance),
+    '--backend',a.backend,'--guidance',str(a.guidance),
     '--temperature',str(a.temperature),'--top-k',str(a.top_k),'--seed',str(a.seed),
     '--decoder-seed',str(a.decoder_seed),'--decoder-steps',str(a.decoder_steps),'--segment-codes',str(a.segment_codes)]
 command+=['--rng',a.rng]
-if prefix is not None:command+=['--audio-prefix',str(prefix_file.resolve())]
+if a.continuation_seconds is not None:command+=['--continuation-seconds',a.continuation_seconds]
+elif requested_frames is not None:command+=['--frames',str(requested_frames)]
+if requested_capacity is not None:command+=['--capacity',str(requested_capacity)]
+if prefix is not None:
+    command+=['--audio-prefix',str(a.audio_prefix.resolve()),'--guide-start-seconds',a.guide_start_seconds]
+    if a.guide_seconds is not None:command+=['--guide-seconds',a.guide_seconds]
 if a.experimental_bpm is not None:
     command+=['--experimental-bpm',str(a.experimental_bpm),'--tempo-width-beats',str(a.tempo_width_beats),'--tempo-offset-beats',str(a.tempo_offset_beats)]
     if a.tempo_local_window:command+=['--tempo-local-window','1']
@@ -76,6 +78,7 @@ with (a.output/'stdout.txt').open('w') as out,(a.output/'stderr.txt').open('w') 
 if run.returncode:raise RuntimeError(f'Native generation failed: {(a.output/"stderr.txt").read_text()[-3000:]}')
 result=json.loads((a.output/'run.json').read_text())
 if result['ggml_commit']!=revision[:8]:raise ValueError('Linked GGML revision mismatch')
+if result['cache_capacity']!=a.capacity or result['requested_new_frames']!=a.frames-(len(prefix) if prefix is not None else 0):raise ValueError('Native and reference timeline plans differ')
 codes=np.fromfile(a.output/'codes.i32',np.int32)
 if codes.size!=result['frames']*8 or np.any(codes<0) or np.any(codes>=8192):raise ValueError('Invalid RVQ output')
 def digest(path):
@@ -93,14 +96,17 @@ report=dict(ggml_revision=revision,shared_baseline=profile['shared_baseline'],gg
 if a.audio_prefix:
     if result['newly_generated_frames']<1:raise ValueError('No newly generated audio after the prefix')
     if prefix.size!=result['audio_prefix_frames']*8 or not np.array_equal(codes[:prefix.size],prefix.ravel()):raise ValueError('Output prefix does not equal the forced guide')
-    report.update(audio_prefix_sha256=digest(prefix_file),audio_prefix_selection=selection,audio_prefix_included_in_output=True,
+    if result['guide_source_start_frame']!=selection['source_start_frame']:raise ValueError('Native and reference guide selections differ')
+    report.update(audio_prefix_sha256=hashlib.sha256(prefix.tobytes()).hexdigest(),audio_prefix_selection=selection,audio_prefix_included_in_output=True,
         continuation_start_seconds=result['audio_prefix_frames']*.08,continuation_seconds=result['newly_generated_frames']*.08)
 if a.flow_model:
     if (a.output/'audio.wav').stat().st_size!=44+result['audio_samples_per_channel']*8:raise ValueError('WAV length mismatch')
     report.update(flow_model_sha256=digest(a.flow_model),sq_model_sha256=digest(a.sq_model),audio_sha256=digest(a.output/'audio.wav'))
     if prefix is not None:
-        write_continuation(a.output/'audio.wav',a.output/'continuation.wav',result['audio_prefix_frames'],result['frames'])
+        suffix=(a.output/'continuation.wav').read_bytes();full=(a.output/'audio.wav').read_bytes()
+        if len(suffix)!=44+result['newly_generated_frames']*3840*8 or suffix[44:]!=full[44+result['audio_prefix_frames']*3840*8:]:raise ValueError('Native continuation export differs from the waveform suffix')
         report.update(continuation_audio_sha256=digest(a.output/'continuation.wav'),continuation_audio_samples_per_channel=result['newly_generated_frames']*3840)
 report['requested_timeline']=dict(total_frames=a.frames,guide_frames=len(prefix) if prefix is not None else 0,
     new_frames=a.frames-(len(prefix) if prefix is not None else 0),continuation_seconds=a.continuation_seconds)
+report['driver_role']='Reference preprocessing, provenance and independent validation only; the native CLI plans, selects and exports the continuation'
 (a.output/'provenance.json').write_text(json.dumps(report,indent=2)+'\n');print(json.dumps(report['run'],indent=2))
