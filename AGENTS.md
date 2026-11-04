@@ -120,6 +120,10 @@
   `tools/generate.py` delegates them and independently validates outputs. Core
   and existing capability layouts are frozen. See `docs/NATIVE_CONTINUATION.md`.
   The audio-to-RVQ encoder and Qwen/prompt preprocessing remain reference Python;
-  do not call raw-PCM continuation fully native. Next validation must use only
+  do not call raw-PCM continuation fully native. The user values both score-guided
+  transformation/continuation and score-free audio continuation; preserve both
+  workflows. `--score-mode none` uses the upstream -1 dropped-score convention
+  without reading symbolic files; this is experimental. See
+  `docs/SCORE_FREE_CONTINUATION.md`. A strict DAW baseline must use only
   pre-cursor audio/transcription and a tail guide: the prior demo has a whole-song
   score and encoder lookahead beyond the selected beginning-of-song guide.

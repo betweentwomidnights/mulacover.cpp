@@ -44,12 +44,14 @@ int main(int argc,char ** argv) {
                k!="--frames"&&k!="--capacity"&&k!="--backend"&&k!="--guidance"&&k!="--temperature"&&k!="--top-k"&&k!="--seed"&&k!="--replay"&&
                k!="--flow-model"&&k!="--sq-model"&&k!="--decoder-seed"&&k!="--decoder-steps"&&k!="--segment-codes"&&k!="--rng"&&k!="--rng-cuda-blocks"&&k!="--rng-device"&&
                k!="--experimental-bpm"&&k!="--tempo-width-beats"&&k!="--tempo-offset-beats"&&k!="--tempo-local-window"&&k!="--audio-prefix"&&k!="--sampler-offset"&&
-               k!="--guide-seconds"&&k!="--guide-start-seconds"&&k!="--continuation-seconds")throw std::runtime_error("Unknown option: "+k);
+               k!="--guide-seconds"&&k!="--guide-start-seconds"&&k!="--continuation-seconds"&&k!="--score-mode")throw std::runtime_error("Unknown option: "+k);
         }
         auto get=[&](const char * k,const char * d){return a.count(k)?a.at(k):std::string(d);};
         const std::filesystem::path input(a.at("--input")),output(a.at("--output"));
         if(std::filesystem::exists(output/"run.json"))throw std::runtime_error("Use a fresh generation output directory");
         const int prompt=std::stoi(a.at("--prompt-frames")),symbolic=std::stoi(a.at("--symbolic-frames"));
+        const auto score_mode=get("--score-mode","provided");
+        if(score_mode!="provided"&&score_mode!="none")throw std::runtime_error("Score mode must be provided or none");
         const bool replay=get("--replay","1")=="1";
         if(prompt<1||prompt>8192||symbolic<1||symbolic>5000)throw std::runtime_error("Invalid conditioning dimensions");
         if(a.count("--frames")&&a.count("--continuation-seconds"))throw std::runtime_error("Choose --frames or --continuation-seconds");
@@ -102,8 +104,13 @@ int main(int argc,char ** argv) {
         uint64_t sampler_offset_per_head=0,decoder_final_offset=0;int64_t decoder_rng_windows=0;
         auto tokens=read<int32_t>(input/"tokens.i32",size_t(prompt)*9);auto mask=read<uint8_t>(input/"mask.u8",size_t(prompt)*9);
         auto qwen=read<float>(input/"qwen.f32",1024),muq=read<float>(input/"muq.f32",512);
-        auto piano=read<float>(input/"piano.f32",size_t(symbolic)*256),drum=read<float>(input/"drum.f32",size_t(symbolic)*128),chord=read<float>(input/"chord.f32",size_t(symbolic)*12);
-        auto padding=read<uint8_t>(input/"context-mask.u8",size_t(symbolic));
+        // Upstream _mask_condition uses -1 for dropped symbolic conditioning.
+        // Retain the requested context length and an unpadded mask; do not read
+        // any score files in this experimental audio-only continuation mode.
+        auto piano=score_mode=="none"?std::vector<float>(size_t(symbolic)*256,-1.0f):read<float>(input/"piano.f32",size_t(symbolic)*256);
+        auto drum=score_mode=="none"?std::vector<float>(size_t(symbolic)*128,-1.0f):read<float>(input/"drum.f32",size_t(symbolic)*128);
+        auto chord=score_mode=="none"?std::vector<float>(size_t(symbolic)*12,-1.0f):read<float>(input/"chord.f32",size_t(symbolic)*12);
+        auto padding=score_mode=="none"?std::vector<uint8_t>(size_t(symbolic),0):read<uint8_t>(input/"context-mask.u8",size_t(symbolic));
         const auto * api=mulacover_get_api(1);const auto * sampling=mulacover_get_sampling_api(1);
         if(!api||api->size<MULACOVER_API_V1_SIZE||!sampling||sampling->size<MULACOVER_SAMPLING_API_V1_SIZE)throw std::runtime_error("Required ABI capability unavailable");
         mulacover_config_v1 config{};config.size=sizeof(config);api->config_init(&config);
@@ -226,7 +233,7 @@ int main(int argc,char ** argv) {
             decode_seconds=std::chrono::duration<double>(std::chrono::steady_clock::now()-decode_started).count();
         }
         std::ofstream report(output/"run.json");
-        report<<"{\"frames\":"<<codes.size()/8<<",\"prompt_frames\":"<<prompt<<",\"symbolic_frames\":"<<symbolic<<",\"cache_capacity\":"<<capacity
+        report<<"{\"frames\":"<<codes.size()/8<<",\"prompt_frames\":"<<prompt<<",\"symbolic_frames\":"<<symbolic<<",\"score_mode\":\""<<score_mode<<"\",\"cache_capacity\":"<<capacity
             <<",\"audio_prefix_frames\":"<<prefix_frames<<",\"newly_generated_frames\":"<<(codes.size()/8-prefix_frames)
             <<",\"guide_source_frames\":"<<timeline.source_frames<<",\"guide_source_start_frame\":"<<plan.source_start_frame
             <<",\"requested_new_frames\":"<<plan.new_frames<<",\"continuation_samples_per_channel\":"<<(samples?uint64_t(codes.size()/8-prefix_frames)*3840:0)

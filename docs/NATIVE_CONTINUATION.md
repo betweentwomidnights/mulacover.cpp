@@ -1,7 +1,10 @@
 # Native continuation and next milestones
 
-The runtime target is a C++ DAW worker that accepts audio available before the
-cursor, prepares conditioning, primes the generator, and returns only new audio.
+The runtime target is a C++ DAW worker that accepts an audio guide, optional
+symbolic score and style conditioning, primes the generator, and returns only
+new audio. Two useful workflows are score-guided transformation/continuation
+(including a supplied arrangement beyond the cursor) and audio-only continuation
+from material available before the cursor. Evaluate them separately.
 Python is retained for reference oracles, checkpoint conversion and analysis;
 it should not be required by the shipped inference path.
 
@@ -79,6 +82,18 @@ frames remain included in `codes.i32` / `audio.wav`. The new waveform contains
 only generated audio. Counts, source start, cache capacity and actual EOS are
 reported; a requested duration is a limit, not forced EOS suppression.
 
+For an experimental score-free comparison, add `--score-mode none`. The default
+is `provided`. The native CLI does not open `piano.f32`, `drum.f32`, `chord.f32`
+or `context-mask.u8` in `none` mode. Instead it supplies -1 for all three symbolic
+streams and an unpadded mask at the requested `--symbolic-frames` length. This
+is upstream `modeling.py::_mask_condition`'s dropped-condition convention;
+zeros would mean an empty score. Text, Qwen style, audio guide, CFG and sampling
+are retained. The ordinary symbolic adaptors/cross-attention remain active.
+The upstream public preprocessing frontend requires a score; this native mode
+is an experiment using its existing null-condition representation, not an
+upstream-supported audio-only pipeline or a claim of training-time coverage.
+See [the listening comparison](SCORE_FREE_CONTINUATION.md).
+
 `tools/generate.py` is now a reference preprocessing/provenance harness. It
 passes the original guide and requested durations into the C++ executable and
 independently checks the selected codes, timeline and exported waveform. It
@@ -87,9 +102,11 @@ does not perform production guide slicing or write the continuation WAV.
 
 ## Next gates, in order
 
-1. **Freeze a past-only DAW baseline.** The existing musical demonstration uses
-   the beginning of a longer encoded clip and a whole-song symbolic score.
-   That is useful regression data, but not a strict cursor-only experiment.
+1. **Evaluate both musical workflows and freeze a past-only DAW baseline.** The
+   existing musical demonstration uses the beginning of a longer encoded clip
+   and a whole-song symbolic score.
+   The user finds that score-guided transformation useful in its own right;
+   preserve it as a separate workflow. It is not a strict cursor-only experiment.
    For the next fixture, place the cursor at the end of available audio; encode
    and transcribe only that audio, use its last selected guide frames, and
    generate beyond the cursor. No future waveform or future score is supplied.

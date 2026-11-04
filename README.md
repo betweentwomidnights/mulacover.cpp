@@ -34,6 +34,10 @@ prepared-input driver; it also exports a guide-free `continuation.wav`.
 These controls and waveform export now run directly in the C++ CLI and a
 negotiated C capability. See [native continuation and the encoder roadmap](docs/NATIVE_CONTINUATION.md)
 for the prepared-input runtime boundary and remaining Python reference bridge.
+The native CLI also accepts experimental `--score-mode none` to remove symbolic
+conditioning while retaining the audio guide, text and style. Both score-guided
+transformation and score-free continuation are useful workflows to evaluate;
+see [the controlled comparison](docs/SCORE_FREE_CONTINUATION.md).
 
 **Native FP32 teacher-forced frame/logit/cache parity passed on Spark CUDA at `07b77b0`.**
 The coordinated baseline is now `b77ae79`; its CUDA parity currently fails due to
