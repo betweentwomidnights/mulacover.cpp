@@ -42,6 +42,10 @@ The [cursor-ending guide baseline](docs/CURSOR_CONTINUATION.md) tests 4/8/16-sec
 tail guides using only available past audio, plus a 50-second context probe.
 Guide length and new audio share a finite cache budget; the model may emit EOS
 before the requested end.
+A longer native score-free run uses 29.76 seconds of input and produces 57.84
+new seconds before EOS; the user positively assesses it as a listening baseline.
+Its prepared-input runtime remains native; arbitrary raw-PCM input still needs
+the reference encoder. See the [extended run report](docs/validation/extended-continuation.json).
 
 **Native FP32 teacher-forced frame/logit/cache parity passed on Spark CUDA at `07b77b0`.**
 The coordinated baseline is now `b77ae79`; its CUDA parity currently fails due to

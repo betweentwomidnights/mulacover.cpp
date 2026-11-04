@@ -174,3 +174,53 @@ The small reports are `docs/validation/cursor-continuation.json` and
 `docs/validation/long-guide-continuation.json`. Larger context succeeds as an
 input capability in this case, while continuation duration and musical quality
 remain separate model behavior to evaluate.
+
+## Duration ceiling and a longer listening request
+
+For this 25-frame prompt, the 8192-position native API limit leaves
+`8192 - 25 + 1 = 8168` audio frames: 653.44 seconds (10 minutes 53.44 seconds)
+of guide plus generated output. A 30-second guide leaves at most about
+10 minutes 23 seconds for new audio at that API ceiling. This is a position
+budget, not a promise of sustained music, EOS timing or laptop VRAM fit at the
+largest capacity. The encoder's chunk processing and generator context budget
+are different limits.
+
+After hearing the 50-second case produce an ending, the user requests a longer
+completion from roughly 30 seconds of input. The follow-up uses the existing
+validated 29.76-second source encoding as the entire guide (372 frames), with
+no score, and requests 90 new seconds (1125 frames). Total requested audio is
+119.76 seconds. Automatic cache planning selects 1536 positions for the 1521
+required positions. It is a native prepared-input run on the laptop with no
+new encoder pass. Its musical input ends at 29.76 seconds.
+
+This listening run sets `--replay 0` to omit the duplicate full pass; replay
+already passed for the shorter cursor/long-guide fixtures. Terminal/reset
+contracts remain checked. Report its actual duration and EOS rather than
+assuming it fills the request. No forced minimum duration or EOS suppression
+is enabled.
+
+The run produces 723 new frames (57.84 seconds), then EOS, for 1095 total frames
+(87.60 seconds including the guide). All 2,976 guide codes remain exact and
+the new-only waveform is a bit-exact suffix export. Terminal/reset contracts
+pass; duplicate replay was not performed. Generation with checks takes 194.611
+seconds and staged decoding 42.7246 seconds. The complete 1536-position cache
+is allocated; EOS occurs with sufficient space remaining.
+
+The generated section has a 119.81 BPM onset candidate and a slightly stronger
+59.86 half-time alias, close to the source's approximately 120 BPM. This remains
+an estimate from one source and seed. The user strongly positively assesses
+this longer continuation; retain it as the accepted listening baseline for
+this source/seed and preset. This does not establish exact melody/BPM lock,
+other-source quality, or strict upstream waveform parity. The
+first 25.6 seconds of the full output match the independent native source-only
+decode bit-for-bit; the next decoder window begins at 25.6 seconds, so guide
+overlap after that point can depend on continuation context. This comparison
+does not resolve the separate strict waveform-parity failure against upstream.
+
+Listening copies apply constant -3 dB gain. `full-listen.wav` contains the
+29.76-second reconstructed guide plus 57.84 new seconds.
+`listen-last8-plus-new.wav` starts at 21.76 seconds in that full render, so it
+contains eight reconstructed guide seconds plus all 57.84 new seconds.
+`continuation-listen.wav` contains only new audio. The raw native output remains
+unchanged, without time stretching, normalization or spliced source PCM.
+See `docs/validation/extended-continuation.json` for counts, hashes and checks.

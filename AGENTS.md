@@ -153,3 +153,16 @@
   hears the long-guide model produce an ending; that probe changes cursor and
   requested length, so it is not an isolated length comparison. Source encoder inputs are frozen
   independently: the longer input changes five earlier RVQ code positions.
+- The user's longer listening request uses the entire cached 29.76s source
+  guide and requests 90 new seconds, without a score. It produces 57.84 new
+  seconds then EOS (87.6s total), using an automatically planned 1536-position
+  cache on the laptop. No forced minimum or EOS suppression. This listening
+  run omits duplicate replay; guide-code, suffix-copy and terminal/reset checks
+  pass. See `docs/validation/extended-continuation.json`. The native API's
+  8192-position limit allows 653.44 total audio seconds with a 25-frame prompt;
+  maximum-cache laptop memory and quality are unvalidated. Keep duration ceiling,
+  EOS behavior and practical hardware limits distinct.
+  The user strongly positively assesses this longer clip. Treat it as an
+  accepted listening baseline for this source/seed/preset, while keeping
+  numerical parity gates and generalization claims separate. The next native
+  implementation milestone is the full audio-to-RVQ encoder in HeartCodec.
