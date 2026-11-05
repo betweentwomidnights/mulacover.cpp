@@ -36,7 +36,7 @@
     "past_only_test":"Input after the 80ms cursor is replaced by NaNs before two successful native jobs; no future PCM reaches encoder validation/resampling.",
     "repeated_jobs":2,"repeat_codes_and_audio_byte_equal":true,"result_free_restores_empty_state":true,
     "none_vs_supplied_identical_dropped_score_tensors_byte_equal":true,
-    "controlled_codec_context_reuse_and_mid_graph_cancel_test_passed":true,
+    "controlled_codec_context_reuse_and_between_graph_cancel_test_passed":true,
     "philox_bulk_vs_frame_chunk_values_and_offsets_bit_identical":true
   },
   "builds": [

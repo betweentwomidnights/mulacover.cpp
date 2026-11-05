@@ -108,7 +108,7 @@ form is `test-job SOURCE.wav PRESET_DIR ENCODER GENERATOR FLOW SQ` on CUDA. It
 poisons all PCM after the cursor with NaNs, tests cancellation at encoding,
 sampling, flow and waveform stages, then runs twice and compares codes/audio
 exactly. It also checks equivalent dropped tensors through supplied-score mode.
-HeartCodec's `test-work` separately tests context reuse after mid-graph cancellation;
+HeartCodec's `test-work` separately tests context reuse after cancellation between graphs;
 `test-rng` compares bulk/chunked normal and exponential streams bit-for-bit.
 
 See [the job validation report](validation/native-audio-job.json) for actual full
