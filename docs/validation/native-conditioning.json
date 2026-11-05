@@ -1,0 +1,164 @@
+{
+  "date": "2026-11-04",
+  "scope": "Native UTF-8 text, prompt, score and F32 Qwen preparation; accepted native continuation replay, not complete cross-runtime waveform parity",
+  "base_commit": "14df4c382d4979a0398829c5d04ac00559f7dec0",
+  "heartcodec_commit": "d83764b404e1e976b166918fed857a656d7321ac",
+  "ggml": {
+    "shared_pin": "b77ae790e628270af46a8af1eca38441c23f1252",
+    "authorized_cuda_target": "0f2ed045eaff6bf01bed074878b6988248efbc22",
+    "pins_changed": false,
+    "kernel_changes": false,
+    "sibling_sources_changed": false
+  },
+  "reference": {
+    "upstream_revision": "e27fa7fa0da7c9817879cc6210cc5693f9327946",
+    "style_revision": "97b0c614be4d77ee51c0cef4e5f07c00f9eb65b3",
+    "versions": {
+      "torch": "2.7.1+cu128",
+      "transformers": "4.57.6",
+      "tokenizers": "0.22.1",
+      "numpy": "2.0.2"
+    },
+    "cpu_hardware": "Spark ARM Torch CPU reference versus laptop x86 native CPU",
+    "stock_style_control": "Actual upstream pipeline._encode_style with default SDPA",
+    "gates": {
+      "max_abs": 0.001,
+      "relative_l2": 0.0001,
+      "discrete": "exact bytes"
+    }
+  },
+  "assets": {
+    "tokenizers_sha256": "4410906510704c282e8308cdd14860ca856e5574bca247075373b9a9a5bc54c2",
+    "style_f32_sha256": "468aee08b358db4a1b962f65990e79867dc923aaba7d2469435bdbf2478386ff",
+    "style_tensors": 312,
+    "style_quantization_implemented": false,
+    "unicode_table_profile": "Python lower 13.0.0, exact Rust tokenizers 0.22.1 regex/NFD/NFC; generated offline"
+  },
+  "discrete": {
+    "text_cases": 262,
+    "both_tokenizers_exact": true,
+    "lower_and_strip_exact": true,
+    "platforms": [
+      "Windows native",
+      "Spark Docker native"
+    ],
+    "score_cases": [
+      "synthetic 16 rows",
+      "MIDI edge 7 rows",
+      "real instrumental lane 540 rows",
+      "real vocal lane 540 rows"
+    ],
+    "score_tensors_exact": true,
+    "upstream_rejected_midi_cases": 9,
+    "native_rejects_all_without_output": true
+  },
+  "floating": {
+    "laptop_cuda_all_five_sampled_cases_pass": true,
+    "spark_cuda_all_five_sampled_cases_pass": true,
+    "cpu_final_embeddings_all_five_pass": true,
+    "complete_cpu_intermediate_parity": false,
+    "cpu_failing_gates": [
+      {
+        "case": "original",
+        "tensor": "style-layer-14.f32",
+        "max_abs": 0.0068359375,
+        "relative_l2": 1.0459995511553052E-06
+      },
+      {
+        "case": "instrumental",
+        "tensor": "style-layer-14.f32",
+        "max_abs": 0.0068359375,
+        "relative_l2": 1.0462568053635874E-06
+      },
+      {
+        "case": "unicode",
+        "tensor": "style-layer-14.f32",
+        "max_abs": 0.01318359375,
+        "relative_l2": 2.0264230202221613E-06
+      },
+      {
+        "case": "specials",
+        "tensor": "style-layer-14.f32",
+        "max_abs": 0.005859375,
+        "relative_l2": 9.596368424553549E-07
+      }
+    ],
+    "cpu_stock_style_worst_max_abs": 4.507601261138916E-07,
+    "laptop_cuda_stock_style_worst_max_abs": 2.980232238769531E-07,
+    "sampled_states": [
+      "embedding",
+      "layer1",
+      "layer14",
+      "final hidden",
+      "normalized style"
+    ],
+    "no_gate_waiver": true
+  },
+  "full_native_run": {
+    "source": "billiegasm_yuey.wav",
+    "source_sha256": "140f18292989b1026113f02e0b6e2c9c1eaea29df05965f9404e40d76f74af9a",
+    "source_modified": false,
+    "cached_prompt_or_style_used": false,
+    "directory": "refdata/cursor-continuation/native-conditioning-job",
+    "run": {
+      "native_pcm_job": true,
+      "native_conditioning": true,
+      "backend": "cuda",
+      "score_mode": "none",
+      "rng": "torch-cuda",
+      "rng_cuda_blocks": 288,
+      "seed": 1701,
+      "decoder_seed": 1701,
+      "cursor_sample": 1312416,
+      "context_start_sample": 0,
+      "context_samples": 1312416,
+      "context_frames": 372,
+      "guide_start_frame": 0,
+      "guide_frames": 372,
+      "new_frames": 723,
+      "requested_new_frames": 1125,
+      "cache_capacity": 1536,
+      "eos": true,
+      "sampler_final_offset": 23168,
+      "decoder_final_offset": 16,
+      "decoder_rng_windows": 4,
+      "samples_per_channel": 2776320,
+      "conditioning_seconds": 3.5413781,
+      "pipeline_seconds": 260.0401534,
+      "style_weight_bytes": 2391494656,
+      "style_graph_bytes": 393856,
+      "encode_seconds": 2.0422321,
+      "generate_seconds": 203.9897981,
+      "decode_seconds": 36.1378118,
+      "total_seconds": 256.4987753,
+      "encoder_weight_bytes": 2157091968,
+      "encoder_graph_bytes": 2156167168,
+      "generator_weight_bytes": 2939920896,
+      "generator_cache_bytes": 705232896,
+      "generator_graph_bytes": 54968832
+    },
+    "accepted_codes_sha256": "0a72c959b0f677761877f4f96c9f8281f4e8f43e44d5493e04932d682bb02a18",
+    "accepted_full_wav_sha256": "b40778a842f0fbea75a71120bb262fb5d5f0a4b4f6ec9095899a009ab9799fa3",
+    "accepted_new_wav_sha256": "47493d786031a8b11ab51a6fa0e040302b19d0b5ed455ef21af66856ac4246ac",
+    "all_three_hashes_exact": true,
+    "sampled_gpu_total_peak_mib": 7222,
+    "gpu_total_mib": 8123,
+    "gpu_sampling_period_ms": 200,
+    "gpu_samples": 1286,
+    "includes_desktop": true
+  },
+  "api_checks": {
+    "windows_cuda_tests_passed": 12,
+    "windows_cpu_dll_tests_passed": 12,
+    "spark_docker_cuda_tests_passed": 12,
+    "model_free_tests_all_pass": true,
+    "native_style_cancel_between_layers_and_context_retry": true,
+    "cpu_dll_style_cancel_retry_and_owned_result_lifetime": true,
+    "prepared_results_outlive_context": true,
+    "occupied_and_failure_outputs_unchanged": true,
+    "empty_style_skips_model_loading": true
+  },
+  "runtime_python_or_subprocesses": false,
+  "audio_transcription_included": false,
+  "existing_encoder_and_upstream_waveform_gaps_unchanged": true
+}

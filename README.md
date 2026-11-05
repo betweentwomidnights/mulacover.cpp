@@ -19,6 +19,14 @@ license; see [third-party and model terms](THIRD_PARTY_NOTICES.md) for upstream
 components and separate checkpoint/output terms. This is a development library;
 Q4 quality and the remaining numerical gaps are documented below.
 
+**Native conditioning now accepts UTF-8 lyrics/tags and MIDI or score triplets.**
+The separate [conditioning capability](docs/NATIVE_CONDITIONING.md) builds prompt,
+score and F32 Qwen style tensors, then releases Qwen before the audio job starts.
+Text + raw PCM now reproduces the accepted long continuation byte-for-byte on
+the laptop without a cached prompt/style preset or Python inference. CUDA passes
+the sampled style gates; CPU final embeddings pass but intermediate parity remains
+open. Transcription/lane selection stays with SheetSage2 and its downstream host.
+
 **BPM is not clock-locked.** A [controlled BPM study](docs/BPM_CONTROL.md) confirms
 that MIDI tempo metadata leaves every model input unchanged; 80/160-BPM text
 requests also missed their targets in the tested Q4 excerpts. Plan downstream
@@ -33,7 +41,7 @@ Guide start/duration and new-audio duration are independently selectable in the
 prepared-input driver; it also exports a guide-free `continuation.wav`.
 These controls and waveform export now run directly in the C++ CLI and a
 negotiated C capability. See [native continuation and the encoder roadmap](docs/NATIVE_CONTINUATION.md)
-for the prepared-input runtime boundary and remaining Python reference bridge.
+for the native runtime boundary and offline reference tooling.
 The native CLI also accepts experimental `--score-mode none` to remove symbolic
 conditioning while retaining the audio guide, text and style. Both score-guided
 transformation and score-free continuation are useful workflows to evaluate;
@@ -47,8 +55,8 @@ new seconds before EOS; the user positively assesses it as a listening baseline.
 The [native PCM job](docs/NATIVE_AUDIO_JOB.md) now accepts a raw audio buffer or
 WAV, an original-clock cursor and prepared conditioning, with separate encoder
 context/guide lengths, `natural_max_seconds`, progress and cancellation. It returns
-only new audio and stages all models on the laptop. Text/Qwen/MIDI preparation
-remains an offline reference bridge. See the [extended run report](docs/validation/extended-continuation.json).
+only new audio and stages all models on the laptop. Its native conditioning path
+also prepares text/Qwen/MIDI inputs. See the [extended run report](docs/validation/extended-continuation.json).
 
 **Native FP32 teacher-forced frame/logit/cache parity passed on Spark CUDA at `07b77b0`.**
 The coordinated baseline is now `b77ae79`; its CUDA parity currently fails due to
@@ -93,9 +101,9 @@ The [opt-in Philox control](docs/PHILOX_PARITY.md) now matches Torch random tens
 bit-for-bit on both GPUs and all 6,888 native F32 codes/EOS for that full-song case.
 The decoded waveform remains close but fails the unchanged strict error limits.
 
-Prepared prompt/style
-and symbolic inputs are supplied by the caller; text/Qwen/MIDI preprocessing
-currently comes from the upstream fixture harness. The laptop is the primary C++
+Prepared prompt/style and symbolic inputs can be supplied by the caller or built
+through the native conditioning capability. The upstream fixture harness remains
+an offline oracle. The laptop is the primary C++
 workspace; full FP32 native/reference execution stays in Spark Docker containers.
 
 The original milestone used `07b77b0`; historical reports retain that provenance.

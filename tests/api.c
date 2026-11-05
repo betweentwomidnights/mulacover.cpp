@@ -3,8 +3,11 @@
 #include "mulacover_tempo.h"
 #include "mulacover_continuation.h"
 #include "mulacover_job.h"
+#include "mulacover_conditioning.h"
 #include <string.h>
 int main(void) {
+    const mulacover_conditioning_api_v1 * frontend=mulacover_get_conditioning_api(1);
+    if(!frontend||frontend->size<MULACOVER_CONDITIONING_API_V1_SIZE||frontend->version!=1||mulacover_get_conditioning_api(0))return 1;
     const mulacover_job_api_v1 * job=mulacover_get_job_api(1);
     if(!job||job->size<MULACOVER_JOB_API_V1_SIZE||job->version!=1||mulacover_get_job_api(0)||mulacover_get_job_api(2))return 1;
     const mulacover_api_v1 * api=mulacover_get_api(1);

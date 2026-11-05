@@ -14,7 +14,7 @@ it should not be required by the shipped inference path.
 | --- | --- | --- |
 | PCM audio to eight RVQ streams | Native HeartCodec F32 encoder | Retain documented backend/numerical limits |
 | Transcription | Native SheetSage2 in sibling yuey.cpp | Consume its public interface; do not duplicate the model |
-| MIDI, prompt tokens and Qwen style embedding | Upstream Python reference preparation | Native conditioning preparation and Qwen/tokenizer inference |
+| MIDI, prompt tokens and Qwen style embedding | Native conditioning capability | Preserve CPU intermediate failures and broaden validation |
 | Guide selection, duration/cache planning | C++ continuation and raw-PCM job capabilities | Host supplies original-clock cursor/sample counts |
 | Guide priming, generator, CFG, Philox, EOS/reset | Native C++ job with progress/cancellation | Integrate with the host worker |
 | RVQ/flow/SQ to stereo | Native shared HeartCodec | Retain staged memory ownership |
@@ -22,8 +22,8 @@ it should not be required by the shipped inference path.
 
 The [native PCM job](NATIVE_AUDIO_JOB.md) now runs from **raw PCM and prepared
 conditioning** through continuation output without launching Python. The older
-cached-RVQ command below remains available. Custom text/Qwen/MIDI preparation
-still uses the reference bridge; the inference path accepts cached presets.
+cached-RVQ command below remains available. [Native conditioning](NATIVE_CONDITIONING.md)
+now prepares custom text, Qwen and MIDI/score inputs too; cached presets remain usable.
 
 ## Reusable C interface
 
@@ -124,11 +124,11 @@ does not perform production guide slicing or write the continuation WAV.
    The PCM job stages it separately from generator/decoder. Preserve those gates;
    use Spark Docker for reference work and keep encoder quantization deferred.
 
-3. **Port conditioning preparation.** Native MIDI-to-pianoroll/chord assembly,
-   text tokenization, prompt layout and Qwen style embedding remove the remaining
-   runtime Python dependency. Reuse sibling library patterns and existing GGML
-   operations. Cached prepared presets can support interim native experiments;
-   they are not a native custom-style frontend.
+3. **Maintain native conditioning preparation.** MIDI/triplet score assembly,
+   both tokenizers, prompt layout and F32 Qwen style embedding are now native.
+   See [the capability and validation](NATIVE_CONDITIONING.md). Preserve its CPU
+   intermediate gate failures while using the validated CUDA path; keep reference
+   Python offline and cached presets available for controlled comparisons.
 
 4. **Integrate the native job into the DAW worker.** Its shared C APIs provide model/RNG lifecycle,
    progress/cancellation between inference steps, selected context ending at

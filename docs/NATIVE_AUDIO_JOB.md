@@ -8,6 +8,10 @@ SQ decoding. Each model is released before the next is loaded. Link through
 This requires HeartCodec's separate `heartcodec_work.h` capability. All earlier
 core/sampling/tempo/continuation/encoder/RNG layouts and defaults remain frozen.
 
+The separate [native conditioning capability](NATIVE_CONDITIONING.md) now builds
+the borrowed prompt/style/score view before this job. The CLI supports either
+native text/MIDI inputs or a cached preset; this job's original ABI is unchanged.
+
 ## Host contract
 
 Initialize the request and result with their size prefixes. Keep paths, borrowed
@@ -115,5 +119,6 @@ See [the job validation report](validation/native-audio-job.json) for actual ful
 run hashes, memory and checks. These are regressions against the accepted native
 continuation, not a new upstream waveform-parity claim. The encoder's documented
 Whisper/RVQ numerical limits and prior strict decoded-waveform failure remain.
-Next frontend work is native prompt/tokenizer/Qwen and MIDI/score preparation,
-consuming SheetSage2's public transcription interface rather than duplicating it.
+Native prompt/tokenizer/Qwen and MIDI/score preparation is now available through
+that separate capability. Transcription and lane selection should consume
+SheetSage2's public interface rather than duplicating it.

@@ -56,3 +56,8 @@ Raw-PCM orchestration is separately negotiated through
 `mulacover_get_job_api(1)` from `mulacover_job.h`. It preserves the earlier tables
 and owns staged codec/generator lifetime, past-only cursor selection, worker
 callbacks and new-audio result ownership. See [the job contract](NATIVE_AUDIO_JOB.md).
+
+Native text, score and Qwen style preparation is separately negotiated through
+`mulacover_get_conditioning_api(1)` from `mulacover_conditioning.h`. Its owned
+prepared result exposes the existing borrowed condition view; keep it alive
+until the generator/job call returns. See [the frontend contract](NATIVE_CONDITIONING.md).

@@ -18,7 +18,8 @@
   diagnostics. Q4_K_M is an experimental measured policy, not quality-approved.
   Native top-k sampling and staged HeartCodec decoding now work from prepared
   conditioning through a separate sampling capability API. Native preprocessing
-  is still absent. See `docs/SAMPLING_AND_AUDIO.md` for eight-second clips and
+  now lives in a separate conditioning capability; historical sampling reports
+  still use prepared fixtures. See `docs/SAMPLING_AND_AUDIO.md` for eight-second clips and
   long-context tests. The original 600-tensor suite passes; the 128-prompt suite
   passes public logits/KV but retains two prefill activation gate failures per
   case. Do not relax those gates or call the complete expanded suite passed.
@@ -120,7 +121,7 @@
   `tools/generate.py` delegates them and independently validates outputs. Core
   and existing capability layouts are frozen. See `docs/NATIVE_CONTINUATION.md`.
   The audio-to-RVQ encoder is now native in sibling HeartCodec; Qwen/prompt
-  preprocessing remains reference Python. Raw-PCM inference with prepared
+  preprocessing is native through the new conditioning capability. Raw-PCM inference with prepared
   conditioning now runs through the native job. The user values both score-guided
   transformation/continuation and score-free audio continuation; preserve both
   workflows. `--score-mode none` uses the upstream -1 dropped-score convention
@@ -172,6 +173,19 @@
   and mulacover-continue CLI. See docs/NATIVE_AUDIO_JOB.md. It trims context backwards
   from the exact original-clock cursor before encoding, selects a tail guide, honors
   natural_max_seconds/EOS, stages models, reports progress and cooperatively cancels.
-  Prepared text/Qwen/MuQ and optional score remain a caller/offline boundary. Reuse
+  Prepared conditioning remains a caller boundary of that job API; the new native
+  conditioning capability supplies text/Qwen/MuQ and optional score. Reuse
   HeartCodec's validated Torch CUDA Philox (cap 288); do not substitute sibling RNG
   mappings or change legacy defaults. Earlier paragraphs describe historical runs.
+- Native conditioning is separately negotiated in `mulacover_conditioning.h`;
+  see `docs/NATIVE_CONDITIONING.md`. Own tokenizer maps on CPU, stage strict F32
+  Qwen per preparation, release it before encoder/generator/decoder, and preserve
+  existing ABI layouts and prepared-input paths. No runtime Python/subprocesses.
+  Both tokenizers and Python lower/strip match 262 corpus cases; score assembly
+  matches synthetic, edge and both real 540-row lanes. CUDA passes five sampled
+  style cases on laptop and Spark, including actual upstream default-SDPA style.
+  CPU final embeddings pass, but four layer-14 absolute gates fail (worst 0.01318);
+  retain the false reports and do not claim complete CPU activation parity or
+  waive gates. Style weights remain unquantized; no GGML work is justified here.
+  Native text+PCM continuation reproduces all 8760 accepted codes and both WAVs.
+  Score lanes/transcription trimming remain explicit caller responsibilities.

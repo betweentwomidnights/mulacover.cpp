@@ -29,6 +29,41 @@ common=(--rm --user "$(id -u):$(id -g)" -e USER=heartcodec -e LOGNAME=heartcodec
   -e CUBLAS_WORKSPACE_CONFIG=:4096:8 -e GGML_CUDA_TF32=0 -e GGML_CUDA_CUBLAS_COMPUTE_TYPE=auto
   -v "$project_root:/workspace" -w /workspace)
 case "$command" in
+  conditioning-native)
+    docker run "${common[@]}" --gpus all --network none -v "$codec:/codec:ro" "${development_mount[@]}" \
+      -e MULACOVER_BUILD_DIR="$build" heartcodec-dev:20261101 /bin/bash -lc \
+      'for name in original instrumental unicode empty-style specials; do
+         "$MULACOVER_BUILD_DIR/bin/mulacover-prepare" --tokenizers-model models/mulacover-conditioning-tokenizers.gguf \
+           --style-model models/mulacover-style-f32.gguf --lyrics-file "refdata/conditioning/$name/lyrics.txt" \
+           --tags-file "refdata/conditioning/$name/tags.txt" --symbolic-frames 16 --backend cuda \
+           --output "refdata/conditioning-native-spark/$name" --diagnostic-directory "refdata/conditioning-native-spark/$name/stages" || exit $?;
+       done'
+    docker run "${common[@]}" --network none "$image" /opt/sa3-venv/bin/python tools/check-conditioning.py \
+      --reference refdata/conditioning-cuda-controls --native refdata/conditioning-native-spark \
+      --report refdata/conditioning-native-spark/comparison.json
+    ;;
+  conditioning-text-score)
+    docker run "${common[@]}" --network none -v "$refs:/refs:ro" "$image" \
+      /opt/sa3-venv/bin/python reference/export-text-scores.py
+    ;;
+  conditioning-unicode)
+    docker run "${common[@]}" --network none "$image" /bin/bash -lc \
+      '/opt/sa3-venv/bin/python tools/generate_unicode_tables.py > src/unicode-tables.h.tmp && mv src/unicode-tables.h.tmp src/unicode-tables.h'
+    ;;
+  conditioning-controls)
+    for device in cpu cuda; do
+      docker run "${common[@]}" --gpus all --network none -v "$refs:/refs:ro" "$image" \
+        /opt/sa3-venv/bin/python reference/export-style-controls.py --upstream /refs/MuLaCover \
+        --device "$device" --output "refdata/conditioning-$device-controls"
+    done
+    ;;
+  conditioning)
+    docker run "${common[@]}" --gpus all --network none -e PYTHONPATH=/gguf-deps \
+      -v "$refs:/refs:ro" -v "$codec/.python-deps:/gguf-deps:ro" "$image" \
+      /opt/sa3-venv/bin/python reference/export-conditioning.py --upstream /refs/MuLaCover
+    docker run "${common[@]}" --network none "$image" /bin/bash -lc \
+      '/opt/sa3-venv/bin/python tools/generate_unicode_tables.py > src/unicode-tables.h.tmp && mv src/unicode-tables.h.tmp src/unicode-tables.h'
+    ;;
   encode-prefix)
     # Pinned CPU reference avoids the image's unsupported GB10 NVRTC STFT path.
     # The host only orchestrates Docker; input may span multiple encoder chunks.
@@ -119,5 +154,5 @@ case "$command" in
       "$image" /opt/sa3-venv/bin/python reference/export_reference.py --upstream /refs/MuLaCover \
       --output "refdata/upstream-$suffix" --dtype "$1"
     ;;
-  *) echo 'Usage: bash reference/run-spark.sh encode-prefix|prepare|float32|bfloat16|convert|sampling-oracle|sequence-oracle|build-development|parity-development|quantize-development|measure-development|sampling-development|sequence-development|generate-development (build/parity also support the shared baseline)' >&2; exit 2 ;;
+  *) echo 'Usage: bash reference/run-spark.sh conditioning|conditioning-controls|conditioning-unicode|conditioning-text-score|conditioning-native-development|encode-prefix|prepare|float32|bfloat16|convert|sampling-oracle|sequence-oracle|build-development|parity-development|quantize-development|measure-development|sampling-development|sequence-development|generate-development (build/parity also support the shared baseline)' >&2; exit 2 ;;
 esac
