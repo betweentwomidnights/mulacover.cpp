@@ -1,0 +1,50 @@
+{
+  "date": "2026-11-04",
+  "scope": "Native raw-PCM continuation with cached prepared conditioning; byte-exact regression against accepted native output, not new upstream waveform parity",
+  "base_commit": "64b60d5",
+  "heartcodec_base_commit": "fa9e3b68feaa55f5007446f670143254cfd2b89a",
+  "required_heartcodec_capability": "heartcodec_get_work_api(1)",
+  "ggml": {"shared_pin":"b77ae790e628270af46a8af1eca38441c23f1252","authorized_isolated_cuda_target":"0f2ed045eaff6bf01bed074878b6988248efbc22","pins_changed":false,"ggml_changes":false,"sibling_changes":false},
+  "source": {"file":"billiegasm_yuey.wav","sha256":"140f18292989b1026113f02e0b6e2c9c1eaea29df05965f9404e40d76f74af9a","rate":44100,"channels":2,"cursor_sample":1312416,"source_modified":false},
+  "models": {
+    "encoder_f32_sha256":"b7cd97fb1cc48764070851777ed00c5b56540730ae7372ad39e2d8c92486c297",
+    "generator_q4_k_m_sha256":"74ebd8a8537f55ea3f3566cfa17c7e28734fc555af5fbc1a254bec94a182f814",
+    "flow_f32_sha256":"5c9cdbfae26ccd3e96355c541cade0feca37cfd8696746b724c294095949f523",
+    "sq_f32_sha256":"2f72b85f924c629aae33004703cc02e16600abee15c01e928b2878e5d0f29ae6"
+  },
+  "full_run": {
+    "directory":"refdata/cursor-continuation/native-pcm-job",
+    "accepted_baseline_directory":"refdata/cursor-continuation/guide30-long",
+    "preset":"refdata/cursor-continuation/input", "prompt_frames":25, "symbolic_frames":540, "qwen_index":14, "muq_index":17,
+    "score_mode":"none", "guidance":1.5, "temperature":1, "top_k":250,
+    "backend":"cuda", "rng":"torch-cuda", "target_grid_cap":288, "seed":1701, "decoder_seed":1701, "decoder_steps":10, "segment_codes":372,
+    "context_start_sample":0, "context_samples":1312416, "context_frames":372, "guide_frames":372,
+    "requested_new_seconds":90, "requested_new_frames":1125, "actual_new_frames":723, "actual_new_seconds":57.84, "total_frames":1095, "eos":true,
+    "cache_capacity":1536, "sampler_final_offset":23168, "decoder_final_offset":16, "decoder_rng_windows":4,
+    "encode_seconds":2.1513097, "generate_seconds":220.3822545, "decode_seconds":36.298636, "total_with_loading_seconds":278.9116172,
+    "guide_sha256":"bdbeab789d35496a3744f41410ab4ffeaecf91e7a0a9759dd1a9e7ae075ab342",
+    "codes_sha256":"0a72c959b0f677761877f4f96c9f8281f4e8f43e44d5493e04932d682bb02a18",
+    "full_wav_sha256":"b40778a842f0fbea75a71120bb262fb5d5f0a4b4f6ec9095899a009ab9799fa3",
+    "new_wav_sha256":"47493d786031a8b11ab51a6fa0e040302b19d0b5ed455ef21af66856ac4246ac",
+    "all_four_hashes_match_accepted_native_baseline":true,
+    "gpu":{"device":"RTX 5070 Laptop","total_mib":8123,"sampled_total_peak_mib":7256,"sampled_total_min_mib":1261,"period_ms":200,"samples":1376,"includes_desktop":true,"sampling_is_not_an_exact_allocation_peak":true},
+    "owned_buffers":{"encoder_weight_bytes":2157091968,"encoder_graph_bytes":2156167168,"generator_weight_bytes":2939920896,"generator_cache_bytes":705232896,"generator_graph_bytes":54968832}
+  },
+  "integration_checks": {
+    "plan_and_cursor_boundary_validation":true,"precancel_before_model_or_rng_work":true,"occupied_output_unchanged":true,
+    "cancel_stages":["encoding","sampling","flow","waveform"],"cancelled_outputs_unchanged":true,"progress_monotonic":true,
+    "past_only_test":"Input after the 80ms cursor is replaced by NaNs before two successful native jobs; no future PCM reaches encoder validation/resampling.",
+    "repeated_jobs":2,"repeat_codes_and_audio_byte_equal":true,"result_free_restores_empty_state":true,
+    "none_vs_supplied_identical_dropped_score_tensors_byte_equal":true,
+    "controlled_codec_context_reuse_and_between_graph_cancel_test_passed":true,
+    "philox_bulk_vs_frame_chunk_values_and_offsets_bit_identical":true
+  },
+  "builds": [
+    {"platform":"Windows CUDA static, single shared GGML target","passed":11,"failed":0},
+    {"platform":"Windows MuLaCover CPU DLL with HeartCodec static dependency","passed":11,"failed":0},
+    {"platform":"Windows HeartCodec CPU static and actual HeartCodec DLL","passed_each":6,"failed":0},
+    {"platform":"Spark Docker CUDA via reference/run-spark.sh build-development","passed":11,"failed":0}
+  ],
+  "runtime_python_or_subprocesses":false,
+  "limits":["Prepared prompt, Qwen/MuQ style and optional score remain caller/offline inputs; custom conditioning is not native yet.","Cancellation is cooperative; initial context loading and running graphs are not interrupted.","Encoder strict activation gaps, backend RVQ boundary differences and prior strict upstream waveform failures remain unchanged.","No guarantee of exact BPM, arbitrary-source musical quality or the requested maximum duration; EOS is honored.","Repeated jobs establish behavioral cleanup/replay, not a long-running GPU-memory leak stress test."]
+}
