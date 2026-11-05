@@ -2,8 +2,11 @@
 #include "mulacover_sampling.h"
 #include "mulacover_tempo.h"
 #include "mulacover_continuation.h"
+#include "mulacover_job.h"
 #include <string.h>
 int main(void) {
+    const mulacover_job_api_v1 * job=mulacover_get_job_api(1);
+    if(!job||job->size<MULACOVER_JOB_API_V1_SIZE||job->version!=1||mulacover_get_job_api(0)||mulacover_get_job_api(2))return 1;
     const mulacover_api_v1 * api=mulacover_get_api(1);
     if(!api||api->size<MULACOVER_API_V1_SIZE||api->version!=1||mulacover_get_api(0)||mulacover_get_api(2))return 1;
     const mulacover_sampling_api_v1 * sampling=mulacover_get_sampling_api(1);

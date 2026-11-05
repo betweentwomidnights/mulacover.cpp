@@ -44,8 +44,11 @@ Guide length and new audio share a finite cache budget; the model may emit EOS
 before the requested end.
 A longer native score-free run uses 29.76 seconds of input and produces 57.84
 new seconds before EOS; the user positively assesses it as a listening baseline.
-Its prepared-input runtime remains native; arbitrary raw-PCM input still needs
-the reference encoder. See the [extended run report](docs/validation/extended-continuation.json).
+The [native PCM job](docs/NATIVE_AUDIO_JOB.md) now accepts a raw audio buffer or
+WAV, an original-clock cursor and prepared conditioning, with separate encoder
+context/guide lengths, `natural_max_seconds`, progress and cancellation. It returns
+only new audio and stages all models on the laptop. Text/Qwen/MIDI preparation
+remains an offline reference bridge. See the [extended run report](docs/validation/extended-continuation.json).
 
 **Native FP32 teacher-forced frame/logit/cache parity passed on Spark CUDA at `07b77b0`.**
 The coordinated baseline is now `b77ae79`; its CUDA parity currently fails due to

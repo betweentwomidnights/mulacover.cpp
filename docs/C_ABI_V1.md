@@ -51,3 +51,8 @@ Downstream source builds use `add_subdirectory` and link `mulacover::mulacover`.
 The library depends on `heartcodec::heartcodec` and reuses the existing `ggml` or
 `ggml::ggml` target. The default standalone path builds from the sibling HeartCodec
 source pin. This prototype does not yet install an exported MuLaCover CMake package.
+
+Raw-PCM orchestration is separately negotiated through
+`mulacover_get_job_api(1)` from `mulacover_job.h`. It preserves the earlier tables
+and owns staged codec/generator lifetime, past-only cursor selection, worker
+callbacks and new-audio result ownership. See [the job contract](NATIVE_AUDIO_JOB.md).

@@ -12,17 +12,18 @@ it should not be required by the shipped inference path.
 
 | Stage | Current implementation | Next work |
 | --- | --- | --- |
-| PCM audio to eight RVQ streams | Official HeartCodec encoder in Spark Docker, FP32 CPU | Port to shared `heartcodec.cpp` |
+| PCM audio to eight RVQ streams | Native HeartCodec F32 encoder | Retain documented backend/numerical limits |
 | Transcription | Native SheetSage2 in sibling yuey.cpp | Consume its public interface; do not duplicate the model |
 | MIDI, prompt tokens and Qwen style embedding | Upstream Python reference preparation | Native conditioning preparation and Qwen/tokenizer inference |
-| Guide selection, duration/cache planning | C++ continuation capability and CLI | Host uses integer RVQ frame counts |
-| Guide priming, generator, CFG, Philox, EOS/reset | Native C++ | Host worker progress/cancellation and lifecycle integration |
+| Guide selection, duration/cache planning | C++ continuation and raw-PCM job capabilities | Host supplies original-clock cursor/sample counts |
+| Guide priming, generator, CFG, Philox, EOS/reset | Native C++ job with progress/cancellation | Integrate with the host worker |
 | RVQ/flow/SQ to stereo | Native shared HeartCodec | Retain staged memory ownership |
 | Generated-audio suffix | C++ continuation capability and CLI | DAW placement/resampling/join policy belongs to the host |
 
-Thus the new native command runs from **prepared conditioning and cached RVQ
-input** through continuation WAV output without launching Python. It does not
-yet implement WAV-in continuation from arbitrary raw audio by itself.
+The [native PCM job](NATIVE_AUDIO_JOB.md) now runs from **raw PCM and prepared
+conditioning** through continuation output without launching Python. The older
+cached-RVQ command below remains available. Custom text/Qwen/MIDI preparation
+still uses the reference bridge; the inference path accepts cached presets.
 
 ## Reusable C interface
 
@@ -113,15 +114,15 @@ does not perform production guide slicing or write the continuation WAV.
    Expand listening across sources and seeds; these cases establish neither
    precise melody preservation nor a hard BPM lock.
 
-2. **Port the full waveform-to-RVQ encoder into HeartCodec.** SQ encoding is a
-   different representation and does not replace this missing stage. Freeze
+2. **Maintain the native waveform-to-RVQ encoder in HeartCodec.** SQ encoding is a
+   different representation and does not replace this stage. Frozen
    FP32 outputs for input resampling/chunking, the Whisper/WavLM/MuEncoder
-   feature branches, feature fusion/query transformer and shared RVQ. Convert
-   weights to GGUF, port each stage against those fixtures, then expose the
-   result through a separate negotiated HeartCodec capability. Keep existing
-   representations and tables frozen. Measure laptop memory with the encoder
-   staged separately from the generator and decoder; quantize only after F32
-   validation. Use Spark reference Docker for oracles, never host Python.
+   feature branches, feature fusion/query transformer and shared RVQ now underpin
+   the native F32 GGUF implementation and separate negotiated encoder capability.
+   See sibling HeartCodec's `docs/AUDIO_ENCODER.md`, `WHISPER_PARITY.md` and
+   `RVQ_BOUNDARY.md` for exact code matches and still-open strict activation gates.
+   The PCM job stages it separately from generator/decoder. Preserve those gates;
+   use Spark Docker for reference work and keep encoder quantization deferred.
 
 3. **Port conditioning preparation.** Native MIDI-to-pianoroll/chord assembly,
    text tokenization, prompt layout and Qwen style embedding remove the remaining
@@ -129,14 +130,15 @@ does not perform production guide slicing or write the continuation WAV.
    operations. Cached prepared presets can support interim native experiments;
    they are not a native custom-style frontend.
 
-4. **Wire the DAW worker.** Use the shared C APIs, explicit model/RNG lifecycle,
+4. **Integrate the native job into the DAW worker.** Its shared C APIs provide model/RNG lifecycle,
    progress/cancellation between inference steps, selected context ending at
    the cursor, and only-new-audio output. Measure latency and peak memory.
    Playback-rate conversion and the final join to the existing clip must be
    tested in the host's sample timeline.
 
-The first implementation here is native runtime control and export, not the
-full encoder port. Numerical gates remain unchanged. The prior full-song strict
+The original capability described below covered cached-code control/export;
+the newer PCM job also incorporates the full encoder port. Numerical gates
+remain unchanged. The prior full-song strict
 decoder waveform comparison with upstream still fails and requires diagnostics.
 No claim of a hard BPM lock or arbitrary-song quality follows from this work.
 Shared GGML stays at the agreed baseline with the already-authorized isolated

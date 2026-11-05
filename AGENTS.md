@@ -119,8 +119,9 @@
   `mulacover_continuation.h` / `src/continuation.cpp` and the C++ generator CLI;
   `tools/generate.py` delegates them and independently validates outputs. Core
   and existing capability layouts are frozen. See `docs/NATIVE_CONTINUATION.md`.
-  The audio-to-RVQ encoder and Qwen/prompt preprocessing remain reference Python;
-  do not call raw-PCM continuation fully native. The user values both score-guided
+  The audio-to-RVQ encoder is now native in sibling HeartCodec; Qwen/prompt
+  preprocessing remains reference Python. Raw-PCM inference with prepared
+  conditioning now runs through the native job. The user values both score-guided
   transformation/continuation and score-free audio continuation; preserve both
   workflows. `--score-mode none` uses the upstream -1 dropped-score convention
   without reading symbolic files; this is experimental. See
@@ -145,7 +146,7 @@
   of context: official encoding supports multiple 29.76-second chunks; guide and
   new frames share the finite native cache budget. The `encode-prefix` action in
   `reference/run-spark.sh` runs the existing FP32 CPU encoder only in dedicated
-  Spark Docker. Native raw-PCM encoding remains unported.
+  Spark Docker. A native F32 encoder now exists in HeartCodec.
   All tail runs replay exactly: 4s and 8s guides yield 32 new seconds; 16s yields
   31.84 seconds then EOS. The 50s guide accepts all 625 frames/5,000 codes and
   yields 6.8 new seconds then EOS despite a 16s request and sufficient cache.
@@ -164,5 +165,13 @@
   EOS behavior and practical hardware limits distinct.
   The user strongly positively assesses this longer clip. Treat it as an
   accepted listening baseline for this source/seed/preset, while keeping
-  numerical parity gates and generalization claims separate. The next native
-  implementation milestone is the full audio-to-RVQ encoder in HeartCodec.
+  numerical parity gates and generalization claims separate. The full native
+  audio-to-RVQ encoder now exists in HeartCodec with documented numerical limits.
+
+- Raw-PCM continuation now lives in the separate negotiated mulacover_job.h capability
+  and mulacover-continue CLI. See docs/NATIVE_AUDIO_JOB.md. It trims context backwards
+  from the exact original-clock cursor before encoding, selects a tail guide, honors
+  natural_max_seconds/EOS, stages models, reports progress and cooperatively cancels.
+  Prepared text/Qwen/MuQ and optional score remain a caller/offline boundary. Reuse
+  HeartCodec's validated Torch CUDA Philox (cap 288); do not substitute sibling RNG
+  mappings or change legacy defaults. Earlier paragraphs describe historical runs.
