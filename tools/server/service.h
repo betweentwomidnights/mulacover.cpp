@@ -2,6 +2,7 @@
 #include "http.h"
 #include "json.h"
 #include "../wave-io.h"
+#include "mulacover_job.h"
 #include <condition_variable>
 #include <functional>
 #include <memory>
@@ -13,6 +14,7 @@ struct Config {
     std::string model_dir="models", codec_model_dir="models", backend="cuda";
     int threads=4, max_cache_capacity=1536;
     int port=8010;
+    int transcription_port=8011;
     std::string allow_origin;
     std::string tokenizers, style, encoder, generator, flow, sq;
     void resolve_models();
@@ -27,6 +29,7 @@ using Progress=std::function<void(double,const std::string &,int64_t,int64_t)>;
 using Cancel=std::function<bool()>;
 using Runner=std::function<Outcome(const Config &,const Input &,const Progress &,const Cancel &)>;
 Outcome run_native(const Config &,const Input &,const Progress &,const Cancel &);
+mulacover_job_plan_v1 plan_audio_input(const Config &,const Input &);
 std::string props(const Config &);
 
 // One accepted GPU job at a time. Terminal results expire after 30 minutes;

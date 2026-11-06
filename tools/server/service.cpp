@@ -1,5 +1,6 @@
 #include "service.h"
 #include "multipart.h"
+#include "transcription.h"
 #include "mulacover_conditioning.h"
 #include "mulacover_runtime.h"
 #include <algorithm>
@@ -60,6 +61,13 @@ mulacover_job_request_v1 request(const Config & c,const Input & in) {
     r.cursor_sample=integer(v,"cursor_sample",-1,-1,r.input_audio.num_samples);
     r.context_samples=integer(v,"context_samples",0,0,INT64_MAX);
     r.guide_samples=integer(v,"guide_samples",0,0,INT64_MAX);
+    if(v.find("audio_context_seconds")){
+        if(v.find("cursor_sample")||v.find("context_samples")||v.find("guide_samples"))throw std::invalid_argument("Use audio_context_seconds or explicit cursor/context/guide, not both");
+        const double seconds=real(v,"audio_context_seconds",29.76,.08,86400);
+        const int64_t frame=int64_t(a.rate)*2/25;if(frame<=0)throw std::invalid_argument("Invalid source sample rate");
+        const int64_t frames=std::min(r.input_audio.num_samples/frame,int64_t(std::floor(seconds*12.5)));
+        r.cursor_sample=r.context_samples=r.guide_samples=frames*frame;
+    }
     r.natural_max_seconds=real(v,"natural_max_seconds",30,.08,655.36);
     r.cache_capacity=int(integer(v,"cache_capacity",0,0,c.max_cache_capacity));
     r.conditioning.guidance=float(real(v,"guidance",1.5,.001,20));
@@ -78,7 +86,13 @@ mulacover_job_request_v1 request(const Config & c,const Input & in) {
     const auto score=json::string(v,"score_mode","none");
     if(score!="none"&&score!="provided")throw std::invalid_argument("score_mode must be none or provided");
     r.score_mode=score=="provided"?1:0;
-    if(r.score_mode&&in.melody.empty())throw std::invalid_argument("Score-guided continuation needs melody_midi");
+    const bool transcribe=json::boolean(v,"transcribe",false);
+    if(transcribe){
+        if(!in.melody.empty()||!in.chords.empty()||!in.drums.empty())throw std::invalid_argument("Automatic transcription cannot use MIDI uploads");
+        if(!c.transcription_port)throw std::invalid_argument("SheetSage2 service is not configured");
+        r.score_mode=1;
+    }
+    if(r.score_mode&&in.melody.empty()&&!transcribe)throw std::invalid_argument("Score-guided continuation needs melody_midi");
     if(!r.score_mode&&(!in.melody.empty()||!in.chords.empty()||!in.drums.empty()))throw std::invalid_argument("MIDI uploads require score_mode provided");
     r.include_full_audio=json::boolean(v,"include_full_audio",false)?1:0;
     return r;
@@ -110,18 +124,20 @@ Input parse_input(const HttpRequest & req,const Config & config) {
     }
     if(!audio)throw std::invalid_argument("Missing audio WAV upload");
     if(in.options.type!=json::Type::object)throw std::invalid_argument("options must be a JSON object");
-    const std::set<std::string> keys={"lyrics","tags","cursor_sample","context_samples","guide_samples","natural_max_seconds","cache_capacity","guidance","seed","top_k","temperature","decoder_seed","decoder_steps","segment_codes","rng","rng_cuda_blocks","score_mode","symbolic_frames","include_full_audio"};
+    const std::set<std::string> keys={"lyrics","tags","audio_context_seconds","cursor_sample","context_samples","guide_samples","natural_max_seconds","cache_capacity","guidance","seed","top_k","temperature","decoder_seed","decoder_steps","segment_codes","rng","rng_cuda_blocks","score_mode","symbolic_frames","include_full_audio","transcribe","transcription_lane","transcription_scope"};
     for(const auto & p:in.options.object)if(!keys.count(p.first))throw std::invalid_argument("Unknown option: "+p.first);
     for(const char * key:{"lyrics","tags"}){
         auto text=json::string(in.options,key,"");
         if(text.size()>16384||text.find('\0')!=std::string::npos)throw std::invalid_argument(std::string(key)+" exceeds 16 KiB or contains NUL");
     }
-    integer(in.options,"symbolic_frames",0,json::string(in.options,"score_mode","none")=="none"?1:0,5000);
+    integer(in.options,"symbolic_frames",0,!json::boolean(in.options,"transcribe",false)&&json::string(in.options,"score_mode","none")=="none"?1:0,5000);
+    const auto lane=json::string(in.options,"transcription_lane","combined");if(lane!="combined"&&lane!="vocal"&&lane!="instrumental")throw std::invalid_argument("Invalid transcription lane");
+    const auto scope=json::string(in.options,"transcription_scope","context");if(scope!="context"&&scope!="source")throw std::invalid_argument("Invalid transcription scope");
     for(const auto * midi:{&in.melody,&in.chords,&in.drums}){
         if(midi->size()>4*1024*1024)throw std::invalid_argument("MIDI exceeds 4 MiB");
         if(!midi->empty()&&(midi->size()<14||midi->compare(0,4,"MThd")))throw std::invalid_argument("Expected standard MIDI upload");
     }
-    plan(config,request(config,in)); // validate before accepting work, no models/RNG
+    plan_audio_input(config,in); // validate before accepting work, no models/RNG
     return in;
 }
 std::string wav(const float * samples,int64_t count,int rate) {
@@ -162,6 +178,7 @@ void Config::resolve_models() {
     tokenizers=model(model_dir,"mulacover-conditioning-tokenizers.gguf");style=model(model_dir,"mulacover-style-f32.gguf");generator=model(model_dir,"mulacover-q4_k_m.gguf");
     encoder=model(codec_model_dir,"heartcodec-encoder-f32-v2.gguf");flow=model(codec_model_dir,"heartcodec-flow-f32.gguf");sq=model(codec_model_dir,"heartcodec-sq-codec-f32.gguf");
 }
+mulacover_job_plan_v1 plan_audio_input(const Config & c,const Input & in){return plan(c,request(c,in));}
 std::string props(const Config & c) {
     auto v=json::object();auto & o=v.object;
     o["service"]=json::from_string("mulacover");o["version"]=json::from_string(MULACOVER_VERSION);o["commit"]=json::from_string(MULACOVER_SOURCE_COMMIT);
@@ -173,7 +190,8 @@ std::string props(const Config & c) {
     o["source_dirty"]=json::from_bool(MULACOVER_SOURCE_DIRTY!=0);
     o["http_api_version"]=json::from_integer(1);o["sample_rate"]=json::from_integer(48000);o["channels"]=json::from_integer(2);
     o["max_cache_capacity"]=json::from_integer(c.max_cache_capacity);o["natural_max_seconds"]=json::from_double(30);
-    o["early_eos"]=json::from_bool(true);o["transcription"]=json::from_bool(false);o["bpm_lock"]=json::from_bool(false);
+    o["early_eos"]=json::from_bool(true);o["transcription"]=json::from_bool(c.transcription_port>0);o["bpm_lock"]=json::from_bool(false);
+    o["transcription_port"]=json::from_integer(c.transcription_port);
     o["job_abi"]=json::from_integer(1);o["conditioning_abi"]=json::from_integer(1);
     auto modes=json::array();modes.array={json::from_string("none"),json::from_string("provided")};o["score_modes"]=std::move(modes);
     auto models=json::object();bool ready=true;
@@ -187,6 +205,14 @@ std::string props(const Config & c) {
 Outcome run_native(const Config & config,const Input & in,const Progress & progress,const Cancel & cancel) {
     if(cancel())throw Cancelled{};
     auto job=request(config,in);auto preliminary=plan(config,job);
+    const bool automatic=json::boolean(in.options,"transcribe",false);TranscribedScore transcribed;
+    if(automatic){
+        const bool full_score=json::string(in.options,"transcription_scope","context")=="source";
+        transcribed=transcribe_score(config,in.audio,full_score?0:preliminary.context_start_sample,full_score?int64_t(in.audio.samples.size()/in.audio.channels):preliminary.context_samples,
+            json::string(in.options,"transcription_lane","combined"),[&](double p,const std::string & stage,int64_t n,int64_t total){progress(.25*p,stage,n,total);},cancel);
+        transcribed.metadata.object["scope"]=json::from_string(full_score?"source":"context");
+    }
+    Progress pipeline_progress=[&](double p,const std::string & stage,int64_t n,int64_t total){progress((automatic?.25:0)+(automatic?.75:1)*p,stage,n,total);};
     const auto * conditioning=mulacover_get_conditioning_api(1);const auto * jobs=mulacover_get_job_api(1);
     if(!conditioning||conditioning->size<MULACOVER_CONDITIONING_API_V1_SIZE||!jobs||jobs->size<MULACOVER_JOB_API_V1_SIZE)throw std::runtime_error("Required native capability unavailable");
     struct Owned {
@@ -198,16 +224,16 @@ Outcome run_native(const Config & config,const Input & in,const Progress & progr
     } owned(conditioning,jobs);
     mulacover_error_v1 e{};e.size=sizeof(e);
     auto check=[&](int code){if(code==3)throw Cancelled{};if(code)throw std::runtime_error(e.message);};
-    progress(0,"loading tokenizers",0,0);check(conditioning->create(config.tokenizers.c_str(),&owned.context,&e));
+    pipeline_progress(0,"loading tokenizers",0,0);check(conditioning->create(config.tokenizers.c_str(),&owned.context,&e));
     if(cancel())throw Cancelled{};
-    Scratch scratch;const auto melody=scratch.midi("melody.mid",in.melody),chords=scratch.midi("chords.mid",in.chords),drums=scratch.midi("drums.mid",in.drums);
+    Scratch scratch;const auto melody=scratch.midi("melody.mid",automatic?transcribed.melody:in.melody),chords=scratch.midi("chords.mid",automatic?transcribed.chords:in.chords),drums=scratch.midi("drums.mid",in.drums);
     const auto lyrics=json::string(in.options,"lyrics","[Instrumental]"),tags=json::string(in.options,"tags","");
     mulacover_conditioning_request_v1 r{};r.size=sizeof(r);conditioning->request_init(&r);
     r.lyrics=lyrics.c_str();r.tags=tags.c_str();r.style_model=config.style.c_str();r.backend=config.backend.c_str();r.threads=config.threads;
     r.score_mode=job.score_mode;r.symbolic_frames=integer(in.options,"symbolic_frames",job.score_mode?0:540,0,5000);
     r.melody_midi=melody.empty()?nullptr:melody.c_str();r.chord_midi=chords.empty()?nullptr:chords.c_str();r.drum_midi=drums.empty()?nullptr:drums.c_str();
     r.guidance=job.conditioning.guidance;r.max_audio_frames=preliminary.guide_frames+preliminary.new_frames;
-    Callbacks callbacks{progress,cancel};r.should_cancel=Callbacks::poll;r.callback_user=&callbacks;r.on_style_progress=Callbacks::style;
+    Callbacks callbacks{pipeline_progress,cancel};r.should_cancel=Callbacks::poll;r.callback_user=&callbacks;r.on_style_progress=Callbacks::style;
     check(conditioning->prepare(owned.context,&r,&owned.prepared,&e));
     conditioning->destroy(owned.context);owned.context=nullptr;
     job.conditioning=owned.prepared.condition;plan(config,job); // actual text prompt budget
@@ -216,6 +242,7 @@ Outcome run_native(const Config & config,const Input & in,const Progress & progr
     auto & result=owned.result;Outcome out;out.wav=wav(result.samples,result.num_samples,result.sample_rate);
     if(result.full_samples)out.full_wav=wav(result.full_samples,result.full_num_samples,result.sample_rate);
     auto & meta=out.meta.object;
+    if(automatic)meta["transcription"]=std::move(transcribed.metadata);
     meta["new_frames"]=json::from_integer(result.new_frames);meta["guide_frames"]=json::from_integer(result.guide_frames);
     meta["duration"]=json::from_double(double(result.num_samples)/result.sample_rate);meta["sample_rate"]=json::from_integer(result.sample_rate);meta["channels"]=json::from_integer(2);
     meta["eos"]=json::from_bool(result.stop_reason==MULACOVER_EOS_V1);meta["cache_capacity"]=json::from_integer(result.plan.cache_capacity);

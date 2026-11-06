@@ -38,6 +38,9 @@ struct HttpServerOptions {
 
 HttpResponse json_response(std::string body, int status = 200);
 HttpResponse error_response(int status, const std::string & message, const std::string & type);
+// Native, bounded HTTP client for the local transcription provider only.
+// Connects to 127.0.0.1; no caller-controlled host/URL or redirects.
+HttpResponse request_loopback(int port,const HttpRequest &,std::size_t max_response_bytes=32*1024*1024);
 
 // Blocking HTTP/1.1 server. Each accepted connection is handled on its own
 // worker thread, joined once it finishes; responses close the connection.

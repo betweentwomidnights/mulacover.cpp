@@ -10,6 +10,23 @@ CSS and JavaScript are embedded into the executable with CMake.
 The server reads it through MuLaCover's ABI, so a DLL server does not link another
 static GGML instance merely to query its version. Earlier tables stay frozen.
 
+## Basic UI
+
+Upload a WAV, choose **Audio context duration** and **Maximum new audio**, and pick:
+
+- **Continue audio:** score-free continuation from the opening of the upload.
+- **Transcribe + remix:** SheetSage2 automatically transcribes the full uploaded
+  song; its combined melody and chords condition the remix, while the chosen
+  opening audio primes MuLaCover. No manual MIDI upload is needed.
+
+For example, 30 seconds of context always uses source seconds 0..30. There is no
+cursor or separate tail-guide control in this basic UI. Durations are floored to
+complete 80ms frames **before** choosing the opening; a 1-second request uses
+0..0.96, never 0.04..1. The selected opening is shown under the duration controls.
+The maximum new duration permits early EOS. Melody focus (all/singer/instruments)
+is optional under generation settings. Manual MIDI and arbitrary-cursor controls
+remain available to API callers for future DAW workflows.
+
 ## Start on the laptop
 
 Build the normal coordinated GGML target:
@@ -27,6 +44,24 @@ $env:CUBLAS_WORKSPACE_CONFIG=':4096:8'
 Open <http://127.0.0.1:8010/>. The default port is 8010, configurable with `--port`.
 The server binds to loopback. Configure an exact `--allow-origin URL` for a
 separate downstream browser frontend; arbitrary web origins are rejected.
+
+Transcribe + remix reuses a local native `yue2-server`/SheetSage2 service on port
+8011. Run that service separately (the future application supervisor can own it):
+
+```powershell
+yue2-server --port 8011 --device cuda --force-unload `
+  --models-dir C:/dev/yue2.cpp/models `
+  --transcription-model C:/dev/yue2.cpp/models/sheetsage2-mert2-f16.gguf
+```
+
+`--transcription-port N` selects another loopback provider; 0 disables it.
+The bridge sends `keep_models=false`, waits for the owned transcription session
+to complete and release its model, then prepares conditioning and runs MuLaCover.
+It never launches a CLI/Python process or globally unloads another service's jobs.
+Cancellation cancels/polls only the session it submitted. A missing provider is
+an explicit job error; score-free continuation remains independent. The provider
+is a separate process, not a second GGML target linked into MuLaCover. Model-free
+props report configuration, not live provider readiness.
 Models are resolved at startup from the supplied directories:
 
 | Directory | Files |
@@ -78,16 +113,18 @@ Example `options`:
   "lyrics": "[Instrumental]",
   "tags": "warm acoustic pop",
   "score_mode": "none",
-  "cursor_sample": 1312416,
-  "context_samples": 1312416,
-  "guide_samples": 1312416,
+  "audio_context_seconds": 30,
   "natural_max_seconds": 30,
   "seed": "1701",
   "include_full_audio": true
 }
 ```
 
-Cursor/context/guide are **original WAV sample counts per channel**, not 48 kHz
+The basic `audio_context_seconds` option aligns the context end down to complete
+frames from source zero and sets cursor/context/guide together. It cannot be
+combined with explicit cursor/context/guide options. The UI uses this option.
+
+For advanced API callers, cursor/context/guide are **original WAV sample counts per channel**, not 48 kHz
 output samples or browser-resampled positions. Cursor defaults to the input end;
 zero context/guide means all available past/context respectively. Context ends
 at the cursor and only its tail is used as the guide. Lengths exceeding the
@@ -102,11 +139,24 @@ Early EOS is honored. The default is 30 seconds. Native planning and the default
 a claim that the laptop can allocate or use them effectively. Actual prompt
 length is checked again after preparation and before encoder/generator work.
 
-`score_mode=provided` requires melody MIDI; chord/drum MIDI may be omitted for
+For automatic transcription add `transcribe=true`, `score_mode=provided` and
+`transcription_scope=source`. `transcription_lane` selects `combined` (default),
+`vocal` or `instrumental`. This is the UI's transcribe + remix path: the full score
+is an intentional future arrangement, even though audio encoding sees only the
+selected opening. SheetSage2 exports no drum lane. Its native MIDI is passed to
+the conditioning capability without an ABC conversion or timing rewrite.
+
+The API also supports `transcription_scope=context` (default) for strict past-only
+workflows. It sends only the exact planned context window, never future PCM.
+This short score can itself encourage EOS after the guide; it is distinct from
+the full-song remix workflow in the basic UI.
+
+Manual `score_mode=provided` requires melody MIDI; chord/drum MIDI may be omitted for
 empty lanes. Score-none rejects any MIDI uploads. Score-none defaults to 540
 symbolic rows; `symbolic_frames` can override it. Provided mode derives the score
-length unless an explicit matching length is supplied. There is no transcription
-inside this server. Use SheetSage2 through yue2.cpp and choose lanes explicitly.
+length unless an explicit matching length is supplied. Automatic transcription
+and manual MIDI uploads cannot be mixed. The server orchestrates SheetSage2
+through yue2.cpp's public HTTP interface; no transcription implementation is copied.
 For strict past-only continuation the caller must also trim the score before the
 cursor. Future arrangements remain available for score-guided transformation.
 
@@ -137,8 +187,9 @@ Download before calling release/unload or starting another UI session.
 
 Tests inject an internal runner to exercise admission, failure recovery,
 cancellation and shutdown without weights. There is no fake-inference server
-option. Real CUDA HTTP/CLI and browser checks are separately recorded in
-`docs/validation/server.json`. Musical quality and all existing numerical parity
+option. Initial CUDA HTTP/CLI and browser checks are recorded in
+`docs/validation/server.json`; simplified UI/transcription checks are in
+`docs/validation/transcribe-remix-ui.json`. Musical quality and all existing numerical parity
 limits keep their earlier scope; these short checks validate service wiring.
 Release packaging, installed SDK exports and the final gary4local adapter are
 separate work. No release workflow is dispatched by this implementation.

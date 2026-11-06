@@ -357,6 +357,39 @@ HttpResponse error_response(
         ",\"type\":" + json::quote(type) + "}}", status);
 }
 
+HttpResponse request_loopback(int port,const HttpRequest & request,std::size_t maximum) {
+    if(port<1||port>65535)throw std::invalid_argument("Invalid transcription port");
+    SocketRuntime runtime;UniqueSocket socket(::socket(AF_INET,SOCK_STREAM,0));
+    if(socket.get()==kInvalidSocket)throw std::runtime_error("Cannot create transcription connection");
+    set_timeouts(socket.get(),10000,10000);
+    sockaddr_in address{};address.sin_family=AF_INET;address.sin_port=htons(uint16_t(port));inet_pton(AF_INET,"127.0.0.1",&address.sin_addr);
+    if(connect(socket.get(),reinterpret_cast<sockaddr *>(&address),sizeof(address)))throw std::runtime_error("SheetSage2 service is unavailable on port "+std::to_string(port));
+    if(request.path.empty()||request.path[0]!='/'||request.path.find_first_of("\r\n ")!=std::string::npos)throw std::invalid_argument("Invalid transcription route");
+    std::string wire=request.method+" "+request.path+" HTTP/1.1\r\nHost: 127.0.0.1:"+std::to_string(port)+"\r\nConnection: close\r\nContent-Type: application/json\r\nContent-Length: "+std::to_string(request.body.size())+"\r\n\r\n"+request.body;
+    send_all(socket.get(),wire);
+    std::string bytes;std::array<char,8192> chunk{};size_t end=std::string::npos,body_size=0;HttpResponse response;
+    for(;;){
+#ifdef _WIN32
+        const int n=recv(socket.get(),chunk.data(),int(chunk.size()),0);
+#else
+        const auto n=recv(socket.get(),chunk.data(),chunk.size(),0);
+#endif
+        if(n<=0)throw std::runtime_error("Incomplete SheetSage2 HTTP response");
+        bytes.append(chunk.data(),size_t(n));
+        if(end==std::string::npos){
+            end=bytes.find("\r\n\r\n");if(end==std::string::npos){if(bytes.size()>65536)throw std::runtime_error("SheetSage2 headers exceed limit");continue;}
+            if(end>65536)throw std::runtime_error("SheetSage2 headers exceed limit");
+            std::istringstream headers(bytes.substr(0,end));std::string line,version;std::getline(headers,line);std::istringstream first(line);first>>version>>response.status;
+            if(version!="HTTP/1.1"||response.status<100||response.status>599)throw std::runtime_error("Invalid SheetSage2 HTTP status");
+            while(std::getline(headers,line)){if(!line.empty()&&line.back()=='\r')line.pop_back();auto colon=line.find(':');if(colon==std::string::npos)throw std::runtime_error("Invalid SheetSage2 HTTP header");if(!response.headers.emplace(lower_ascii(trim(line.substr(0,colon))),trim(line.substr(colon+1))).second)throw std::runtime_error("Duplicate SheetSage2 HTTP header");}
+            if(response.headers.count("transfer-encoding")||!response.headers.count("content-length"))throw std::runtime_error("SheetSage2 requires a Content-Length response");
+            body_size=parse_content_length(response.headers.at("content-length"));if(body_size>maximum)throw std::runtime_error("SheetSage2 response exceeds limit");
+        }
+        if(bytes.size()-end-4>=body_size){response.body=bytes.substr(end+4,body_size);return response;}
+        if(bytes.size()>maximum+65540)throw std::runtime_error("SheetSage2 response exceeds limit");
+    }
+}
+
 void serve_http(
     const HttpServerOptions & options,
     const HttpHandler & handler,

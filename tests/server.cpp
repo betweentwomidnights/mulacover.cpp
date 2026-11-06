@@ -16,6 +16,9 @@ HttpResponse route(Service & s,const std::string & path,const std::string & meth
 json::Value terminal(Service & s,const std::string & id){for(int i=0;i<400;++i){auto r=route(s,"/poll_status/"+id);CHECK(r.status==200);auto j=json::parse(r.body);if(!json::boolean(j,"generation_in_progress",true))return j;std::this_thread::sleep_for(std::chrono::milliseconds(5));}throw std::runtime_error("worker timeout");}
 int main(){try{
     Config config;config.backend="cpu";config.resolve_models();
+    Input opening;opening.audio=wave_io::read_wave_bytes(wave());opening.options=json::parse("{\"audio_context_seconds\":1}");
+    auto short_plan=plan_audio_input(config,opening);CHECK(short_plan.context_start_sample==0&&short_plan.cursor_sample==3840&&short_plan.guide_frames==1);
+    opening.audio.samples.resize(96000);auto one_second=plan_audio_input(config,opening);CHECK(one_second.context_start_sample==0&&one_second.cursor_sample==46080&&one_second.guide_frames==12);
     std::atomic<bool> entered{false},finish{false};std::atomic<int> active{0},maximum{0};
     Service s(config,[&](const Config &,const Input & in,const Progress & progress,const Cancel & cancel){
         ++active;maximum.store(std::max(maximum.load(),active.load()));struct Exit{std::atomic<int>& a;~Exit(){--a;}} exit{active};
@@ -29,6 +32,9 @@ int main(){try{
     auto bad=submission("{\"seed\":\"18446744073709551616\"}");CHECK(s.handle(bad).status==400);
     for(const auto * v:{"{\"unknown\":1}","{\"cursor_sample\":99999999}","{\"score_mode\":\"provided\"}","{\"rng\":\"torch-cuda\"}","{\"seed\":\"+1\"}","{\"seed\":1.5}","{\"natural_max_seconds\":655.36}","{\"guide_samples\":-1}","{\"top_k\":0}","{\"lyrics\":\"a\\u0000b\"}","{\"seed\":1,\"seed\":2}"})CHECK(s.handle(submission(v)).status==400);
     auto invalid=submission();invalid.body="bad";CHECK(s.handle(invalid).status==400);
+    CHECK(s.handle(submission("{\"audio_context_seconds\":1,\"cursor_sample\":1}")).status==400);
+    CHECK(s.handle(submission("{\"audio_context_seconds\":0.01}")).status==400);
+    CHECK(s.handle(submission("{\"transcription_scope\":\"invalid\"}")).status==400);
     auto origin=submission();origin.headers["origin"]="https://untrusted.example";CHECK(s.handle(origin).status==403);
     auto r=s.handle(submission("{\"seed\":\"18446744073709551615\"}"));CHECK(r.status==202);auto id=json::string(json::parse(r.body),"session_id");
     for(int i=0;i<400&&!entered;++i)std::this_thread::sleep_for(std::chrono::milliseconds(5));CHECK(entered);
@@ -37,7 +43,7 @@ int main(){try{
     CHECK(route(s,"/cancel/"+id,"POST").status==200);CHECK(json::string(terminal(s,id),"status")=="cancelled");CHECK(route(s,"/audio/"+id).status==409);
     CHECK(route(s,"/release/"+id,"POST").status==200);CHECK(route(s,"/poll_status/"+id).status==404);
     r=s.handle(submission("{\"tags\":\"fail\"}"));CHECK(r.status==202);id=json::string(json::parse(r.body),"session_id");CHECK(json::string(terminal(s,id),"status")=="failed");
-    finish=true;r=s.handle(submission("{\"context_samples\":1428480,\"guide_samples\":1428480}"));CHECK(r.status==202);id=json::string(json::parse(r.body),"session_id");auto done=terminal(s,id);CHECK(json::string(done,"status")=="completed");CHECK(route(s,json::string(done,"audio_url")).body=="test-wav");CHECK(route(s,"/full_audio/"+id).status==404);
+    finish=true;r=s.handle(submission("{\"audio_context_seconds\":1}"));CHECK(r.status==202);id=json::string(json::parse(r.body),"session_id");auto done=terminal(s,id);CHECK(json::string(done,"status")=="completed");CHECK(route(s,json::string(done,"audio_url")).body=="test-wav");CHECK(route(s,"/full_audio/"+id).status==404);
     CHECK(route(s,"/unload","POST").status==200);CHECK(route(s,"/audio/"+id).status==404);CHECK(maximum==1);
     finish=false;entered=false;r=s.handle(submission());CHECK(r.status==202);s.shutdown();CHECK(active==0);s.shutdown();
     std::cout<<"server admission, validation, cancellation, replay lifecycle, download and shutdown passed\n";return 0;

@@ -23,6 +23,7 @@ int main(int argc,char ** argv){try{
               "  --codec-model-dir DIR   encoder, flow and SQ GGUFs\n"
               "  --backend cpu|cuda|vulkan|metal\n"
               "  --port 8010 --threads 4 --max-cache-capacity 1536\n"
+              "  --transcription-port 8011  local Yue2/SheetSage2 service (0 disables)\n"
               "  --allow-origin URL      optional exact downstream browser origin\n"
               "  --props | --version     model-free installer probes\n"
               "Listens on 127.0.0.1. Open / for the embedded continuation UI.\n";return 0;
@@ -34,6 +35,7 @@ int main(int argc,char ** argv){try{
         else if(key=="--codec-model-dir")config.codec_model_dir=value;
         else if(key=="--backend")config.backend=value;
         else if(key=="--port")config.port=integer();
+        else if(key=="--transcription-port")config.transcription_port=integer();
         else if(key=="--threads")config.threads=integer();
         else if(key=="--max-cache-capacity")config.max_cache_capacity=integer();
         else if(key=="--allow-origin")config.allow_origin=value;
@@ -42,6 +44,7 @@ int main(int argc,char ** argv){try{
     if(!std::set<std::string>{"cpu","cuda","vulkan","metal"}.count(config.backend)||config.port<1||config.port>65535||config.threads<1||config.threads>1024||config.max_cache_capacity<256||config.max_cache_capacity>8192)
         throw std::invalid_argument("Invalid backend, port, threads or cache budget");
     if(config.allow_origin.find_first_of("\r\n")!=std::string::npos||config.allow_origin=="*")throw std::invalid_argument("--allow-origin must be an exact origin");
+    if(config.transcription_port<0||config.transcription_port>65535||config.transcription_port==config.port)throw std::invalid_argument("Invalid transcription port");
     config.resolve_models();
     if(print_props){std::cout<<props(config)<<'\n';return 0;}
     std::signal(SIGINT,stop);std::signal(SIGTERM,stop);

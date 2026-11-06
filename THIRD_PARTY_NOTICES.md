@@ -13,7 +13,7 @@ components retain their respective licenses.
 | betweentwomidnights/heartcodec.cpp | Linked sibling dependency, MIT project source with its own third-party inventory and RNG notices. |
 | betweentwomidnights/ggml | Shared pinned dependency supplied by HeartCodec; retain that fork's license when distributing it. No second GGML copy is bundled here. |
 | betweentwomidnights/sa3.cpp | MIT source; library ownership, capability negotiation, parity and Philox development patterns. |
-| betweentwomidnights/yue2.cpp | MIT source retained in `LICENSES/YuE2-MIT.txt`; native UTF-8/NFC and tokenizer splitting structure adapted for the conditioning frontend. HTTP, JSON, multipart support and the CMake resource embedder are adapted from `c36baa91c594d84b646e73013b1fa81a3f3e39f4`. Generated tables use the pinned reference runtimes. The transcription model remains an external sibling dependency. |
+| betweentwomidnights/yue2.cpp | MIT source retained in `LICENSES/YuE2-MIT.txt`; native UTF-8/NFC and tokenizer splitting structure adapted for the conditioning frontend. HTTP, JSON, multipart/base64 support and the CMake resource embedder are adapted from `c36baa91c594d84b646e73013b1fa81a3f3e39f4`. Generated tables use the pinned reference runtimes. SheetSage2 runs through the external native service; its model implementation is not copied here. |
 | betweentwomidnights/acestep.cpp | MIT source retained in `LICENSES/ACE-Step-MIT.txt`; Qwen3 encoder graph and lifecycle reference. Its weight loader/backend fallback and tokenizer approximations are not imported. |
 | PyTorch / torchtune / Transformers / Qwen | External reference and model dependencies, not vendored source or checkpoints. Retain their applicable terms when supplying those dependencies. |
 

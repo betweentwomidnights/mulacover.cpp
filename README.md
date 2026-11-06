@@ -20,9 +20,10 @@ components and separate checkpoint/output terms. This is a development library;
 Q4 quality and the remaining numerical gaps are documented below.
 
 **A native server and embedded continuation UI are available.** Build
-`mulacover-server`, then open `http://127.0.0.1:8010/`. It supports audio-only or
-MIDI-guided continuation, original-clock cursor/context/guide controls, a natural
-duration ceiling, progress/cancellation and stereo WAV downloads. See
+`mulacover-server`, then open `http://127.0.0.1:8010/`. Choose **Continue audio** or
+**Transcribe + remix**, set the opening audio context duration and maximum new
+audio, and download stereo WAVs. Remix obtains melody/chords automatically from
+the local native Yue2/SheetSage2 service. See
 [startup and HTTP integration](docs/SERVER.md). It uses the existing negotiated
 C APIs; no Python inference or web build/runtime dependencies are introduced.
 

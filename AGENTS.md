@@ -11,6 +11,13 @@
   preserve cooperative cancellation and staged ownership, and retain score-none
   and provided-MIDI modes. UI time controls use the original WAV clock. Server
   validation is service wiring, not a waiver of the numerical gates below.
+- The basic UI has only Continue audio and Transcribe + remix, with an opening
+  context duration and maximum new audio. Always start its audio context at zero;
+  align its end down to full frames before selecting it. Remix transcribes the
+  full song via native Yue2/SheetSage2 and uses that score as a future arrangement.
+  The API's context-only transcription scope is a separate past-only workflow.
+  Release transcription models before MuLaCover; never globally unload a shared
+  provider or copy its model implementation. Manual MIDI/cursor controls stay API-only.
 - Native FP32 teacher-forced frame/logit/cache parity passes 600 tensors on
   Spark CUDA at coordinated `e3db5210`; see `docs/validation/ggml-029-adoption.json`.
   Earlier `07b77b0` evidence remains in `docs/NATIVE_PARITY.md`. The former
