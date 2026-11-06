@@ -114,7 +114,21 @@ int main(int argc,char ** argv) {
             if(mulacover_session_reset_v1(c,&error)||mulacover_teacher_frame_v1(c,teacher.data(),nullptr,&result,&error)||!std::equal(changed.begin(),changed.end(),result.logits))throw std::runtime_error("Changed-condition reset differs");
             mulacover_frame_free_v1(&result);piano[0]=original;
             if(mulacover_session_begin_v1(c,&condition,&error)||mulacover_teacher_frame_v1(c,teacher.data(),nullptr,&result,&error)||!std::equal(first_logits.begin(),first_logits.begin()+8*8197,result.logits))throw std::runtime_error("Restored condition differs");
+            mulacover_frame_free_v1(&result);const float original_style=qwen[0];qwen[0]+=1;
+            if(mulacover_session_begin_v1(c,&condition,&error)||mulacover_teacher_frame_v1(c,teacher.data(),nullptr,&result,&error))throw std::runtime_error(error.message);
+            if(std::equal(first_logits.begin(),first_logits.begin()+8*8197,result.logits))throw std::runtime_error("Changed style was not observed");
+            mulacover_frame_free_v1(&result);qwen[0]=original_style;
+            // Reuse the same model/workspaces with different symbolic shapes and
+            // CFG branch count, then restore the original cold result.
+            auto short_condition=condition;uint8_t visible=0;short_condition.symbolic_frames=1;
+            short_condition.context_mask=&visible;short_condition.guidance=1;
+            if(mulacover_session_begin_v1(c,&short_condition,&error)||mulacover_teacher_frame_v1(c,teacher.data(),nullptr,&result,&error)||result.branches!=1)throw std::runtime_error("Changed shape/branch begin failed");
+            std::vector<float> short_logits(result.logits,result.logits+8*8197);mulacover_frame_free_v1(&result);
+            if(mulacover_session_reset_v1(c,&error)||mulacover_teacher_frame_v1(c,teacher.data(),nullptr,&result,&error)||!std::equal(short_logits.begin(),short_logits.end(),result.logits))throw std::runtime_error("Changed-shape reset differs");
+            mulacover_frame_free_v1(&result);
+            if(mulacover_session_begin_v1(c,&condition,&error)||mulacover_teacher_frame_v1(c,teacher.data(),nullptr,&result,&error)||!std::equal(first_logits.begin(),first_logits.begin()+8*8197,result.logits))throw std::runtime_error("Restored shape/branches differ");
             std::cout<<"condition replacement/reset/restoration exact\n";
+            std::cout<<"style/shape/branch replacement and restoration exact\n";
         }
         const float saved=result.logits[0];mulacover_destroy_v1(c);c=nullptr;
         if(!std::isfinite(result.logits[0])||result.logits[0]!=saved)throw std::runtime_error("Frame result did not survive context destruction");

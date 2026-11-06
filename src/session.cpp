@@ -25,7 +25,7 @@ void collect(Graph & g,Dumps & values) {
 }
 std::vector<float> embed(Session & s,int branch) {
     const bool first=s.frame_index==0;const int n=first?s.condition.prompt:1;
-    Graph g(s.model);g.role="embedding";ggml_tensor * x=nullptr;
+    Graph g(s.model,"embedding");g.role="embedding";ggml_tensor * x=nullptr;
     for(int q=0;q<9;++q) {
         std::vector<int32_t> token(size_t(n),0);std::vector<float> mask(size_t(n),0);
         for(int t=0;t<n;++t) {
@@ -58,15 +58,23 @@ std::vector<float> embed(Session & s,int branch) {
 }
 std::vector<float> run_backbone(Session & s,int branch,Dumps * dumps,std::vector<float> & first_logits) {
     const auto embedding=embed(s,branch);const int n=s.frame_index==0?s.condition.prompt:1;
-    Graph g(s.model);g.role="backbone";auto * x=g.input(embedding,3072,n);
-    const bool cache_score=s.score_cache_enabled&&s.tempo.bpm==0;
+    Graph g(s.model,"backbone");g.role="backbone";auto * x=g.input(embedding,3072,n);
+    const bool cache_device=s.device_cache_enabled&&s.tempo.bpm==0;
+    auto & device=s.device_scores[size_t(branch)];
+    const bool device_hit=cache_device&&device.ready;
+    if(cache_device&&!device_hit) {
+        device.allocate(s.model,s.condition.symbolic);size_t bytes=0;
+        for(auto & d:s.device_scores)if(d.buffer)bytes+=ggml_backend_buffer_get_size(d.buffer);
+        s.model.device_score_bytes=std::max(s.model.device_score_bytes,bytes);
+    }
+    const bool cache_score=s.score_cache_enabled&&!cache_device&&s.tempo.bpm==0;
     auto & cached=s.score_contexts[size_t(branch)];
     const bool cache_hit=cache_score&&cached.size()==8;
-    if(cache_score){if(cache_hit)++s.model.score_cache_hits;else ++s.model.score_cache_misses;}
-    auto * style=ggml_silu(g.ctx,g.input(branch_input(s.condition.qwen,branch),1024,1));
-    auto * piano=cache_hit?nullptr:g.input(branch_input(s.condition.piano,branch),256,s.condition.symbolic);
-    auto * drum=cache_hit?nullptr:g.input(branch_input(s.condition.drum,branch),128,s.condition.symbolic);
-    auto * chord=cache_hit?nullptr:g.input(branch_input(s.condition.chord,branch),12,s.condition.symbolic);
+    if(cache_score||cache_device){if(cache_hit||device_hit)++s.model.score_cache_hits;else ++s.model.score_cache_misses;}
+    auto * style=device_hit?nullptr:ggml_silu(g.ctx,g.input(branch_input(s.condition.qwen,branch),1024,1));
+    auto * piano=cache_hit||device_hit?nullptr:g.input(branch_input(s.condition.piano,branch),256,s.condition.symbolic);
+    auto * drum=cache_hit||device_hit?nullptr:g.input(branch_input(s.condition.drum,branch),128,s.condition.symbolic);
+    auto * chord=cache_hit||device_hit?nullptr:g.input(branch_input(s.condition.chord,branch),12,s.condition.symbolic);
     auto * one=g.input({1.0f},1,1);
     const auto clock=tempo_bias(s.tempo,s.position,n,s.condition.prompt,s.condition.context_mask,branch);
     const auto score_padding=tempo_padding(s.tempo,s.frame_index==0?s.condition.prompt-1:s.position,
@@ -75,7 +83,8 @@ std::vector<float> run_backbone(Session & s,int branch,Dumps * dumps,std::vector
     for(int layer=0;layer<28;++layer) {
         const auto l=std::to_string(layer),p="peft_layers."+l;
         if(layer>=20) {
-            auto * affine=g.linear("tag_mlp_layers."+l+".mlp",style,true);
+            auto * affine=device_hit?device.layers[size_t(layer-20)].affine:g.linear("tag_mlp_layers."+l+".mlp",style,true);
+            if(cache_device&&!device_hit)g.save(affine,device.layers[size_t(layer-20)].affine);
             auto * scale=ggml_view_1d(g.ctx,affine,3072,0);
             auto * shift=ggml_view_1d(g.ctx,affine,3072,3072*4);
             if(dumps&&layer==27) {
@@ -87,7 +96,8 @@ std::vector<float> run_backbone(Session & s,int branch,Dumps * dumps,std::vector
         if(dumps&&(layer==0||layer==13||layer==27))x=g.keep("stage.backbone.layers."+l,x);
         if(layer>=20) {
             ggml_tensor * context=nullptr;
-            if(cache_hit)context=g.input(cached[size_t(layer-20)],3072,s.condition.symbolic);
+            if(device_hit)context=layer==27?device.last_context:nullptr;
+            else if(cache_hit)context=g.input(cached[size_t(layer-20)],3072,s.condition.symbolic);
             else {
             const auto a=p+".adaptor";
             auto * cp=g.linear(a+".pianoroll_proj",piano,true);
@@ -102,11 +112,24 @@ std::vector<float> run_backbone(Session & s,int branch,Dumps * dumps,std::vector
             }
             previous_context=context;
             const auto c=p+".cross_attn";
+            AttentionKV attention_kv,gate_kv;
+            if(cache_device) {
+                auto & saved=device.layers[size_t(layer-20)];
+                if(device_hit){attention_kv=saved.attention;gate_kv=saved.gate;}
+                else {
+                    attention_kv=g.project_kv(c+".attn",context,384,8);
+                    auto * gate_context=g.linear(c+".context_gate_proj",context,true);
+                    gate_kv=g.project_kv(c+".gate",gate_context,12,1);
+                    g.save(attention_kv.key,saved.attention.key);g.save(attention_kv.value,saved.attention.value);
+                    g.save(gate_kv.key,saved.gate.key);g.save(gate_kv.value,saved.gate.value);
+                    if(layer==27)g.save(context,device.last_context);
+                }
+            }
             auto * normalized=g.norm(c+".norm",x);
-            auto * attended=g.attention(c+".attn",normalized,context,8,8,s.position,false,score_padding,nullptr,0,branch,clock);
+            auto * attended=g.attention(c+".attn",normalized,context,8,8,s.position,false,score_padding,nullptr,0,branch,clock,cache_device?&attention_kv:nullptr);
             auto * gate_x=g.linear(c+".x_gate_proj",normalized,true);
-            auto * gate_context=g.linear(c+".context_gate_proj",context,true);
-            auto * gate=g.attention(c+".gate",gate_x,gate_context,1,1,s.position,false,score_padding,nullptr,0,branch,clock);
+            auto * gate_context=cache_device?nullptr:g.linear(c+".context_gate_proj",context,true);
+            auto * gate=g.attention(c+".gate",gate_x,gate_context,1,1,s.position,false,score_padding,nullptr,0,branch,clock,cache_device?&gate_kv:nullptr);
             gate=ggml_tanh(g.ctx,g.linear(c+".gate_proj",gate,true));
             x=ggml_add(g.ctx,x,ggml_mul(g.ctx,attended,gate));
             if(dumps&&layer==27) {
@@ -118,11 +141,16 @@ std::vector<float> run_backbone(Session & s,int branch,Dumps * dumps,std::vector
     auto * last=ggml_view_2d(g.ctx,x,3072,1,x->nb[1],size_t(n-1)*x->nb[1]);
     g.keep("last_hidden",last);g.keep("raw_logits",g.linear("codebook0_head",last));
     g.execute();first_logits=g.read("raw_logits");if(dumps)collect(g,*dumps);
+    if(cache_device&&!device_hit)device.ready=true;
     if(cache_score&&!cache_hit){std::vector<std::vector<float>> next;for(int layer=20;layer<28;++layer)next.push_back(g.read("score_cache."+std::to_string(layer)));cached=std::move(next);}
     return g.read("last_hidden");
 }
 }
-Session::Session(const mulacover_config_v1 & config):capacity(config.cache_capacity){const auto * p=std::getenv("MULACOVER_PROFILE");model.profiling=p&&std::string(p)=="1";const auto * cache=std::getenv("MULACOVER_SCORE_CACHE");score_cache_enabled=cache&&std::string(cache)=="1";model.load(config);}
+Session::Session(const mulacover_config_v1 & config):capacity(config.cache_capacity){
+    auto enabled=[](const char * name){const auto * p=std::getenv(name);return p&&std::string(p)=="1";};
+    model.profiling=enabled("MULACOVER_PROFILE");model.graph_reuse=enabled("MULACOVER_GRAPH_REUSE");
+    score_cache_enabled=enabled("MULACOVER_SCORE_CACHE");device_cache_enabled=enabled("MULACOVER_DEVICE_CACHE");model.load(config);
+}
 void Session::begin(const mulacover_condition_v1 & c) {
     if(c.size<sizeof(c)||c.prompt_frames<1||c.prompt_frames>capacity||c.symbolic_frames<1||c.symbolic_frames>5000||
        c.qwen_index<0||c.qwen_index>=c.prompt_frames||c.muq_index<0||c.muq_index>=c.prompt_frames||
@@ -149,7 +177,7 @@ void Session::begin(const mulacover_condition_v1 & c) {
     }
     condition=std::move(next);branches=batch;reset();
 }
-void Session::reset(){backbone.clear();decoder.clear();for(auto & c:score_contexts)c.clear();position=0;frame_index=0;stopped=false;previous.fill(0);}
+void Session::reset(){backbone.clear();decoder.clear();for(auto & c:score_contexts)c.clear();for(auto & d:device_scores)d.clear();position=0;frame_index=0;stopped=false;previous.fill(0);}
 void Session::frame(const int32_t * codes,const char * dump,mulacover_frame_v1 & result,
         const mulacover_sampling_config_v1 * sampling,int32_t * stop) {
     if(!branches||(!codes&&!sampling)||stopped)throw std::invalid_argument("Begin/reset a nonterminal session before requesting frames");
@@ -180,7 +208,7 @@ void Session::frame(const int32_t * codes,const char * dump,mulacover_frame_v1 &
     guide_and_select(0);
     for(int q=1;q<8;++q) {
         for(int branch=0;branch<branches;++branch) {
-            Graph g(model);g.role="local";
+            Graph g(model,"local."+std::to_string(q));g.role="local";
             auto * audio=ggml_get_rows(g.ctx,model.get("audio_embeddings.weight"),g.ids({selected[size_t(q-1)]+(q-1)*8197}));
             auto * input=q==1?ggml_concat(g.ctx,g.input(hidden[size_t(branch)],3072,1),audio,1):audio;
             auto * x=g.linear("projection",input);
