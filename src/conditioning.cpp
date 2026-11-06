@@ -39,7 +39,7 @@ int MULACOVER_CALL mulacover_conditioning_prepare_v1(mulacover_conditioning_cont
         std::vector<mulacover_note_v1> melody,chords,drums;
         if(r.score_mode==1){
             const bool files=r.melody_midi||r.chord_midi||r.drum_midi;
-            if(files){if(r.melody_count||r.chord_count||r.drum_count)throw std::invalid_argument("Choose MIDI or note arrays");melody=midi(r.melody_midi,false);chords=midi(r.chord_midi,false);if(r.drum_midi)drums=midi(r.drum_midi,true);}
+            if(files){if(r.melody_count||r.chord_count||r.drum_count)throw std::invalid_argument("Choose MIDI or note arrays");melody=midi(r.melody_midi,false);if(r.chord_midi)chords=midi(r.chord_midi,false);if(r.drum_midi)drums=midi(r.drum_midi,true);}
             else{if(r.melody_count)melody.assign(r.melody,r.melody+r.melody_count);if(r.chord_count)chords.assign(r.chords,r.chords+r.chord_count);if(r.drum_count)drums.assign(r.drums,r.drums+r.drum_count);}
             validate_notes(melody,false);validate_notes(chords,true);validate_notes(drums,false);if(melody.empty())throw std::invalid_argument("Provided score requires a melody note");
         }else if(r.melody_count||r.chord_count||r.drum_count||r.melody_midi||r.chord_midi||r.drum_midi)throw std::invalid_argument("Score none must not include note/MIDI inputs");

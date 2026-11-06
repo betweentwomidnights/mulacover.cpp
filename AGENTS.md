@@ -6,6 +6,11 @@
   inside dedicated Docker images. Do not change production containers.
 - Match unquantized reference tensors before quantizing the generator.
 - Keep weights, caches and large fixtures out of Git; keep compact manifests and reports.
+- `mulacover-server` wraps the negotiated conditioning/job capabilities on one
+  worker; see `docs/SERVER.md`. Keep inference out of HTTP/realtime callbacks,
+  preserve cooperative cancellation and staged ownership, and retain score-none
+  and provided-MIDI modes. UI time controls use the original WAV clock. Server
+  validation is service wiring, not a waiver of the numerical gates below.
 - Native FP32 teacher-forced frame/logit/cache parity passes 600 tensors on
   Spark CUDA at coordinated `e3db5210`; see `docs/validation/ggml-029-adoption.json`.
   Earlier `07b77b0` evidence remains in `docs/NATIVE_PARITY.md`. The former

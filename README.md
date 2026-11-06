@@ -19,6 +19,13 @@ license; see [third-party and model terms](THIRD_PARTY_NOTICES.md) for upstream
 components and separate checkpoint/output terms. This is a development library;
 Q4 quality and the remaining numerical gaps are documented below.
 
+**A native server and embedded continuation UI are available.** Build
+`mulacover-server`, then open `http://127.0.0.1:8010/`. It supports audio-only or
+MIDI-guided continuation, original-clock cursor/context/guide controls, a natural
+duration ceiling, progress/cancellation and stereo WAV downloads. See
+[startup and HTTP integration](docs/SERVER.md). It uses the existing negotiated
+C APIs; no Python inference or web build/runtime dependencies are introduced.
+
 **Native conditioning now accepts UTF-8 lyrics/tags and MIDI or score triplets.**
 The separate [conditioning capability](docs/NATIVE_CONDITIONING.md) builds prompt,
 score and F32 Qwen style tensors, then releases Qwen before the audio job starts.

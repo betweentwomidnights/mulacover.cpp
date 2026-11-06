@@ -6,6 +6,7 @@
 #include <filesystem>
 #include <fstream>
 #include <stdexcept>
+#include <string_view>
 #include <vector>
 namespace wave_io {
 template<class T> static std::vector<T> read(const std::filesystem::path & p,size_t count) {
@@ -14,10 +15,11 @@ template<class T> static std::vector<T> read(const std::filesystem::path & p,siz
     if(!file.read(reinterpret_cast<char *>(result.data()),std::streamsize(count*sizeof(T))))throw std::runtime_error("Cannot read encoder input");return result;
 }
 struct Wave {std::vector<float> samples;int rate=0,channels=0;};
-static Wave read_wave(const std::filesystem::path & path) {
-    const auto bytes=std::filesystem::file_size(path);
+static Wave read_wave_bytes(std::string_view bytes_view) {
+    const auto bytes=bytes_view.size();
     if(bytes<44||bytes>UINT32_MAX)throw std::runtime_error("Invalid RIFF WAV length");
-    auto raw=read<uint8_t>(path,size_t(bytes));
+    const auto * data_ptr=reinterpret_cast<const uint8_t *>(bytes_view.data());
+    struct View {const uint8_t * p;size_t n;const uint8_t * data()const{return p;}size_t size()const{return n;}uint8_t operator[](size_t i)const{return p[i];}} raw{data_ptr,size_t(bytes)};
     auto u16=[&](size_t i){return uint16_t(raw[i]|uint16_t(raw[i+1])<<8);};
     auto u32=[&](size_t i){return uint32_t(raw[i])|uint32_t(raw[i+1])<<8|uint32_t(raw[i+2])<<16|uint32_t(raw[i+3])<<24;};
     if(std::memcmp(raw.data(),"RIFF",4)||std::memcmp(raw.data()+8,"WAVE",4))throw std::runtime_error("Expected little-endian RIFF WAV");
@@ -43,6 +45,12 @@ static Wave read_wave(const std::filesystem::path & path) {
         result.samples[i]=value;
     }
     return result;
+}
+static Wave read_wave(const std::filesystem::path & path) {
+    const auto bytes=std::filesystem::file_size(path);
+    if(bytes<44||bytes>UINT32_MAX)throw std::runtime_error("Invalid RIFF WAV length");
+    auto raw=read<char>(path,size_t(bytes));
+    return read_wave_bytes(std::string_view(raw.data(),raw.size()));
 }
 template<class T>static void wav(const std::filesystem::path & path,const T & audio) {
     const uint64_t bytes=uint64_t(audio.num_samples)*8;if(bytes>UINT32_MAX-36)throw std::runtime_error("WAV is too large");
