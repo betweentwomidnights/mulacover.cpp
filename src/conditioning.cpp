@@ -1,4 +1,5 @@
 #include "conditioning-internal.h"
+#include "backend-select.h"
 #include <algorithm>
 #include <cmath>
 #include <cstdio>
@@ -23,7 +24,7 @@ void MULACOVER_CALL mulacover_conditioning_destroy_v1(mulacover_conditioning_con
 int MULACOVER_CALL mulacover_conditioning_prepare_v1(mulacover_conditioning_context * context,const mulacover_conditioning_request_v1 * request,mulacover_prepared_condition_v1 * output,mulacover_error_v1 * error){
     return guard(error,[&]{
         if(!context||!request||request->size<sizeof(*request)||!output||output->size<sizeof(*output)||output->tokens||output->tokens_mask||output->qwen||output->muq||output->pianoroll||output->drum_pianoroll||output->chord||output->context_mask||output->style_tokens||output->style_token_count||output->normalized_lyrics||output->normalized_tags||output->condition.tokens||output->condition.prompt_frames)throw std::invalid_argument("Invalid request/context or occupied conditioning output");
-        const auto & r=*request;if(!r.lyrics||!r.tags||std::strlen(r.lyrics)>262144||std::strlen(r.tags)>262144||!r.backend||(std::strcmp(r.backend,"cpu")&&std::strcmp(r.backend,"cuda"))||r.threads<1||r.threads>1024||!std::isfinite(r.guidance)||r.guidance<=0||r.max_audio_frames<1||r.max_audio_frames>8192||r.symbolic_frames<0||r.symbolic_frames>5000||(r.score_mode!=0&&r.score_mode!=1))throw std::invalid_argument("Invalid conditioning configuration");
+        const auto & r=*request;if(!r.lyrics||!r.tags||std::strlen(r.lyrics)>262144||std::strlen(r.tags)>262144||!mula::known_backend(r.backend)||r.threads<1||r.threads>1024||!std::isfinite(r.guidance)||r.guidance<=0||r.max_audio_frames<1||r.max_audio_frames>8192||r.symbolic_frames<0||r.symbolic_frames>5000||(r.score_mode!=0&&r.score_mode!=1))throw std::invalid_argument("Invalid conditioning configuration");
         for(auto pair:{std::make_pair(r.melody,r.melody_count),std::make_pair(r.chords,r.chord_count),std::make_pair(r.drums,r.drum_count)})if(pair.second<0||pair.second>1000000||(pair.second&&!pair.first))throw std::invalid_argument("Invalid note buffer");
         checkpoint(r);auto lyric=lower(r.lyrics);auto tags=lower(strip(r.tags));if(strip(lyric).empty())throw std::invalid_argument("Lyrics must not be empty");
         if(tags.size()>=11&&tags.compare(0,5,"<tag>")==0&&tags.compare(tags.size()-6,6,"</tag>")==0)tags=strip(tags.substr(5,tags.size()-11));

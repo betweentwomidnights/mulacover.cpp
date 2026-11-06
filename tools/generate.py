@@ -13,7 +13,7 @@ from continuation import select_guide,plan_frames,frames_for_seconds
 p=argparse.ArgumentParser(description=__doc__)
 for name in ('reference','model','cli','output','ggml-source'):p.add_argument('--'+name,type=Path,required=True)
 p.add_argument('--flow-model',type=Path);p.add_argument('--sq-model',type=Path)
-p.add_argument('--backend',choices=('cpu','cuda'),default='cuda');p.add_argument('--frames',type=int,help='Total guide plus new frames; default 100')
+p.add_argument('--backend',choices=('cpu','cuda','vulkan','metal'),default='cuda');p.add_argument('--frames',type=int,help='Total guide plus new frames; default 100')
 p.add_argument('--capacity',type=int,help='Cache positions; default rounds required positions up to 256');p.add_argument('--guidance',type=float,default=1.5)
 p.add_argument('--temperature',type=float,default=1);p.add_argument('--top-k',type=int,default=250);p.add_argument('--seed',type=int,default=1701)
 p.add_argument('--decoder-seed',type=int,default=1701);p.add_argument('--decoder-steps',type=int,default=10);p.add_argument('--segment-codes',type=int,default=372)

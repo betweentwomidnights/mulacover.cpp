@@ -2,6 +2,7 @@
 #include "sampling.h"
 #include "heartcodec_work.h"
 #include "heartcodec_rng.h"
+#include "backend-select.h"
 #include <algorithm>
 #include <chrono>
 #include <cmath>
@@ -92,7 +93,7 @@ int MULACOVER_CALL mulacover_job_run_v1(const mulacover_job_request_v1 * request
             throw std::invalid_argument("Invalid job request or occupied result");
         const auto & r=*request;mulacover_job_plan_v1 p{};p.size=sizeof(p);plan(r,p);
         require_path(r.encoder_model);require_path(r.generator_model);require_path(r.flow_model);require_path(r.sq_model);
-        if(!r.input_audio.samples||!r.backend||(std::strcmp(r.backend,"cpu")&&std::strcmp(r.backend,"cuda"))||r.cpu_threads<1||r.cpu_threads>1024||
+        if(!r.input_audio.samples||!mula::known_backend(r.backend)||r.cpu_threads<1||r.cpu_threads>1024||
            (r.score_mode!=MULACOVER_JOB_SCORE_NONE_V1&&r.score_mode!=MULACOVER_JOB_SCORE_PROVIDED_V1)||(r.rng_mode!=0&&r.rng_mode!=1)||r.rng_device<0||r.rng_cuda_blocks>1048576||(r.rng_mode==1&&!r.rng_cuda_blocks)||
            r.sampler_offset%4||(r.rng_mode==0&&r.sampler_offset)||r.decoder_steps<1||r.decoder_steps>1000||r.segment_codes<93||r.segment_codes%93||r.segment_codes>4092||
            (r.include_full_audio!=0&&r.include_full_audio!=1)||r.sampling.exponential_noise||r.sampling.noise_count)

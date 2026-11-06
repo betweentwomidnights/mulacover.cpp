@@ -1,6 +1,7 @@
 // Qwen3 backbone follows ACE-Step's qwen3-enc.h graph structure. This strict
 // F32 path retains separate projections/manual attention and frozen HF RoPE.
 #include "conditioning-internal.h"
+#include "backend-select.h"
 #include <algorithm>
 #include <cmath>
 #include <cctype>
@@ -23,7 +24,7 @@ static void load(Model & m,const char * path,const char * backend,int threads){
     for(int i=0;i<28;++i){auto p="layers."+std::to_string(i);shape(p+".input_layernorm.weight",1024);shape(p+".post_attention_layernorm.weight",1024);for(auto part:{"q","k","v"})shape(p+".self_attn."+part+"_proj.weight",1024,std::string(part)=="q"?2048:1024);shape(p+".self_attn.o_proj.weight",2048,1024);shape(p+".self_attn.q_norm.weight",128);shape(p+".self_attn.k_norm.weight",128);shape(p+".mlp.gate_proj.weight",1024,3072);shape(p+".mlp.up_proj.weight",1024,3072);shape(p+".mlp.down_proj.weight",3072,1024);}
     if(names.size()!=size_t(gguf_get_n_tensors(m.gguf)))throw std::runtime_error("Unexpected style tensor inventory");
     static std::once_flag once;std::call_once(once,[]{ggml_backend_load_all();});
-    for(size_t i=0;i<ggml_backend_dev_count();++i){auto dev=ggml_backend_dev_get(i);std::string name=ggml_backend_reg_name(ggml_backend_dev_backend_reg(dev));std::transform(name.begin(),name.end(),name.begin(),[](unsigned char c){return char(std::tolower(c));});if(name==backend){m.backend=ggml_backend_dev_init(dev,nullptr);break;}}
+    m.backend=mula::open_backend(backend,"style");
     if(!m.backend)throw std::runtime_error("Requested style backend unavailable");
     if(std::strcmp(backend,"cpu")==0){auto reg=ggml_backend_dev_backend_reg(ggml_backend_get_device(m.backend));auto set=reinterpret_cast<ggml_backend_set_n_threads_t>(ggml_backend_reg_get_proc_address(reg,"ggml_backend_set_n_threads"));if(set)set(m.backend,threads);}
     m.buffer=ggml_backend_alloc_ctx_tensors(m.ctx,m.backend);if(!m.buffer)throw std::runtime_error("Cannot allocate style weights");ggml_backend_buffer_set_usage(m.buffer,GGML_BACKEND_BUFFER_USAGE_WEIGHTS);
