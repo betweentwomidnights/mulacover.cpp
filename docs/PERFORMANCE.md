@@ -77,13 +77,98 @@ For Spark, `reference/run-spark.sh` forwards the two diagnostic environment flag
 into Docker. Set `MULACOVER_PARITY_OUTPUT` to a fresh directory when comparing
 cache modes; the GGML checkout must still match the exact coordinated pin.
 
+## Device projections and reusable workspaces
+
+Two further experiments are independently opt-in at generator context creation:
+
+- `MULACOVER_DEVICE_CACHE=1` retains the eight style-affine results, both
+  cross-attention K/V projections (musical attention and gate), and the last
+  cumulative score context directly on the selected backend. Cold preparation
+  uses the original GGML math and device-to-device copies. Warm frames use these
+  tensors without CPU readback/upload of score contexts. This flag takes
+  precedence over the earlier host score cache. Nonzero experimental tempo
+  conditioning bypasses both score caches.
+- `MULACOVER_GRAPH_REUSE=1` reuses nine session-owned metadata arenas and graph
+  allocators: embedding, backbone and seven local-head slots. This follows
+  ACE-Step's `ggml_reset` arena pattern using existing APIs. Graphs are still
+  rebuilt and allocation plans are reserved on every call: equal tensor shapes
+  and node counts do not guarantee equal lifetimes when debug outputs, views or
+  persistent inputs change. Allocator buffers retain their high-water storage.
+  Slots are borrowed by one synchronous graph at a time, and die before the
+  backend. No backend graph plan or CUDA graph capture is introduced.
+
+Both flags default **off**; no public ABI layout or EOS/RNG policy changes.
+Begin/reset/failure rewind frees the device score cache. Conditional and
+unconditional branches own separate tensors. Metadata/allocator slots survive
+reset, but store no caller pointers or reusable output handles. The optional parity CLI
+condition-reuse probe now also changes style, symbolic shape and CFG branch
+count, then checks cold-result restoration.
+
+Three short paired trials on the same 540-row workload above, rotating order:
+
+| Path | Median generator seconds | Less time than original |
+| --- | ---: | ---: |
+| Original | 4.226 | — |
+| Earlier host score cache | 3.795 | 10.2% |
+| Device projections only | 2.129 | 49.6% |
+| Workspaces only | 3.805 | 10.0% |
+| Device projections + workspaces | 2.009 | 52.5% |
+
+These timings exclude loading, include two cold preparations/reset-replays, and
+write no diagnostic tensors. The existing Windows configuration has
+`GGML_CUDA_GRAPHS=OFF`; the gain does not rely on enabling CUDA graph capture.
+These are generator-only results for one laptop/workload, not end-to-end DAW
+speedups. The two gains do not add independently.
+
+For 540-row CFG, persistent device score storage is **226,832,384 bytes
+(216.32 MiB)**. Combined reusable graph buffers retain about 47.7 MiB in the
+short timed case, plus 46.2 MiB of CPU metadata arenas. This replaces the host
+cache's 101.25 MiB of score vectors, but increases persistent device storage.
+The private profile report exposes those costs separately from the frozen
+memory API's existing per-graph high-water count.
+
+Checks: all 600 Spark Docker FP32 tensors pass existing rules (the same
+two original CFG flat-absolute diagnostics remain false). All 100 exported Q4
+tensors at frame 11 are byte-identical to the original for device-only,
+workspace-only and combined paths; the uncached refactor also matches the prior
+baseline. The combined experimental tempo/local-window path bypasses score
+caching and matches all 100 original frame-2 tensors. Reset/replay and
+score/style/shape/branch replacement probes pass. Windows CUDA static and Spark
+Docker CTests pass 15/15; Windows CPU DLL tests pass 14/14. This is not CPU model
+parity or new Metal/Vulkan validation.
+
+The smaller real provided-score workload (128 rows, otherwise the same short
+teacher/replay settings) improves from median **2.856s to 1.957s, 31.5% less
+generator time**, across three paired runs. A separate 12-guide/20-sampled-frame
+check, Torch CUDA cap 288 and UINT64_MAX seed, matches all 256 codes, EOS state
+and sampler offset 640 with replay/terminal checks intact.
+
+A longer fresh control uses 29.76 seconds / 372 guide frames, score-none 540
+rows, native-prepared 25-position prompt/style, seed 1701 and a 90-second new
+audio ceiling. Both paths emit 713 new frames / 57.04 seconds then EOS; all
+**8,680 codes** and sampler offset 22,848 are byte-identical. Generator time with
+checks is **188.371s -> 80.429s**. This is one diagnostic pair, not a statistical
+long-song benchmark; nvidia-smi monitoring runs in both, and brief CUDA smoke
+tests overlap the beginning of the baseline diagnostic. No decode is performed.
+Whole-device sampled peak (including desktop/other processes) is **4,579 MiB ->
+4,688 MiB**, out of 8,123 MiB, at capacity 1536. Combined allocator storage
+retains 56,745,472 bytes in this case. These results establish this laptop case;
+maximum API capacity and 5,000-row scores remain unvalidated.
+
+The long comparison is against the **fresh matched uncached control**. Its
+native-prepared Qwen bytes differ from the historical cached upstream listening
+fixture, although guide codes are identical. Neither equality to that historical
+output nor a cause for its different ending is asserted here. Existing strict
+upstream waveform limits are unchanged. Compact evidence is recorded separately
+in `docs/validation/generator-device-workspaces.json`.
+
 ## Next targets
 
-1. Keep invariant adaptor/cross-attention K/V and style-affine results on device,
-   avoiding repeated projections and the prototype's host transfers. Measure the
-   additional persistent VRAM against the laptop budget before adoption.
-2. Reuse graph metadata, workspaces and allocations for repeated one-frame
-   shapes. Current rebuilding cost is large; use existing GGML APIs first.
+1. Review the opt-in device-cache/workspace implementations and extend memory
+   coverage to longer scores and maximum API capacities before default adoption.
+2. Reuse complete one-frame graph construction/plans where shapes, lifetimes and
+   external pointers are explicitly stable; the current workspace experiment
+   retains buffers/metadata but still rebuilds graphs and reserves their plans.
 3. Add a dedicated guide-priming path that updates backbone KV without unused
    local-head logits. The existing teacher-frame API must still return all its
    documented outputs; optimize the job through an explicit primitive instead.
