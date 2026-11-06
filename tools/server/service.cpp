@@ -83,7 +83,7 @@ mulacover_job_request_v1 request(const Config & c,const Input & in) {
     r.sampling.seed=seed(v,"seed",1701);
     r.sampling.top_k=int(integer(v,"top_k",250,1,8197));
     r.sampling.temperature=float(real(v,"temperature",1,.001,10));
-    r.decoder_seed=seed(v,"decoder_seed",1701);
+    r.decoder_seed=seed(v,"decoder_seed",r.sampling.seed);
     r.decoder_steps=int(integer(v,"decoder_steps",10,1,1000));
     r.segment_codes=integer(v,"segment_codes",372,93,4092);
     if(r.segment_codes%93)throw std::invalid_argument("segment_codes must be a multiple of 93");
@@ -147,7 +147,8 @@ Input parse_input(const HttpRequest & req,const Config & config) {
         if(midi->size()>4*1024*1024)throw std::invalid_argument("MIDI exceeds 4 MiB");
         if(!midi->empty()&&(midi->size()<14||midi->compare(0,4,"MThd")))throw std::invalid_argument("Expected standard MIDI upload");
     }
-    plan_audio_input(config,in); // validate before accepting work, no models/RNG
+    resolve_job_seeds(in.options);
+    plan_audio_input(config,in); // model-free admission
     return in;
 }
 std::string wav(const float * samples,int64_t count,int rate) {
@@ -187,6 +188,15 @@ void Config::resolve_models() {
     auto model=[&](const std::string & dir,const char * name){return fs::absolute(fs::u8path(dir)/name).lexically_normal().u8string();};
     tokenizers=model(model_dir,"mulacover-conditioning-tokenizers.gguf");style=model(model_dir,"mulacover-style-f32.gguf");generator=model(model_dir,"mulacover-q4_k_m.gguf");
     encoder=model(codec_model_dir,"heartcodec-encoder-f32-v2.gguf");flow=model(codec_model_dir,"heartcodec-flow-f32.gguf");sq=model(codec_model_dir,"heartcodec-sq-codec-f32.gguf");
+}
+void resolve_job_seeds(json::Value & options){
+    const auto * p=options.find("seed");
+    const bool random=!p||((p->type==json::Type::number||p->type==json::Type::string)&&p->text=="-1");
+    uint64_t value;
+    if(random){std::random_device entropy;value=(uint64_t(uint32_t(entropy()))<<32)|uint32_t(entropy());}
+    else value=seed(options,"seed",1701);
+    options.object["seed"]=json::from_string(std::to_string(value));
+    options.object["decoder_seed"]=json::from_string(std::to_string(seed(options,"decoder_seed",value)));
 }
 mulacover_job_plan_v1 plan_audio_input(const Config & c,const Input & in){return plan(c,request(c,in));}
 std::string props(const Config & c) {
@@ -262,13 +272,13 @@ Outcome run_native(const Config & config,const Input & in,const Progress & progr
     meta["duration"]=json::from_double(double(result.num_samples)/result.sample_rate);meta["sample_rate"]=json::from_integer(result.sample_rate);meta["channels"]=json::from_integer(2);
     meta["eos"]=json::from_bool(result.stop_reason==MULACOVER_EOS_V1);meta["cache_capacity"]=json::from_integer(result.plan.cache_capacity);
     meta["cursor_sample"]=json::from_integer(result.plan.cursor_sample);meta["context_start_sample"]=json::from_integer(result.plan.context_start_sample);
-    meta["seed"]=json::from_string(std::to_string(job.sampling.seed));meta["sampler_final_offset"]=json::from_string(std::to_string(result.sampler_final_offset));
+    meta["seed"]=json::from_string(std::to_string(job.sampling.seed));meta["decoder_seed"]=json::from_string(std::to_string(job.decoder_seed));meta["sampler_final_offset"]=json::from_string(std::to_string(result.sampler_final_offset));
     meta["decoder_final_offset"]=json::from_string(std::to_string(result.decoder_final_offset));
     meta["encode_seconds"]=json::from_double(result.encode_seconds);meta["generate_seconds"]=json::from_double(result.generate_seconds);meta["decode_seconds"]=json::from_double(result.decode_seconds);
     return out;
 }
 struct Service::Job {
-    std::string id, status="queued",stage="queued",error;
+    std::string id, status="queued",stage="queued",error,seed,decoder_seed;
     std::atomic<bool> cancelled{false};
     double progress=0;int64_t completed=0,total=0;
     Clock::time_point finished{};
@@ -332,9 +342,9 @@ HttpResponse Service::route(const HttpRequest & req){
         std::lock_guard<std::mutex> lock(mutex_);prune();
         if(stopping_)return error_response(503,"Server is stopping","unavailable");
         if(busy_)return error_response(409,"A job is already running","busy");
-        auto job=std::make_shared<Job>();job->input=parse_input(req,config_);do{job->id=id();}while(jobs_.count(job->id));
+        auto job=std::make_shared<Job>();job->input=parse_input(req,config_);job->seed=json::string(job->input.options,"seed");job->decoder_seed=json::string(job->input.options,"decoder_seed");do{job->id=id();}while(jobs_.count(job->id));
         jobs_[job->id]=job;pending_=job;busy_=true;prune();wake_.notify_one();
-        return json_response("{\"success\":true,\"session_id\":"+json::quote(job->id)+"}",202);
+        return json_response("{\"success\":true,\"session_id\":"+json::quote(job->id)+",\"seed\":"+json::quote(job->seed)+",\"decoder_seed\":"+json::quote(job->decoder_seed)+"}",202);
     }
     if(req.path=="/unload"){
         if(!post)return method();std::lock_guard<std::mutex> lock(mutex_);
@@ -357,6 +367,7 @@ HttpResponse Service::route(const HttpRequest & req){
         return {200,"audio/wav",bytes,{{"Content-Disposition",std::string("inline; filename=\"")+(action=="/audio"?"continuation.wav":"guide-and-continuation.wav")+"\""}}};
     }
     auto v=json::object();auto & o=v.object;o["success"]=json::from_bool(j.status!="failed");o["session_id"]=json::from_string(j.id);o["status"]=json::from_string(j.status);
+    o["seed"]=json::from_string(j.seed);o["decoder_seed"]=json::from_string(j.decoder_seed);
     o["generation_in_progress"]=json::from_bool(!j.terminal());o["progress"]=json::from_double(j.progress);o["stage"]=json::from_string(j.stage);o["step"]=json::from_integer(j.completed);o["total_steps"]=json::from_integer(j.total);
     if(!j.error.empty())o["error"]=json::from_string(j.error);
     if(j.status=="completed"){o["audio_url"]=json::from_string("/audio/"+j.id);o["meta"]=j.output.meta;if(!j.output.full_wav.empty())o["full_audio_url"]=json::from_string("/full_audio/"+j.id);}

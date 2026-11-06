@@ -31,6 +31,7 @@ using Runner=std::function<Outcome(const Config &,const Input &,const Progress &
 Outcome run_native(const Config &,const Input &,const Progress &,const Cancel &);
 mulacover_job_plan_v1 plan_audio_input(const Config &,const Input &);
 std::string props(const Config &);
+void resolve_job_seeds(json::Value &); // -1 resolves once, at job admission
 
 // One accepted GPU job at a time. Terminal results expire after 30 minutes;
 // at most four are retained. HTTP callbacks never own model contexts.

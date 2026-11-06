@@ -16,6 +16,8 @@ HttpResponse route(Service & s,const std::string & path,const std::string & meth
 json::Value terminal(Service & s,const std::string & id){for(int i=0;i<400;++i){auto r=route(s,"/poll_status/"+id);CHECK(r.status==200);auto j=json::parse(r.body);if(!json::boolean(j,"generation_in_progress",true))return j;std::this_thread::sleep_for(std::chrono::milliseconds(5));}throw std::runtime_error("worker timeout");}
 int main(){try{
     Config config;config.backend="cpu";config.resolve_models();
+    for(const char * text:{"{}","{\"seed\":-1}","{\"seed\":\"-1\"}"}){auto v=json::parse(text);resolve_job_seeds(v);CHECK(json::string(v,"seed")!="-1"&&json::string(v,"seed")==json::string(v,"decoder_seed"));const auto before=json::string(v,"seed");resolve_job_seeds(v);CHECK(json::string(v,"seed")==before);}
+    auto fixed=json::parse("{\"seed\":\"18446744073709551615\",\"decoder_seed\":12}");resolve_job_seeds(fixed);CHECK(json::u64(fixed,"seed",0)==UINT64_MAX&&json::u64(fixed,"decoder_seed",0)==12);
     Input opening;opening.audio=wave_io::read_wave_bytes(wave());opening.options=json::parse("{\"audio_context_seconds\":1}");
     auto short_plan=plan_audio_input(config,opening);CHECK(short_plan.context_start_sample==0&&short_plan.cursor_sample==3840&&short_plan.guide_frames==1);
     opening.audio.samples.resize(96000);auto one_second=plan_audio_input(config,opening);CHECK(one_second.context_start_sample==0&&one_second.cursor_sample==46080&&one_second.guide_frames==12);
@@ -29,7 +31,7 @@ int main(){try{
     Service s(config,[&](const Config &,const Input & in,const Progress & progress,const Cancel & cancel){
         ++active;maximum.store(std::max(maximum.load(),active.load()));struct Exit{std::atomic<int>& a;~Exit(){--a;}} exit{active};
         if(json::string(in.options,"tags","")=="fail")throw std::runtime_error("injected failure");
-        CHECK(json::u64(in.options,"seed",UINT64_MAX)==UINT64_MAX);
+        CHECK(in.options.find("seed")&&in.options.find("decoder_seed"));
         progress(.7,"sampling",1,2);progress(.4,"sampling",1,2);entered=true;
         while(!finish&&!cancel())std::this_thread::sleep_for(std::chrono::milliseconds(1));
         Outcome out;out.wav="test-wav";out.meta.object["seed"]=json::from_string("18446744073709551615");return out;

@@ -181,6 +181,12 @@ Other options: `guidance` (1.5), `temperature` (1), `top_k` (250),
 `cache_capacity` (0/automatic), `decoder_seed` (1701, independent stream),
 `decoder_steps` (10), `segment_codes` (372), `rng` and `rng_cuda_blocks` (288).
 Pass uint64 seeds as decimal strings to avoid JavaScript's integer precision loss.
+The UI/server seed defaults to `-1` (number or string), resolved once per accepted
+job to a fresh uint64 seed. Admission/poll responses expose that resolved decimal
+string, including failed or cancelled jobs. Re-enter it to replay. Unless supplied
+explicitly, `decoder_seed` follows the resolved sampling seed; an explicit decoder
+seed overrides it. Native C ABI and CLI unsigned seeds/defaults remain unchanged;
+UINT64_MAX remains a valid fixed seed and is not a random sentinel.
 Unknown/duplicate fields, invalid geometry, unsupported score/RNG combinations
 and malformed uploads are rejected. Lyrics/tags are bounded to 16 KiB each,
 options to 64 KiB, MIDI to 4 MiB per lane, and the HTTP body to 128 MiB.
