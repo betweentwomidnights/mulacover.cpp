@@ -1,0 +1,233 @@
+{
+  "reference": "refdata\\native-conditioning",
+  "native": "refdata\\native-conditioning\\laptop-cpu",
+  "upstream_revision": "e27fa7fa0da7c9817879cc6210cc5693f9327946",
+  "style_revision": "97b0c614be4d77ee51c0cef4e5f07c00f9eb65b3",
+  "versions": {
+    "torch": "2.7.1+cu128",
+    "transformers": "4.57.6",
+    "tokenizers": "0.22.1",
+    "numpy": "2.0.2"
+  },
+  "reference_device": "cuda",
+  "attention_oracle": "eager",
+  "stock_control": null,
+  "gates": {
+    "max_abs": 0.001,
+    "relative_l2": 0.0001,
+    "discrete": "exact bytes"
+  },
+  "cases": [
+    {
+      "name": "original",
+      "discrete": {
+        "tokens.i32": true,
+        "mask.u8": true,
+        "style-ids.i32": true,
+        "normalized-lyrics.txt": true,
+        "normalized-tags.txt": true,
+        "muq.f32": true,
+        "prompt_frames": true,
+        "qwen_index": true,
+        "muq_index": true
+      },
+      "floating": {
+        "qwen.f32": {
+          "max_abs": 1.0058283805847168e-07,
+          "relative_l2": 9.86541468200307e-07,
+          "passed": true
+        },
+        "style-hidden.f32": {
+          "max_abs": 2.47955322265625e-05,
+          "relative_l2": 9.721818612655395e-07,
+          "passed": true
+        },
+        "style-layer-0.f32": {
+          "max_abs": 0.0,
+          "relative_l2": 0.0,
+          "passed": true
+        },
+        "style-layer-1.f32": {
+          "max_abs": 1.9073486328125e-06,
+          "relative_l2": 4.348032038561197e-07,
+          "passed": true
+        },
+        "style-layer-14.f32": {
+          "max_abs": 0.00146484375,
+          "relative_l2": 2.2315041929287604e-07,
+          "passed": false
+        },
+        "style-layer-28.f32": {
+          "max_abs": 2.47955322265625e-05,
+          "relative_l2": 9.721818612655395e-07,
+          "passed": true
+        }
+      },
+      "passed": false
+    },
+    {
+      "name": "instrumental",
+      "discrete": {
+        "tokens.i32": true,
+        "mask.u8": true,
+        "style-ids.i32": true,
+        "normalized-lyrics.txt": true,
+        "normalized-tags.txt": true,
+        "muq.f32": true,
+        "prompt_frames": true,
+        "qwen_index": true,
+        "muq_index": true
+      },
+      "floating": {
+        "qwen.f32": {
+          "max_abs": 1.1175870895385742e-07,
+          "relative_l2": 9.979262746670436e-07,
+          "passed": true
+        },
+        "style-hidden.f32": {
+          "max_abs": 2.765655517578125e-05,
+          "relative_l2": 1.0082595136334914e-06,
+          "passed": true
+        },
+        "style-layer-0.f32": {
+          "max_abs": 0.0,
+          "relative_l2": 0.0,
+          "passed": true
+        },
+        "style-layer-1.f32": {
+          "max_abs": 1.9073486328125e-06,
+          "relative_l2": 4.0946835731877973e-07,
+          "passed": true
+        },
+        "style-layer-14.f32": {
+          "max_abs": 0.00146484375,
+          "relative_l2": 2.2318922903000629e-07,
+          "passed": false
+        },
+        "style-layer-28.f32": {
+          "max_abs": 2.765655517578125e-05,
+          "relative_l2": 1.0082595136334914e-06,
+          "passed": true
+        }
+      },
+      "passed": false
+    },
+    {
+      "name": "unicode",
+      "discrete": {
+        "tokens.i32": true,
+        "mask.u8": true,
+        "style-ids.i32": true,
+        "normalized-lyrics.txt": true,
+        "normalized-tags.txt": true,
+        "muq.f32": true,
+        "prompt_frames": true,
+        "qwen_index": true,
+        "muq_index": true
+      },
+      "floating": {
+        "qwen.f32": {
+          "max_abs": 2.1513551473617554e-07,
+          "relative_l2": 1.9926371934150787e-06,
+          "passed": true
+        },
+        "style-hidden.f32": {
+          "max_abs": 9.34600830078125e-05,
+          "relative_l2": 3.466327512328007e-06,
+          "passed": true
+        },
+        "style-layer-0.f32": {
+          "max_abs": 0.0,
+          "relative_l2": 0.0,
+          "passed": true
+        },
+        "style-layer-1.f32": {
+          "max_abs": 3.337860107421875e-06,
+          "relative_l2": 8.00455785803609e-07,
+          "passed": true
+        },
+        "style-layer-14.f32": {
+          "max_abs": 0.00390625,
+          "relative_l2": 6.054660069989973e-07,
+          "passed": false
+        },
+        "style-layer-28.f32": {
+          "max_abs": 9.34600830078125e-05,
+          "relative_l2": 3.466327512328007e-06,
+          "passed": true
+        }
+      },
+      "passed": false
+    },
+    {
+      "name": "empty-style",
+      "discrete": {
+        "tokens.i32": true,
+        "mask.u8": true,
+        "style-ids.i32": true,
+        "normalized-lyrics.txt": true,
+        "normalized-tags.txt": true,
+        "muq.f32": true,
+        "prompt_frames": true,
+        "qwen_index": true,
+        "muq_index": true
+      },
+      "floating": {
+        "qwen.f32": {
+          "max_abs": 0.0,
+          "relative_l2": 0.0,
+          "passed": true
+        }
+      },
+      "passed": true
+    },
+    {
+      "name": "specials",
+      "discrete": {
+        "tokens.i32": true,
+        "mask.u8": true,
+        "style-ids.i32": true,
+        "normalized-lyrics.txt": true,
+        "normalized-tags.txt": true,
+        "muq.f32": true,
+        "prompt_frames": true,
+        "qwen_index": true,
+        "muq_index": true
+      },
+      "floating": {
+        "qwen.f32": {
+          "max_abs": 1.0058283805847168e-07,
+          "relative_l2": 7.210834923489172e-07,
+          "passed": true
+        },
+        "style-hidden.f32": {
+          "max_abs": 7.677078247070312e-05,
+          "relative_l2": 9.607502834590903e-07,
+          "passed": true
+        },
+        "style-layer-0.f32": {
+          "max_abs": 0.0,
+          "relative_l2": 0.0,
+          "passed": true
+        },
+        "style-layer-1.f32": {
+          "max_abs": 9.5367431640625e-07,
+          "relative_l2": 4.5954271721117363e-07,
+          "passed": true
+        },
+        "style-layer-14.f32": {
+          "max_abs": 0.00018310546875,
+          "relative_l2": 3.320770681391612e-08,
+          "passed": true
+        },
+        "style-layer-28.f32": {
+          "max_abs": 7.677078247070312e-05,
+          "relative_l2": 9.607502834590903e-07,
+          "passed": true
+        }
+      },
+      "passed": true
+    }
+  ],
+  "passed": false
+}

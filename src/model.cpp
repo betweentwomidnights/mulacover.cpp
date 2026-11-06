@@ -1,5 +1,6 @@
 #include "internal.h"
 #include "weight-policy.h"
+#include "backend-select.h"
 #include <algorithm>
 #include <cmath>
 #include <cctype>
@@ -89,12 +90,8 @@ void Model::load(const mulacover_config_v1 & config) {
     validate();
     static std::once_flag once; std::call_once(once,[]{ggml_backend_load_all();});
     const std::string requested(config.backend);
-    if(requested!="cpu"&&requested!="cuda") throw std::invalid_argument("Backend must be cpu or cuda");
-    for(size_t i=0;i<ggml_backend_dev_count();++i) {
-        auto dev=ggml_backend_dev_get(i); std::string name=ggml_backend_reg_name(ggml_backend_dev_backend_reg(dev));
-        std::transform(name.begin(),name.end(),name.begin(),[](unsigned char c){return char(std::tolower(c));});
-        if(name==requested) {backend=ggml_backend_dev_init(dev,nullptr);break;}
-    }
+    if(!known_backend(requested.c_str())) throw std::invalid_argument("Backend must be cpu, cuda, vulkan or metal");
+    backend=open_backend(requested,"generator");
     if(!backend) throw std::runtime_error("Requested backend unavailable");
     if(requested=="cpu") {
         auto reg=ggml_backend_dev_backend_reg(ggml_backend_get_device(backend));

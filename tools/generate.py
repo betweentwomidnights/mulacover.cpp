@@ -9,11 +9,12 @@ import os
 import subprocess
 import numpy as np
 from continuation import select_guide,plan_frames,frames_for_seconds
+from ggml_profile import PROFILE, validate_checkout
 
 p=argparse.ArgumentParser(description=__doc__)
 for name in ('reference','model','cli','output','ggml-source'):p.add_argument('--'+name,type=Path,required=True)
 p.add_argument('--flow-model',type=Path);p.add_argument('--sq-model',type=Path)
-p.add_argument('--backend',choices=('cpu','cuda'),default='cuda');p.add_argument('--frames',type=int,help='Total guide plus new frames; default 100')
+p.add_argument('--backend',choices=('cpu','cuda','vulkan','metal'),default='cuda');p.add_argument('--frames',type=int,help='Total guide plus new frames; default 100')
 p.add_argument('--capacity',type=int,help='Cache positions; default rounds required positions up to 256');p.add_argument('--guidance',type=float,default=1.5)
 p.add_argument('--temperature',type=float,default=1);p.add_argument('--top-k',type=int,default=250);p.add_argument('--seed',type=int,default=1701)
 p.add_argument('--decoder-seed',type=int,default=1701);p.add_argument('--decoder-steps',type=int,default=10);p.add_argument('--segment-codes',type=int,default=372)
@@ -27,10 +28,8 @@ p.add_argument('--guide-start-seconds',default='0',help='Start within encoded in
 p.add_argument('--continuation-seconds',help='Requested NEW audio after the guide; mutually exclusive with --frames. EOS may finish earlier.')
 p.add_argument('--sampler-offset',type=int,default=0,help='Explicit initial Torch CUDA Philox offset; teacher-forced guide frames do not draw random numbers')
 a=p.parse_args();root=Path(__file__).resolve().parents[1]
-profile=json.loads((root/'dependencies/ggml-development.json').read_text())
-revision=subprocess.check_output(['git','-C',str(a.ggml_source),'rev-parse','HEAD'],text=True).strip()
-dirty=subprocess.check_output(['git','-C',str(a.ggml_source),'status','--porcelain'],text=True).strip()
-if revision!=profile['revision'] or dirty:raise ValueError('Generation requires the clean isolated development GGML profile')
+profile=PROFILE
+revision=validate_checkout(a.ggml_source)
 if (a.output/'run.json').exists() or (a.output/'provenance.json').exists():raise ValueError('Use a fresh output directory')
 manifest=json.loads((a.reference/'manifest.json').read_text())
 prefix=None;selection=None
@@ -86,7 +85,7 @@ def digest(path):
     with path.open('rb') as f:
         for data in iter(lambda:f.read(16*1024*1024),b''):h.update(data)
     return h.hexdigest()
-report=dict(ggml_revision=revision,shared_baseline=profile['shared_baseline'],ggml_bump_check_started=False,
+report=dict(ggml_revision=revision,shared_baseline=profile['revision'],coordinated_dependency=True,
     command=command,decoder=dict(seed=a.decoder_seed,steps=a.decoder_steps,segment_codes=a.segment_codes,guidance=1.25),
     prepared_manifest_sha256=digest(a.reference/'manifest.json'),upstream_revision=manifest['upstream_revision'],
     model_sha256=digest(a.model),cli_sha256=digest(a.cli),codes_sha256=digest(a.output/'codes.i32'),execution_passed=True,

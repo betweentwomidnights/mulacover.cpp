@@ -1,5 +1,6 @@
 #include "internal.h"
 #include "sampling.h"
+#include "backend-select.h"
 #include <algorithm>
 #include <cstdio>
 #include <cstring>
@@ -34,7 +35,7 @@ int MULACOVER_CALL mulacover_create_v1(const mulacover_config_v1 * c,mulacover_c
     return guard(e,[&]{
         if(!c||c->size<sizeof(*c)||!out||!c->model_path||!*c->model_path||!c->backend||c->threads<1||c->threads>1024||c->cache_capacity<1||c->cache_capacity>8192)
             throw std::invalid_argument("Invalid generator configuration");
-        if(std::strcmp(c->backend,"cpu")&&std::strcmp(c->backend,"cuda"))throw std::invalid_argument("Backend must be cpu or cuda");
+        if(!mula::known_backend(c->backend))throw std::invalid_argument("Backend must be cpu, cuda, vulkan or metal");
         auto p=std::make_unique<mulacover_context>();p->session=std::make_unique<mula::Session>(*c);*out=p.release();
     });
 }

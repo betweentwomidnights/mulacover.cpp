@@ -13,6 +13,8 @@ components retain their respective licenses.
 | betweentwomidnights/heartcodec.cpp | Linked sibling dependency, MIT project source with its own third-party inventory and RNG notices. |
 | betweentwomidnights/ggml | Shared pinned dependency supplied by HeartCodec; retain that fork's license when distributing it. No second GGML copy is bundled here. |
 | betweentwomidnights/sa3.cpp | MIT source; library ownership, capability negotiation, parity and Philox development patterns. |
+| betweentwomidnights/yue2.cpp | MIT source retained in `LICENSES/YuE2-MIT.txt`; native UTF-8/NFC and tokenizer splitting structure adapted for the conditioning frontend. Generated tables use the pinned reference runtimes. The transcription model remains an external sibling dependency. |
+| betweentwomidnights/acestep.cpp | MIT source retained in `LICENSES/ACE-Step-MIT.txt`; Qwen3 encoder graph and lifecycle reference. Its weight loader/backend fallback and tokenizer approximations are not imported. |
 | PyTorch / torchtune / Transformers / Qwen | External reference and model dependencies, not vendored source or checkpoints. Retain their applicable terms when supplying those dependencies. |
 
 The reference scripts execute separately checked-out pinned upstream source.

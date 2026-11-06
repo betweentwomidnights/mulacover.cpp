@@ -1,5 +1,10 @@
 # MuLaCover development dependency
 
+**Historical profile, retired on 2026-11-06.** GGML #22 merged the fix into the
+coordinated `e3db5210` pin. The commands and paths below record the earlier
+isolated experiment. Use [coordinated adoption](GGML_029_ADOPTION.md) and the
+normal build scripts now; the old development parameters are rejected.
+
 The user authorized continued MuLaCover work with the CUDA fix before a coordinated
 GGML bump. Use clean commit `0f2ed045eaff6bf01bed074878b6988248efbc22`, recorded in
 `dependencies/ggml-development.json`, from draft
