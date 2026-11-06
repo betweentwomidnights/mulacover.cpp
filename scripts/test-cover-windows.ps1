@@ -7,7 +7,7 @@ param([string]$Audio,[ValidatePattern('^[A-Za-z0-9_-]+$')][string]$CaseName=('co
   [ValidateRange(0,1048576)][int]$RngCudaBlocks=0,[ValidateRange(0,128)][int]$RngDevice=0,
   [string]$Lyrics='[Instrumental]',
   [string]$Tags='topic:[Instrumental]; genre:[Classical]; instrument:[Violin, Piano]; mood:[dramatic]',
-  [string]$TranscriberCli,[string]$TranscriberModel,[string]$GeneratorModel,[string]$DevelopmentGgml)
+  [string]$TranscriberCli,[string]$TranscriberModel,[string]$GeneratorModel)
 $ErrorActionPreference='Stop'
 if($Rng -eq 'native' -and ($RngCudaBlocks -ne 0 -or $RngDevice -ne 0)){throw 'CUDA RNG options require torch-cuda mode'}
 if($FullSong -and ($PSBoundParameters.ContainsKey('Frames') -or $PSBoundParameters.ContainsKey('Sixteenths'))){throw 'FullSong derives duration from the source; omit Frames and Sixteenths'}
@@ -21,7 +21,7 @@ if(-not $Audio){$Audio=$selected.source_path}
 if(-not $TranscriberCli){$TranscriberCli=Join-Path $siblings 'yue2.cpp/build-ggml027-cuda/bin/Release/yue2-transcribe.exe'}
 if(-not $TranscriberModel){$TranscriberModel=Join-Path $siblings 'yue2.cpp/models/sheetsage2-mert2-f16.gguf'}
 if(-not $GeneratorModel){$GeneratorModel=Join-Path $projectRoot 'models/mulacover-q4_k_m.gguf'}
-if(-not $DevelopmentGgml){$DevelopmentGgml=Join-Path $siblings '_ggml_reviews/cuda-f32-source-b77'}
+$ggml=Join-Path $siblings 'heartcodec.cpp/ggml'
 $localRoot=Join-Path $projectRoot "refdata/covers/$CaseName"
 if(Test-Path -LiteralPath $localRoot){throw 'Use a fresh CaseName; existing outputs are preserved'}
 $transcription=Join-Path $localRoot 'transcription'
@@ -63,8 +63,8 @@ if($FullSong -and -not $PSBoundParameters.ContainsKey('CacheCapacity')){
 }
 if($promptFrames+$Frames-1 -gt $CacheCapacity){throw 'CacheCapacity must hold the prompt and requested frames'}
 & $python (Join-Path $projectRoot 'tools/generate.py') --reference (Join-Path $localRoot 'prepared') `
-  --model $GeneratorModel --cli (Join-Path $projectRoot 'build-windows-development-cuda/bin/Release/mulacover-generate.exe') `
-  --output (Join-Path $localRoot 'generation') --ggml-source $DevelopmentGgml --frames $Frames --capacity $CacheCapacity `
+  --model $GeneratorModel --cli (Join-Path $projectRoot 'build-windows-cuda/bin/Release/mulacover-generate.exe') `
+  --output (Join-Path $localRoot 'generation') --ggml-source $ggml --frames $Frames --capacity $CacheCapacity `
   --rng $Rng --rng-cuda-blocks $RngCudaBlocks --rng-device $RngDevice `
   --flow-model (Join-Path $siblings 'heartcodec.cpp/models/heartcodec-flow-f32.gguf') `
   --sq-model (Join-Path $siblings 'heartcodec.cpp/models/heartcodec-sq-codec-f32.gguf')

@@ -1,0 +1,119 @@
+{
+  "date": "2026-11-06",
+  "scope": "Coordinated dependency adoption and scoped fresh checks; not complete encoder or waveform parity",
+  "ggml": {
+    "repository": "https://github.com/betweentwomidnights/ggml",
+    "revision": "e3db5210fe3ecdaa4d65b4c93d515f2cf15524b7",
+    "upstream_version": "0.29.0",
+    "merged_pr": 22,
+    "subsumed_pr": 21,
+    "new_kernel_changes": false,
+    "normal_heartcodec_target": true,
+    "isolated_override_retired": true
+  },
+  "stack": {
+    "heartcodec_pr3_merge": "ae641f1e6d16135c503f57b63da3fb6037b5b8ab",
+    "encoder_old_head": "fa9e3b68feaa55f5007446f670143254cfd2b89a",
+    "encoder_rebased_head": "3294bbcf47b54e1d365947a67ba81cd682e5d1da",
+    "controlled_work_old_head": "459d74e89b87f9782b4e5e4600e53374fb4dc380",
+    "controlled_work_rebased_head": "90da66aa287a3b405b5115de4c6273179949ddaa",
+    "range_diff_equal_commits": 6,
+    "metal_device_selection_and_broadcast_add_preserved": true,
+    "mulacover_cleanup_base": "568e6f083729d21d5a5626f56810a1a733222022",
+    "existing_negotiated_abi_layouts_changed": false
+  },
+  "builds": [
+    {"platform": "Windows HeartCodec CPU static", "tests_passed": 6, "failed": 0},
+    {"platform": "Windows MuLaCover CPU static", "tests_passed": 12, "failed": 0},
+    {"platform": "Windows MuLaCover CPU DLL, HeartCodec static dependency", "tests_passed": 12, "failed": 0},
+    {"platform": "Windows MuLaCover CUDA static, RTX 5070 Laptop", "tests_passed": 12, "failed": 0},
+    {"platform": "Spark Docker MuLaCover CUDA static, GB10", "tests_passed": 12, "failed": 0}
+  ],
+  "fp32_generator": {
+    "platform": "Spark dedicated Docker CUDA",
+    "reference": "refdata/upstream-f32",
+    "native": "refdata/shared-029-native-cuda",
+    "reference_manifest_sha256": "a42129fa97f295a3241bf46efb2a1a16937321d61723315b56391cfff8c0380a",
+    "model_sha256": "5f3bfcb7bd441301d272546e4bfb7ddd690df45447251100f5e223e036dab62c",
+    "cache_capacity": 256,
+    "cases": [
+      {"name": "conditional", "tensors": 300, "passed_existing_gates": true, "reset_replay_exact": true, "flat_absolute_diagnostic_failures": []},
+      {"name": "cfg-1.5", "tensors": 300, "passed_existing_gates": true, "reset_replay_exact": true, "flat_absolute_diagnostic_failures": [
+        {"tensor": "frame0.stage.backbone.layers.27", "max_abs": 0.00146484375, "relative_l2": 1.9360948104475793e-7},
+        {"tensor": "frame0.stage.peft_layers.27.0", "max_abs": 0.001953125, "relative_l2": 2.1363297177155455e-7}
+      ]}
+    ],
+    "gates_unchanged": {
+      "public_logits_and_kv_max_abs": 0.001,
+      "relative_l2": 0.0001,
+      "activation_atol": 0.001,
+      "activation_rtol": 0.000001,
+      "activation_rule": "Elementwise abs(delta) <= atol + rtol*abs(reference), AND relative L2; separate flat absolute diagnostics remain failed where exceeded"
+    },
+    "longer_128_prompt_suite_revalidated": false
+  },
+  "conditioning": {
+    "windows_static_text_cases_exact": 262,
+    "both_tokenizers_and_python_lower_strip": true,
+    "windows_dll_score_tensors_exact": true,
+    "upstream_rejected_midi_cases_rejected_without_output": 9,
+    "windows_dll_model_free_owned_lifetime_checks_passed": true,
+    "laptop_cuda": {
+      "native": "refdata/conditioning-shared-029-laptop",
+      "cases_passed": ["original", "instrumental", "unicode", "empty-style", "specials"],
+      "max_abs_gate": 0.001,
+      "relative_l2_gate": 0.0001,
+      "discrete_gate": "Exact bytes",
+      "worst_sampled_max_abs": 0.00048828125,
+      "stock_upstream_sdpa_final_embeddings_passed": true,
+      "style_layer_cancel_retry_and_owned_lifetime_passed": true,
+      "raw_comparison_sha256": "cf28e35c0c29e5ac461961b95a983b6c08ccc097878890f8b0ecc8ddb4637cd0"
+    },
+    "spark_cuda": {
+      "native": "refdata/conditioning-shared-029-spark",
+      "cases_passed": ["original", "instrumental", "unicode", "empty-style", "specials"],
+      "max_abs_gate": 0.001,
+      "relative_l2_gate": 0.0001,
+      "discrete_gate": "Exact bytes",
+      "worst_sampled_max_abs": 0.00048828125,
+      "stock_upstream_sdpa_final_embeddings_passed": true
+    }
+  },
+  "model_backed_laptop_cuda": {
+    "generator": "Q4_K_M, unchanged model",
+    "encoder_flow_sq": "Strict F32, unchanged models",
+    "test_job_passed": true,
+    "cancel_stages": ["encoding", "sampling", "flow", "waveform"],
+    "cancelled_outputs_unchanged": true,
+    "successful_repeated_jobs": 2,
+    "cursor_samples": 3528,
+    "source_rate": 44100,
+    "future_pcm_poisoned_with_nan": true,
+    "new_frames_each": 2,
+    "codes_and_audio_same_pin_byte_exact": true,
+    "none_and_supplied_dropped_score_equivalent": true,
+    "progress_monotonic": true,
+    "controlled_codec_cancel_context_reuse_legacy_replay_passed": true,
+    "philox_bulk_chunk_normal_and_exponential_passed": true,
+    "philox_seed_bits": 64,
+    "philox_grid_cap": 288,
+    "full_old_pin_song_hashes_retested": false
+  },
+  "configuration_checks": {
+    "retired_nonempty_cmake_override_rejected": true,
+    "offline_provenance_accepts_clean_coordinated_pin": true,
+    "offline_provenance_rejects_old_isolated_pin": true,
+    "spark_bash_syntax_passed": true,
+    "offline_python_syntax_passed": true
+  },
+  "not_claimed": [
+    "Existing strict Whisper/encoder activation gates or cross-backend RVQ boundary differences resolved",
+    "Complete CPU Qwen intermediate parity; historical layer14 absolute failures remain",
+    "Strict upstream full-song decoded-waveform parity",
+    "Byte identity with old-pin accepted sampled continuation or new-pin listening acceptance",
+    "Fresh Vulkan or Metal execution in this follow-up; separate coordinated bump-check reports retain their own evidence",
+    "Long-running memory leak stress or unrestricted maximum-cache hardware capacity"
+  ],
+  "sibling_repositories_or_bump_check_modified": false,
+  "release_workflows_dispatched": false
+}
