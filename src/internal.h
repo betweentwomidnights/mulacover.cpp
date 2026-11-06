@@ -17,6 +17,7 @@ namespace mula {
 struct Model {
     struct Timing {uint64_t graphs=0,nodes=0;double build_ms=0,allocate_ms=0,upload_ms=0,compute_ms=0,read_ms=0;};
     bool profiling=false;
+    uint64_t score_cache_hits=0,score_cache_misses=0;
     std::map<std::string,Timing> timings;
     ggml_context * ctx=nullptr;
     gguf_context * gguf=nullptr;
@@ -88,6 +89,8 @@ struct Session {
     mulacover_tempo_config_v1 tempo{sizeof(mulacover_tempo_config_v1),0,1,0};
     int capacity=8192,branches=0,position=0,frame_index=0;
     bool stopped=false;
+    bool score_cache_enabled=false;
+    std::array<std::vector<std::vector<float>>,2> score_contexts;
     std::array<int32_t,8> previous{};
     explicit Session(const mulacover_config_v1 &);
     void begin(const mulacover_condition_v1 &);

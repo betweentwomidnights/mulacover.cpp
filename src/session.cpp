@@ -59,10 +59,14 @@ std::vector<float> embed(Session & s,int branch) {
 std::vector<float> run_backbone(Session & s,int branch,Dumps * dumps,std::vector<float> & first_logits) {
     const auto embedding=embed(s,branch);const int n=s.frame_index==0?s.condition.prompt:1;
     Graph g(s.model);g.role="backbone";auto * x=g.input(embedding,3072,n);
+    const bool cache_score=s.score_cache_enabled&&s.tempo.bpm==0;
+    auto & cached=s.score_contexts[size_t(branch)];
+    const bool cache_hit=cache_score&&cached.size()==8;
+    if(cache_score){if(cache_hit)++s.model.score_cache_hits;else ++s.model.score_cache_misses;}
     auto * style=ggml_silu(g.ctx,g.input(branch_input(s.condition.qwen,branch),1024,1));
-    auto * piano=g.input(branch_input(s.condition.piano,branch),256,s.condition.symbolic);
-    auto * drum=g.input(branch_input(s.condition.drum,branch),128,s.condition.symbolic);
-    auto * chord=g.input(branch_input(s.condition.chord,branch),12,s.condition.symbolic);
+    auto * piano=cache_hit?nullptr:g.input(branch_input(s.condition.piano,branch),256,s.condition.symbolic);
+    auto * drum=cache_hit?nullptr:g.input(branch_input(s.condition.drum,branch),128,s.condition.symbolic);
+    auto * chord=cache_hit?nullptr:g.input(branch_input(s.condition.chord,branch),12,s.condition.symbolic);
     auto * one=g.input({1.0f},1,1);
     const auto clock=tempo_bias(s.tempo,s.position,n,s.condition.prompt,s.condition.context_mask,branch);
     const auto score_padding=tempo_padding(s.tempo,s.frame_index==0?s.condition.prompt-1:s.position,
@@ -82,15 +86,20 @@ std::vector<float> run_backbone(Session & s,int branch,Dumps * dumps,std::vector
         x=g.transformer("backbone.layers."+l,x,24,8,s.position,true,{},&s.backbone,layer,branch);
         if(dumps&&(layer==0||layer==13||layer==27))x=g.keep("stage.backbone.layers."+l,x);
         if(layer>=20) {
+            ggml_tensor * context=nullptr;
+            if(cache_hit)context=g.input(cached[size_t(layer-20)],3072,s.condition.symbolic);
+            else {
             const auto a=p+".adaptor";
             auto * cp=g.linear(a+".pianoroll_proj",piano,true);
             auto * cd=g.linear(a+".drum_pianoroll_proj",drum,true);
             auto * cc=g.linear(a+".chord_proj",chord,true);
-            auto * context=g.linear(a+".fusion_proj",ggml_concat(g.ctx,ggml_concat(g.ctx,cp,cd,0),cc,0),true);
+            context=g.linear(a+".fusion_proj",ggml_concat(g.ctx,ggml_concat(g.ctx,cp,cd,0),cc,0),true);
             for(int i=0;i<2;++i)context=g.transformer(a+".decoder.layers."+std::to_string(i),context,8,8,0,false,score_padding);
             context=g.norm(a+".decoder.norm",context);
             context=g.linear(a+".out_proj",context,true);
             if(previous_context)context=ggml_add(g.ctx,previous_context,context);
+            if(cache_score)context=g.keep("score_cache."+l,context);
+            }
             previous_context=context;
             const auto c=p+".cross_attn";
             auto * normalized=g.norm(c+".norm",x);
@@ -109,10 +118,11 @@ std::vector<float> run_backbone(Session & s,int branch,Dumps * dumps,std::vector
     auto * last=ggml_view_2d(g.ctx,x,3072,1,x->nb[1],size_t(n-1)*x->nb[1]);
     g.keep("last_hidden",last);g.keep("raw_logits",g.linear("codebook0_head",last));
     g.execute();first_logits=g.read("raw_logits");if(dumps)collect(g,*dumps);
+    if(cache_score&&!cache_hit){std::vector<std::vector<float>> next;for(int layer=20;layer<28;++layer)next.push_back(g.read("score_cache."+std::to_string(layer)));cached=std::move(next);}
     return g.read("last_hidden");
 }
 }
-Session::Session(const mulacover_config_v1 & config):capacity(config.cache_capacity){const auto * p=std::getenv("MULACOVER_PROFILE");model.profiling=p&&std::string(p)=="1";model.load(config);}
+Session::Session(const mulacover_config_v1 & config):capacity(config.cache_capacity){const auto * p=std::getenv("MULACOVER_PROFILE");model.profiling=p&&std::string(p)=="1";const auto * cache=std::getenv("MULACOVER_SCORE_CACHE");score_cache_enabled=cache&&std::string(cache)=="1";model.load(config);}
 void Session::begin(const mulacover_condition_v1 & c) {
     if(c.size<sizeof(c)||c.prompt_frames<1||c.prompt_frames>capacity||c.symbolic_frames<1||c.symbolic_frames>5000||
        c.qwen_index<0||c.qwen_index>=c.prompt_frames||c.muq_index<0||c.muq_index>=c.prompt_frames||
@@ -139,7 +149,7 @@ void Session::begin(const mulacover_condition_v1 & c) {
     }
     condition=std::move(next);branches=batch;reset();
 }
-void Session::reset(){backbone.clear();decoder.clear();position=0;frame_index=0;stopped=false;previous.fill(0);}
+void Session::reset(){backbone.clear();decoder.clear();for(auto & c:score_contexts)c.clear();position=0;frame_index=0;stopped=false;previous.fill(0);}
 void Session::frame(const int32_t * codes,const char * dump,mulacover_frame_v1 & result,
         const mulacover_sampling_config_v1 * sampling,int32_t * stop) {
     if(!branches||(!codes&&!sampling)||stopped)throw std::invalid_argument("Begin/reset a nonterminal session before requesting frames");
