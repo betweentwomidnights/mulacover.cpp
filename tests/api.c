@@ -4,8 +4,12 @@
 #include "mulacover_continuation.h"
 #include "mulacover_job.h"
 #include "mulacover_conditioning.h"
+#include "mulacover_runtime.h"
 #include <string.h>
 int main(void) {
+    const mulacover_runtime_api_v1 * runtime=mulacover_get_runtime_api(1);
+    if(!runtime||runtime->size<MULACOVER_RUNTIME_API_V1_SIZE||runtime->version!=1||mulacover_get_runtime_api(0)||mulacover_get_runtime_api(2))return 1;
+    if(!runtime->library_version()[0]||!runtime->ggml_version()[0]||!runtime->ggml_commit()[0])return 1;
     const mulacover_conditioning_api_v1 * frontend=mulacover_get_conditioning_api(1);
     if(!frontend||frontend->size<MULACOVER_CONDITIONING_API_V1_SIZE||frontend->version!=1||mulacover_get_conditioning_api(0))return 1;
     const mulacover_job_api_v1 * job=mulacover_get_job_api(1);
