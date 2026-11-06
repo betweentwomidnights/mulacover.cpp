@@ -12,12 +12,29 @@ static GGML instance merely to query its version. Earlier tables stay frozen.
 
 ## Basic UI
 
-Upload a WAV, choose **Audio context duration** and **Maximum new audio**, and pick:
+Upload a WAV, choose a mode and **Audio context duration**:
 
 - **Continue audio:** score-free continuation from the opening of the upload.
+  Choose **Maximum new audio** for this mode.
 - **Transcribe + remix:** SheetSage2 automatically transcribes the full uploaded
   song; its combined melody and chords condition the remix, while the chosen
   opening audio primes MuLaCover. No manual MIDI upload is needed.
+  Duration is derived from the uploaded song; there is no selectable new-audio
+  maximum. The primary playback/download is the full remix, including context.
+
+Remix mode sends `match_source_duration=true` and omits `natural_max_seconds`.
+The server targets floor(source duration / 80ms) total frames and subtracts the
+opening guide frames to derive the remaining generation ceiling. It always
+returns full audio for this policy. A context consuming every complete source
+frame is rejected: shorten it to leave room for generated audio. Source-length
+matching requires automatic full-source transcription and `audio_context_seconds`;
+it cannot be mixed with an explicit new-audio duration.
+
+This is a target, not an EOS override. The model may end early, and the codec's
+80ms frame grid can omit a partial source tail. The UI reports target and actual
+total duration and identifies early endings. No silence padding, time stretching,
+EOS suppression or forced minimum is applied. The continuation-only API remains
+available independently of the remix's full-audio download.
 
 For example, 30 seconds of context always uses source seconds 0..30. There is no
 cursor or separate tail-guide control in this basic UI. Durations are floored to

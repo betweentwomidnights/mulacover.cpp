@@ -19,6 +19,12 @@ int main(){try{
     Input opening;opening.audio=wave_io::read_wave_bytes(wave());opening.options=json::parse("{\"audio_context_seconds\":1}");
     auto short_plan=plan_audio_input(config,opening);CHECK(short_plan.context_start_sample==0&&short_plan.cursor_sample==3840&&short_plan.guide_frames==1);
     opening.audio.samples.resize(96000);auto one_second=plan_audio_input(config,opening);CHECK(one_second.context_start_sample==0&&one_second.cursor_sample==46080&&one_second.guide_frames==12);
+    opening.options=json::parse("{\"audio_context_seconds\":1,\"transcribe\":true,\"transcription_scope\":\"source\",\"match_source_duration\":true}");
+    auto remix=plan_audio_input(config,opening);CHECK(remix.context_start_sample==0&&remix.guide_frames==12&&remix.new_frames==13); // 0.96 + 1.04 = 2s
+    opening.options=json::parse("{\"audio_context_seconds\":0.08,\"transcribe\":true,\"transcription_scope\":\"source\",\"match_source_duration\":true}");
+    for(int n=1;n<=40;++n){opening.audio.samples.resize(size_t(n+1)*3840+17);auto p=plan_audio_input(config,opening);CHECK(p.guide_frames==1&&p.new_frames==n&&p.context_start_sample==0);}
+    opening.audio.samples.resize(4800);opening.options=json::parse("{\"audio_context_seconds\":0.08,\"transcribe\":true,\"transcription_scope\":\"source\",\"match_source_duration\":true}");
+    bool no_room=false;try{plan_audio_input(config,opening);}catch(const std::invalid_argument &){no_room=true;}CHECK(no_room);
     std::atomic<bool> entered{false},finish{false};std::atomic<int> active{0},maximum{0};
     Service s(config,[&](const Config &,const Input & in,const Progress & progress,const Cancel & cancel){
         ++active;maximum.store(std::max(maximum.load(),active.load()));struct Exit{std::atomic<int>& a;~Exit(){--a;}} exit{active};

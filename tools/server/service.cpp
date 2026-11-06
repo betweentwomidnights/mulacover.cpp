@@ -69,6 +69,15 @@ mulacover_job_request_v1 request(const Config & c,const Input & in) {
         r.cursor_sample=r.context_samples=r.guide_samples=frames*frame;
     }
     r.natural_max_seconds=real(v,"natural_max_seconds",30,.08,655.36);
+    if(json::boolean(v,"match_source_duration",false)){
+        if(!json::boolean(v,"transcribe",false)||json::string(v,"transcription_scope","context")!="source"||!v.find("audio_context_seconds"))
+            throw std::invalid_argument("Source-length remix requires automatic full-source transcription and audio_context_seconds");
+        if(v.find("natural_max_seconds"))throw std::invalid_argument("Source-length remix derives its duration; omit natural_max_seconds");
+        const int64_t frame=int64_t(a.rate)*2/25;
+        const int64_t remaining=r.input_audio.num_samples/frame-r.cursor_sample/frame;
+        if(remaining<1)throw std::invalid_argument("Choose an audio context shorter than the song to leave room for the remix");
+        r.natural_max_seconds=std::nextafter(double(remaining)/12.5,INFINITY);
+    }
     r.cache_capacity=int(integer(v,"cache_capacity",0,0,c.max_cache_capacity));
     r.conditioning.guidance=float(real(v,"guidance",1.5,.001,20));
     r.sampling.seed=seed(v,"seed",1701);
@@ -95,6 +104,7 @@ mulacover_job_request_v1 request(const Config & c,const Input & in) {
     if(r.score_mode&&in.melody.empty()&&!transcribe)throw std::invalid_argument("Score-guided continuation needs melody_midi");
     if(!r.score_mode&&(!in.melody.empty()||!in.chords.empty()||!in.drums.empty()))throw std::invalid_argument("MIDI uploads require score_mode provided");
     r.include_full_audio=json::boolean(v,"include_full_audio",false)?1:0;
+    if(json::boolean(v,"match_source_duration",false))r.include_full_audio=1;
     return r;
 }
 mulacover_job_plan_v1 plan(const Config & c,const mulacover_job_request_v1 & r) {
@@ -124,7 +134,7 @@ Input parse_input(const HttpRequest & req,const Config & config) {
     }
     if(!audio)throw std::invalid_argument("Missing audio WAV upload");
     if(in.options.type!=json::Type::object)throw std::invalid_argument("options must be a JSON object");
-    const std::set<std::string> keys={"lyrics","tags","audio_context_seconds","cursor_sample","context_samples","guide_samples","natural_max_seconds","cache_capacity","guidance","seed","top_k","temperature","decoder_seed","decoder_steps","segment_codes","rng","rng_cuda_blocks","score_mode","symbolic_frames","include_full_audio","transcribe","transcription_lane","transcription_scope"};
+    const std::set<std::string> keys={"lyrics","tags","audio_context_seconds","cursor_sample","context_samples","guide_samples","natural_max_seconds","cache_capacity","guidance","seed","top_k","temperature","decoder_seed","decoder_steps","segment_codes","rng","rng_cuda_blocks","score_mode","symbolic_frames","include_full_audio","transcribe","transcription_lane","transcription_scope","match_source_duration"};
     for(const auto & p:in.options.object)if(!keys.count(p.first))throw std::invalid_argument("Unknown option: "+p.first);
     for(const char * key:{"lyrics","tags"}){
         auto text=json::string(in.options,key,"");
@@ -242,6 +252,11 @@ Outcome run_native(const Config & config,const Input & in,const Progress & progr
     auto & result=owned.result;Outcome out;out.wav=wav(result.samples,result.num_samples,result.sample_rate);
     if(result.full_samples)out.full_wav=wav(result.full_samples,result.full_num_samples,result.sample_rate);
     auto & meta=out.meta.object;
+    const bool source_length=json::boolean(in.options,"match_source_duration",false);
+    meta["duration_policy"]=json::from_string(source_length?"source":"natural_max");
+    meta["target_total_duration"]=json::from_double(source_length?double(in.audio.samples.size()/in.audio.channels)/in.audio.rate:double(result.plan.guide_frames+result.plan.new_frames)*.08);
+    meta["actual_total_duration"]=json::from_double(double(result.guide_frames+result.new_frames)*.08);
+    meta["ended_early"]=json::from_bool(result.new_frames<result.plan.new_frames);
     if(automatic)meta["transcription"]=std::move(transcribed.metadata);
     meta["new_frames"]=json::from_integer(result.new_frames);meta["guide_frames"]=json::from_integer(result.guide_frames);
     meta["duration"]=json::from_double(double(result.num_samples)/result.sample_rate);meta["sample_rate"]=json::from_integer(result.sample_rate);meta["channels"]=json::from_integer(2);

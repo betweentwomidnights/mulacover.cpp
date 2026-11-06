@@ -1,0 +1,20 @@
+{
+  "date":"2026-11-06",
+  "scope":"Source-length remix planning and UI; not an exact-duration musical or waveform-parity claim",
+  "policy":"match_source_duration",
+  "total_target":"floor(original source samples / source samples per 80ms frame)",
+  "new_target":"total target frames minus opening guide frames",
+  "primary_remix_output":"Full reconstructed context plus generated audio",
+  "tests":{
+    "two_second_source_with_one_second_context":{"guide_frames":12,"new_frames":13,"total_seconds":2},
+    "one_through_forty_new_frame_boundaries_and_partial_source_tails":true,
+    "context_consuming_whole_source_rejected":true,
+    "legacy_continuation_duration_behavior_preserved":true
+  },
+  "eos_honored":true,
+  "partial_source_tail":"Dropped to complete 80ms frames; displayed target and actual can differ",
+  "padding_time_stretch_or_eos_suppression":false,
+  "existing_abi_layouts_or_ggml_changed":false,
+  "full_new_model_render_repeated":false,
+  "prior_transcription_and_native_audio_integration_evidence":"transcribe-remix-ui.json"
+}
