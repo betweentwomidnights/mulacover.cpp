@@ -108,6 +108,10 @@ ggml_tensor * Graph::transformer(const std::string & p,ggml_tensor * x,int heads
     return ggml_add(ctx,x,linear(p+".mlp.w2",ggml_mul(ctx,gate,up)));
 }
 void Graph::execute() {
+    using Clock=std::chrono::steady_clock;auto start=Clock::now();
+    auto ms=[](auto a,auto b){return std::chrono::duration<double,std::milli>(b-a).count();};
+    Model::Timing * timing=model.profiling?&model.timings[role]:nullptr;
+    if(timing){++timing->graphs;timing->build_ms+=ms(created,start);}
     for(auto & pair:outputs)ggml_build_forward_expand(graph,pair.second);
     for(int i=0;i<ggml_graph_n_nodes(graph);++i) {
         auto * n=ggml_graph_node(graph,i);
@@ -116,13 +120,18 @@ void Graph::execute() {
     allocator=ggml_gallocr_new(ggml_backend_get_default_buffer_type(model.backend));
     if(!allocator||!ggml_gallocr_alloc_graph(allocator,graph))throw std::runtime_error("Cannot allocate generator graph");
     model.graph_bytes=std::max(model.graph_bytes,ggml_gallocr_get_buffer_size(allocator,0));
+    if(timing){timing->nodes+=ggml_graph_n_nodes(graph);timing->allocate_ms+=ms(start,Clock::now());}start=Clock::now();
     for(const auto & b:bindings)ggml_backend_tensor_set(b.tensor,b.bytes.data(),0,b.bytes.size());
+    if(timing)timing->upload_ms+=ms(start,Clock::now());start=Clock::now();
     if(ggml_backend_graph_compute(model.backend,graph)!=GGML_STATUS_SUCCESS)throw std::runtime_error("Generator graph execution failed");
+    if(timing)timing->compute_ms+=ms(start,Clock::now());
 }
 std::vector<float> Graph::read(const std::string & name) const {
+    const auto start=std::chrono::steady_clock::now();
     auto * t=outputs.at(name);std::vector<float> data(size_t(ggml_nelements(t)));
     ggml_backend_tensor_get(t,data.data(),0,data.size()*4);
     if(!std::all_of(data.begin(),data.end(),[](float x){return std::isfinite(x);}))throw std::runtime_error("Nonfinite native tensor: "+name);
+    if(model.profiling)model.timings[role].read_ms+=std::chrono::duration<double,std::milli>(std::chrono::steady_clock::now()-start).count();
     return data;
 }
 }

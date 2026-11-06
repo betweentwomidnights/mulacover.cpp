@@ -7,6 +7,7 @@
 #include "ggml-alloc.h"
 #include "gguf.h"
 #include <array>
+#include <chrono>
 #include <map>
 #include <memory>
 #include <string>
@@ -14,6 +15,9 @@
 
 namespace mula {
 struct Model {
+    struct Timing {uint64_t graphs=0,nodes=0;double build_ms=0,allocate_ms=0,upload_ms=0,compute_ms=0,read_ms=0;};
+    bool profiling=false;
+    std::map<std::string,Timing> timings;
     ggml_context * ctx=nullptr;
     gguf_context * gguf=nullptr;
     ggml_backend_t backend=nullptr;
@@ -43,6 +47,8 @@ struct Cache {
 };
 struct Binding { ggml_tensor * tensor; std::vector<uint8_t> bytes; };
 struct Graph {
+    std::string role="other";
+    std::chrono::steady_clock::time_point created=std::chrono::steady_clock::now();
     Model & model;
     ggml_context * ctx=nullptr;
     ggml_cgraph * graph=nullptr;

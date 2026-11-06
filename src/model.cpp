@@ -9,9 +9,11 @@
 #include <set>
 #include <stdexcept>
 #include <cstring>
+#include <cstdio>
 
 namespace mula {
 Model::~Model() {
+    if(profiling)for(const auto & p:timings){const auto & t=p.second;std::fprintf(stderr,"[mulacover-profile] {\"role\":\"%s\",\"graphs\":%llu,\"nodes\":%llu,\"build_ms\":%.3f,\"allocate_ms\":%.3f,\"upload_ms\":%.3f,\"compute_ms\":%.3f,\"read_ms\":%.3f}\n",p.first.c_str(),(unsigned long long)t.graphs,(unsigned long long)t.nodes,t.build_ms,t.allocate_ms,t.upload_ms,t.compute_ms,t.read_ms);}
     if(buffer) ggml_backend_buffer_free(buffer);
     if(ctx) ggml_free(ctx);
     if(gguf) gguf_free(gguf);

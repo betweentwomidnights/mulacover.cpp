@@ -2,6 +2,7 @@
 #include "sampling.h"
 #include <algorithm>
 #include <cmath>
+#include <cstdlib>
 #include <filesystem>
 #include <stdexcept>
 
@@ -24,7 +25,7 @@ void collect(Graph & g,Dumps & values) {
 }
 std::vector<float> embed(Session & s,int branch) {
     const bool first=s.frame_index==0;const int n=first?s.condition.prompt:1;
-    Graph g(s.model);ggml_tensor * x=nullptr;
+    Graph g(s.model);g.role="embedding";ggml_tensor * x=nullptr;
     for(int q=0;q<9;++q) {
         std::vector<int32_t> token(size_t(n),0);std::vector<float> mask(size_t(n),0);
         for(int t=0;t<n;++t) {
@@ -57,7 +58,7 @@ std::vector<float> embed(Session & s,int branch) {
 }
 std::vector<float> run_backbone(Session & s,int branch,Dumps * dumps,std::vector<float> & first_logits) {
     const auto embedding=embed(s,branch);const int n=s.frame_index==0?s.condition.prompt:1;
-    Graph g(s.model);auto * x=g.input(embedding,3072,n);
+    Graph g(s.model);g.role="backbone";auto * x=g.input(embedding,3072,n);
     auto * style=ggml_silu(g.ctx,g.input(branch_input(s.condition.qwen,branch),1024,1));
     auto * piano=g.input(branch_input(s.condition.piano,branch),256,s.condition.symbolic);
     auto * drum=g.input(branch_input(s.condition.drum,branch),128,s.condition.symbolic);
@@ -111,7 +112,7 @@ std::vector<float> run_backbone(Session & s,int branch,Dumps * dumps,std::vector
     return g.read("last_hidden");
 }
 }
-Session::Session(const mulacover_config_v1 & config):capacity(config.cache_capacity){model.load(config);}
+Session::Session(const mulacover_config_v1 & config):capacity(config.cache_capacity){const auto * p=std::getenv("MULACOVER_PROFILE");model.profiling=p&&std::string(p)=="1";model.load(config);}
 void Session::begin(const mulacover_condition_v1 & c) {
     if(c.size<sizeof(c)||c.prompt_frames<1||c.prompt_frames>capacity||c.symbolic_frames<1||c.symbolic_frames>5000||
        c.qwen_index<0||c.qwen_index>=c.prompt_frames||c.muq_index<0||c.muq_index>=c.prompt_frames||
@@ -169,7 +170,7 @@ void Session::frame(const int32_t * codes,const char * dump,mulacover_frame_v1 &
     guide_and_select(0);
     for(int q=1;q<8;++q) {
         for(int branch=0;branch<branches;++branch) {
-            Graph g(model);
+            Graph g(model);g.role="local";
             auto * audio=ggml_get_rows(g.ctx,model.get("audio_embeddings.weight"),g.ids({selected[size_t(q-1)]+(q-1)*8197}));
             auto * input=q==1?ggml_concat(g.ctx,g.input(hidden[size_t(branch)],3072,1),audio,1):audio;
             auto * x=g.linear("projection",input);
