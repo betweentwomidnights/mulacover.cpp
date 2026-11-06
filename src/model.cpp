@@ -13,7 +13,7 @@
 
 namespace mula {
 Model::~Model() {
-    if(profiling){size_t graph_storage=0;for(auto & p:workspaces)graph_storage+=ggml_gallocr_get_buffer_size(p.second->allocator,0);
+    if(profiling){size_t graph_storage=0;for(auto & p:workspaces)graph_storage+=p.second->buffer_bytes;
         size_t metadata=0;for(auto & p:workspaces)metadata+=ggml_get_mem_size(p.second->ctx);
         std::fprintf(stderr,"[mulacover-optimization-memory] device_score_peak_bytes=%llu workspace_buffer_bytes=%llu workspace_metadata_bytes=%llu workspace_count=%llu\n",(unsigned long long)device_score_bytes,(unsigned long long)graph_storage,(unsigned long long)metadata,(unsigned long long)workspaces.size());}
     if(profiling)std::fprintf(stderr,"[mulacover-score-cache] hits=%llu misses=%llu\n",(unsigned long long)score_cache_hits,(unsigned long long)score_cache_misses);

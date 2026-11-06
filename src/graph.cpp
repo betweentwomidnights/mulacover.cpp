@@ -151,6 +151,7 @@ void Graph::execute() {
     if(workspace&&!ggml_gallocr_reserve(allocator,graph))throw std::runtime_error("Cannot reserve reusable generator graph");
     if(!allocator||!ggml_gallocr_alloc_graph(allocator,graph))throw std::runtime_error("Cannot allocate generator graph");
     model.graph_bytes=std::max(model.graph_bytes,ggml_gallocr_get_buffer_size(allocator,0));
+    if(workspace)workspace->buffer_bytes=ggml_gallocr_get_buffer_size(allocator,0);
     if(timing){timing->nodes+=ggml_graph_n_nodes(graph);timing->allocate_ms+=ms(start,Clock::now());}start=Clock::now();
     for(const auto & b:bindings)ggml_backend_tensor_set(b.tensor,b.bytes.data(),0,b.bytes.size());
     if(timing)timing->upload_ms+=ms(start,Clock::now());start=Clock::now();

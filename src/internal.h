@@ -19,6 +19,7 @@ struct GraphWorkspace {
     ggml_context * ctx=nullptr;
     ggml_gallocr_t allocator=nullptr;
     int nodes=0;
+    size_t buffer_bytes=0;
     bool in_use=false;
     GraphWorkspace(ggml_backend_t,int);
     ~GraphWorkspace();

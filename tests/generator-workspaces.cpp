@@ -35,5 +35,8 @@ int main(){try{
     compute("local.1",1,false);
     // The independent default path must still work with no workspace allocation.
     m.graph_reuse=false;compute("unused",3,true);if(m.workspaces.count("unused"))throw std::runtime_error("Default path allocated a workspace");
+    // Profiling after graph-construction failure must not query an allocator
+    // that has never reserved a buffer.
+    m.graph_reuse=true;{mula::Graph unexecuted(m,"unexecuted");}m.profiling=true;
     std::cout<<"Workspace shape/output changes and unwind passed\n";return 0;
 }catch(const std::exception & e){std::cerr<<e.what()<<'\n';return 1;}}
