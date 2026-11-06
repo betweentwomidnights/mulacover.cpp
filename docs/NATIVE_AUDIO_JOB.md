@@ -1,5 +1,8 @@
 # Native PCM continuation job
 
+The original replay and memory results retain their recorded dependency profile.
+Current commands use the coordinated [GGML 0.29 pin](GGML_029_ADOPTION.md).
+
 `mulacover_get_job_api(1)` from `mulacover_job.h` accepts borrowed PCM and prepared
 conditioning and returns owned **new audio only**, without Python or temporary
 RVQ files. It stages HeartCodec's F32 encoder, the generator, then F32 flow and
@@ -69,7 +72,8 @@ Placement, device-rate conversion and join treatment belong to the downstream.
 
 ## Native tool
 
-Build with the existing Windows script and isolated development GGML profile.
+Build with `scripts/build-windows.ps1 -Backend cuda` and HeartCodec's coordinated
+GGML target; see [GGML 0.29 adoption](GGML_029_ADOPTION.md).
 `mulacover-continue` reads PCM16/24/32 or F32 RIFF WAV natively; preset preparation
 remains an offline boundary. Example from the repository root:
 
@@ -77,7 +81,7 @@ remains an offline boundary. Example from the repository root:
 $env:GGML_CUDA_TF32='0'
 $env:GGML_CUDA_CUBLAS_COMPUTE_TYPE='auto'
 $env:CUBLAS_WORKSPACE_CONFIG=':4096:8'
-./build-windows-development-cuda/bin/Release/mulacover-continue.exe `
+./build-windows-cuda/bin/Release/mulacover-continue.exe `
   --audio C:/Users/thegr/Music/billiegasm_yuey.wav `
   --input refdata/cursor-continuation/input `
   --output refdata/cursor-continuation/new-pcm-job `

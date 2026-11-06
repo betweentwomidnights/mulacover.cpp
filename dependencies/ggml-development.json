@@ -1,8 +1,0 @@
-{
-  "repository": "https://github.com/betweentwomidnights/ggml.git",
-  "shared_baseline": "b77ae790e628270af46a8af1eca38441c23f1252",
-  "revision": "0f2ed045eaff6bf01bed074878b6988248efbc22",
-  "branch": "fix/cuda-f32-source-precision-b77",
-  "pull_request": "https://github.com/betweentwomidnights/ggml/pull/21",
-  "scope": "MuLaCover development only; coordinated sibling bumps and ggml-bump-check deferred by user"
-}

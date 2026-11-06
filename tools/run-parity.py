@@ -9,6 +9,7 @@ import subprocess
 import threading
 import time
 import numpy as np
+from ggml_profile import PIN, validate_checkout
 
 
 def metric(expected,actual,activation=False):
@@ -81,26 +82,18 @@ def main():
     p.add_argument("--cases",default="conditional,cfg-1.5")
     p.add_argument("--reuse",action="store_true")
     p.add_argument("--ggml-source",type=Path,required=True)
-    p.add_argument("--review-ggml-revision",help="Full SHA of an unadopted GGML review candidate descending from the shared baseline")
     p.add_argument("--capacity",type=int,default=8192)
     p.add_argument("--measure-quantization",action="store_true",help="Measure drift; FP32 gates remain diagnostics and are not relaxed")
     p.add_argument("--sample-device-memory",action="store_true")
     a=p.parse_args()
     m=json.loads((a.reference/"manifest.json").read_text())
     if m['generator_dtype']!='float32':raise ValueError("This first native baseline requires FP32 oracle tensors")
-    pin='b77ae790e628270af46a8af1eca38441c23f1252'
-    git_env=dict(os.environ,GIT_OPTIONAL_LOCKS='0')
-    revision=subprocess.check_output(['git','-C',str(a.ggml_source),'rev-parse','HEAD'],text=True,env=git_env).strip()
-    dirty=subprocess.check_output(['git','-C',str(a.ggml_source),'status','--porcelain'],text=True,env=git_env).strip()
-    expected=a.review_ggml_revision or pin
-    if len(expected)!=40 or any(c not in '0123456789abcdef' for c in expected):raise ValueError('Expected GGML revision must be a full lowercase commit SHA')
-    if revision!=expected or dirty:raise ValueError('Parity requires the requested clean GGML revision')
-    if a.review_ggml_revision:
-        subprocess.run(['git','-C',str(a.ggml_source),'merge-base','--is-ancestor',pin,revision],check=True,env=git_env)
+    pin=PIN
+    revision=validate_checkout(a.ggml_source)
     report=dict(reference_manifest_sha256=hashlib.sha256((a.reference/"manifest.json").read_bytes()).hexdigest(),
         upstream_revision=m['upstream_revision'],checkpoint_revision=m['models']['generator']['revision'],
         ggml_revision=revision,ggml_worktree_clean=True,shared_ggml_baseline=pin,
-        unadopted_review_candidate=bool(a.review_ggml_revision),
+        unadopted_review_candidate=False,
         backend=a.backend,cache_capacity=a.capacity,evaluation_mode='quantization_measurement' if a.measure_quantization else 'fp32_parity',
         quantization_accuracy_accepted=False if a.measure_quantization else None,
         gates=dict(logits_and_cache_max_abs=1e-3,relative_l2=1e-4,

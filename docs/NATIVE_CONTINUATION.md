@@ -1,5 +1,8 @@
 # Native continuation and next milestones
 
+Dependency adoption now follows [the coordinated GGML 0.29 profile](GGML_029_ADOPTION.md).
+Earlier measurements below retain their original pin provenance.
+
 The runtime target is a C++ DAW worker that accepts an audio guide, optional
 symbolic score and style conditioning, primes the generator, and returns only
 new audio. Two useful workflows are score-guided transformation/continuation
@@ -65,7 +68,7 @@ For the existing cached regression fixture, run from the repository root:
 $env:GGML_CUDA_TF32='0'
 $env:GGML_CUDA_CUBLAS_COMPUTE_TYPE='auto'
 $env:CUBLAS_WORKSPACE_CONFIG=':4096:8'
-./build-windows-development-cuda/bin/Release/mulacover-generate.exe `
+./build-windows-cuda/bin/Release/mulacover-generate.exe `
   --model models/mulacover-q4_k_m.gguf `
   --input refdata/covers/billiegasm-full-acoustic/generation-q4-philox-laptop/input `
   --output refdata/native-continuation/new-run `
@@ -141,8 +144,8 @@ the newer PCM job also incorporates the full encoder port. Numerical gates
 remain unchanged. The prior full-song strict
 decoder waveform comparison with upstream still fails and requires diagnostics.
 No claim of a hard BPM lock or arbitrary-song quality follows from this work.
-Shared GGML stays at the agreed baseline with the already-authorized isolated
-development override; no sibling bump or ggml-bump-check is initiated.
+Shared GGML now uses the coordinated `e3db5210` pin after the sibling adoption.
+The isolated override is retired; historical reports retain their original pin.
 
 Validation is recorded in `docs/validation/native-continuation.json`:
 

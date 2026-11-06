@@ -1,5 +1,9 @@
 # Native conditioning preparation
 
+The numerical/audio results below retain their original `0f2ed045` provenance.
+Current builds use the coordinated [GGML 0.29 pin](GGML_029_ADOPTION.md); its
+follow-up validation is separate and does not overwrite the earlier hashes.
+
 `mulacover_conditioning.h` adds a separate negotiated C capability for UTF-8 text,
 prompt construction, symbolic score tensors and the unquantized Qwen3-Embedding-
 0.6B style encoder. `mulacover-continue` can now run text + raw PCM through stereo
@@ -118,13 +122,13 @@ future information.
 
 ## Native commands
 
-From this repository with the current development GGML build and local assets:
+From this repository with the coordinated GGML build and local assets:
 
 ```powershell
 $env:GGML_CUDA_TF32='0'
 $env:GGML_CUDA_CUBLAS_COMPUTE_TYPE='auto'
 $env:CUBLAS_WORKSPACE_CONFIG=':4096:8'
-./build-windows-development-cuda/bin/Release/mulacover-continue.exe `
+./build-windows-cuda/bin/Release/mulacover-continue.exe `
   --audio C:/Users/thegr/Music/billiegasm_yuey.wav `
   --tokenizers-model models/mulacover-conditioning-tokenizers.gguf `
   --style-model models/mulacover-style-f32.gguf `
@@ -149,7 +153,8 @@ Reference preparation, model conversion, Unicode generation and comparison remai
 offline tools. Run Spark work only through the dedicated Docker workflow:
 `reference/run-spark.sh conditioning`, `conditioning-controls`,
 `conditioning-unicode`, `conditioning-text-score`, and
-`conditioning-native-development`. Conversion pins the existing generator/style
+`conditioning-native`. Conversion pins the existing generator/style
 checkpoints; model/tokenizer GGUFs and raw fixtures stay outside Git. Fresh native
-output directories are required. The shared pin remains b77ae79 and the authorized
-isolated CUDA target remains 0f2ed045; coordinated adoption is still deferred.
+output directories are required. The shared pin is now `e3db5210` through GGML
+#22. Earlier `0f2ed045` results above remain historical; the isolated override
+and development commands are retired.

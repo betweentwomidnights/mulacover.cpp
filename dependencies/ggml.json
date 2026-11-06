@@ -1,0 +1,8 @@
+{
+  "repository": "https://github.com/betweentwomidnights/ggml.git",
+  "revision": "e3db5210fe3ecdaa4d65b4c93d515f2cf15524b7",
+  "upstream_version": "0.29.0",
+  "branch": "feature/shared-sa3-acestep-v0.17",
+  "pull_request": "https://github.com/betweentwomidnights/ggml/pull/22",
+  "source": "heartcodec::heartcodec shares the downstream GGML target; standalone builds use HeartCodec's coordinated submodule"
+}
