@@ -9,9 +9,16 @@
 #include <set>
 #include <stdexcept>
 #include <cstring>
+#include <cstdio>
 
 namespace mula {
 Model::~Model() {
+    if(profiling){size_t graph_storage=0;for(auto & p:workspaces)graph_storage+=p.second->buffer_bytes;
+        size_t metadata=0;for(auto & p:workspaces)metadata+=ggml_get_mem_size(p.second->ctx);
+        std::fprintf(stderr,"[mulacover-optimization-memory] device_score_peak_bytes=%llu workspace_buffer_bytes=%llu workspace_metadata_bytes=%llu workspace_count=%llu\n",(unsigned long long)device_score_bytes,(unsigned long long)graph_storage,(unsigned long long)metadata,(unsigned long long)workspaces.size());}
+    if(profiling)std::fprintf(stderr,"[mulacover-score-cache] hits=%llu misses=%llu\n",(unsigned long long)score_cache_hits,(unsigned long long)score_cache_misses);
+    if(profiling)for(const auto & p:timings){const auto & t=p.second;std::fprintf(stderr,"[mulacover-profile] {\"role\":\"%s\",\"graphs\":%llu,\"nodes\":%llu,\"build_ms\":%.3f,\"allocate_ms\":%.3f,\"upload_ms\":%.3f,\"compute_ms\":%.3f,\"read_ms\":%.3f}\n",p.first.c_str(),(unsigned long long)t.graphs,(unsigned long long)t.nodes,t.build_ms,t.allocate_ms,t.upload_ms,t.compute_ms,t.read_ms);}
+    workspaces.clear(); // Allocators and arenas must die before their backend.
     if(buffer) ggml_backend_buffer_free(buffer);
     if(ctx) ggml_free(ctx);
     if(gguf) gguf_free(gguf);
@@ -114,6 +121,20 @@ void Model::load(const mulacover_config_v1 & config) {
     }
 }
 Cache::~Cache(){if(buffer)ggml_backend_buffer_free(buffer);if(ctx)ggml_free(ctx);}
+DeviceScoreCache::~DeviceScoreCache(){clear();}
+void DeviceScoreCache::clear(){if(buffer)ggml_backend_buffer_free(buffer);if(ctx)ggml_free(ctx);buffer=nullptr;ctx=nullptr;layers={};last_context=nullptr;ready=false;}
+void DeviceScoreCache::allocate(Model & model,int symbolic) {
+    clear();ctx=ggml_init({1024*1024,nullptr,true});
+    if(!ctx)throw std::runtime_error("Cannot allocate device score metadata");
+    for(auto & l:layers) {
+        l.affine=ggml_new_tensor_2d(ctx,GGML_TYPE_F32,6144,1);
+        auto kv=[&](int dim,int heads){return AttentionKV{ggml_new_tensor_3d(ctx,GGML_TYPE_F32,dim,symbolic,heads),ggml_new_tensor_3d(ctx,GGML_TYPE_F32,dim,symbolic,heads)};};
+        l.attention=kv(384,8);l.gate=kv(12,1);
+    }
+    last_context=ggml_new_tensor_2d(ctx,GGML_TYPE_F32,3072,symbolic);
+    buffer=ggml_backend_alloc_ctx_tensors(ctx,model.backend);
+    if(!buffer)throw std::runtime_error("Cannot allocate device score buffers");
+}
 void Cache::allocate(Model & model,int layers,int dim,int heads,int cap,int batch) {
     if(buffer) {ggml_backend_buffer_free(buffer);buffer=nullptr;}
     if(ctx) {ggml_free(ctx);ctx=nullptr;}

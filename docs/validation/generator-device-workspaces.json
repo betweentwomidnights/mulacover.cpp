@@ -1,0 +1,252 @@
+{
+  "date": "2026-11-06",
+  "scope": "Opt-in generator-only device projection caching and reusable metadata/allocator storage; fresh matched controls",
+  "implementation_commit": "2a5462c2d4bfda673325ed41b561601970b40fe1",
+  "parent_commit": "e85548be8a12652f5cd7b1fe5b4a91d5a6aefe39",
+  "ggml_revision": "e3db5210fe3ecdaa4d65b4c93d515f2cf15524b7",
+  "ggml_changed": false,
+  "frozen_abi_layouts_changed": false,
+  "default_enabled": false,
+  "flags": {
+    "device": "MULACOVER_DEVICE_CACHE=1",
+    "workspace": "MULACOVER_GRAPH_REUSE=1",
+    "legacy_host": "MULACOVER_SCORE_CACHE=1; device takes precedence",
+    "profile": "MULACOVER_PROFILE=1"
+  },
+  "workload": {
+    "model_loading_included": false,
+    "teacher_frames": 12,
+    "trial_orders": [
+      [
+        "baseline",
+        "host",
+        "device",
+        "reuse",
+        "both"
+      ],
+      [
+        "both",
+        "reuse",
+        "device",
+        "host",
+        "baseline"
+      ],
+      [
+        "device",
+        "baseline",
+        "both",
+        "host",
+        "reuse"
+      ]
+    ],
+    "guidance": 1.5,
+    "replays": 2,
+    "gpu": "RTX 5070 Laptop 8GB",
+    "score": "dropped/-1",
+    "cold_preparation_included": true,
+    "capacity": 256,
+    "total_device_mib": 8123,
+    "prompt_frames": 17,
+    "timed_dumps": false,
+    "model": "Q4_K_M",
+    "ggml_cuda_graphs": false,
+    "symbolic_frames": 540
+  },
+  "short_seconds": {
+    "baseline": [
+      4.34354,
+      4.22593,
+      4.07121
+    ],
+    "host": [
+      3.79541,
+      3.8543,
+      3.73142
+    ],
+    "device": [
+      2.0977,
+      2.13419,
+      2.12945
+    ],
+    "reuse": [
+      3.78768,
+      3.80504,
+      3.81605
+    ],
+    "both": [
+      2.00668,
+      2.01421,
+      2.0086
+    ]
+  },
+  "medians": {
+    "baseline": {
+      "time_reduction_percent": 0.0,
+      "seconds": 4.22593
+    },
+    "host": {
+      "time_reduction_percent": 10.187580011973695,
+      "seconds": 3.79541
+    },
+    "device": {
+      "time_reduction_percent": 49.60990835153446,
+      "seconds": 2.12945
+    },
+    "reuse": {
+      "time_reduction_percent": 9.959701178202195,
+      "seconds": 3.80504
+    },
+    "both": {
+      "time_reduction_percent": 52.469633903069855,
+      "seconds": 2.0086
+    }
+  },
+  "smaller_provided_score": {
+    "baseline_median": 2.85584,
+    "time_reduction_percent": 31.47725362765421,
+    "teacher_frames": 12,
+    "replays": 2,
+    "baseline_seconds": [
+      2.85584,
+      2.87612,
+      2.84287
+    ],
+    "combined_seconds": [
+      1.93872,
+      1.96163,
+      1.9569
+    ],
+    "symbolic_frames": 128,
+    "combined_median": 1.9569
+  },
+  "fp32_spark_docker": {
+    "flat_absolute_failures_retained": {
+      "cfg-1.5": [
+        "frame0.stage.backbone.layers.27",
+        "frame0.stage.peft_layers.27.0"
+      ],
+      "conditional": []
+    },
+    "tensors": 600,
+    "model_sha256": "5f3bfcb7bd441301d272546e4bfb7ddd690df45447251100f5e223e036dab62c",
+    "passed_existing_rules": true,
+    "reference_manifest_sha256": "a42129fa97f295a3241bf46efb2a1a16937321d61723315b56391cfff8c0380a",
+    "ggml_worktree_clean": true,
+    "final_source_recheck_passed": true
+  },
+  "q4_tensor_comparisons": [
+    {
+      "tensors_byte_exact": 100,
+      "candidate": "current uncached refactor",
+      "reference": "previous uncached frame11"
+    },
+    {
+      "tensors_byte_exact": 100,
+      "candidate": "device only",
+      "reference": "current uncached frame11"
+    },
+    {
+      "tensors_byte_exact": 100,
+      "candidate": "workspaces only",
+      "reference": "current uncached frame11"
+    },
+    {
+      "tensors_byte_exact": 100,
+      "candidate": "combined",
+      "reference": "current uncached frame11"
+    },
+    {
+      "tensors_byte_exact": 100,
+      "candidate": "combined flags with device cache bypassed",
+      "reference": "uncached tempo120/local-window frame2"
+    }
+  ],
+  "lifecycle": {
+    "toy_cpu_workspace_shape_output_and_exception_unwind_passed": true,
+    "cold_original_restoration_exact": true,
+    "tempo_device_cache_hits": 0,
+    "changed_score_observed": true,
+    "changed_style_observed": true,
+    "reset_replay_exact": true,
+    "symbolic_shape_and_cfg_branch_replacement_exact": true
+  },
+  "provided_sampling": {
+    "codes_byte_exact": true,
+    "guide_frames": 12,
+    "codes_sha256": "a37a2f3b92fe28c4e5b1980d5606412645cf0559b989eed6b4c33289520ca7b5",
+    "new_frames": 20,
+    "frames": 32,
+    "cap": 288,
+    "replay_bit_exact": true,
+    "terminal_contract_passed": true,
+    "sampler_final_offset": 640,
+    "eos": false,
+    "rng": "torch-cuda",
+    "codes": 256,
+    "seed": "18446744073709551615",
+    "symbolic_frames": 128
+  },
+  "full_context_validation": {
+    "baseline_seconds_with_checks": 188.371,
+    "cap": 288,
+    "rng": "torch-cuda",
+    "score_mode": "none",
+    "codes_sha256": "ba4052805b45355b9f7270431697c34fc15ba58bca23f377cb22bbbf6740ddab",
+    "eos": true,
+    "frames": 1085,
+    "combined_memory": {
+      "samples": 305,
+      "scope": "Whole physical GPU including desktop and other processes; roughly 200ms plus nvidia-smi latency",
+      "before_mib": 737,
+      "peak_mib": 4688
+    },
+    "requested_new_seconds": 90,
+    "sampler_final_offset": 22848,
+    "codes_byte_exact": true,
+    "decode_performed": false,
+    "codes": 8680,
+    "prompt_frames": 25,
+    "time_reduction_percent": 57.30276953458866,
+    "baseline_memory": {
+      "samples": 702,
+      "scope": "Whole physical GPU including desktop and other processes; roughly 200ms plus nvidia-smi latency",
+      "before_mib": 737,
+      "peak_mib": 4579
+    },
+    "guide_frames": 372,
+    "symbolic_frames": 540,
+    "seed": "1701",
+    "historical_listening_output_equality_claimed": false,
+    "capacity": 1536,
+    "historical_control_note": "Uses native-prepared Qwen bytes, which differ from historical cached upstream preparation. Only the fresh baseline/combined comparison is asserted; original guide codes match.",
+    "combined_seconds_with_checks": 80.4292,
+    "new_frames": 713
+  },
+  "storage": {
+    "public_graph_memory_field": "Existing per-graph high-water only; persistent score/workspace costs reported separately",
+    "workspace_count": 9,
+    "workspace_cpu_metadata_bytes": 48490512,
+    "device_score_bytes_cfg540": 226832384,
+    "plans_rebuilt_each_call": true,
+    "short_workspace_buffer_bytes": 50039424,
+    "host_score_vectors_used_with_device_cache": false,
+    "complete_graph_construction_cached": false
+  },
+  "tests": {
+    "windows_cuda_static": 15,
+    "windows_cpu_dll": 14,
+    "failures": 0,
+    "spark_docker_cuda_static": 15
+  },
+  "native_cli_sha256": "e3dcfeb77e22cf034b8d7c98faff4b3cd2c2fac7607b2cab531c00c910895184",
+  "generator_cli_sha256": "b8a7472c902f14547950df3da7c93d4e491c4b01cedfe97d35777863ff8132e5",
+  "limitations": [
+    "Generator time only; model loading, transcription, preparation, encoding and decoding excluded from short timings.",
+    "Long run is one diagnostic pair with nvidia-smi monitoring; not a statistical long-song benchmark. Brief CUDA smoke tests ran near the beginning of the baseline diagnostic.",
+    "No maximum 8192-position / 5000-symbolic-row memory validation or new CPU/Metal/Vulkan model parity claim.",
+    "Existing numerical/waveform/encoder failures and EOS policy remain unchanged.",
+    "No inference Python, GGML changes, sibling migrations or release workflow dispatch."
+  ],
+  "profiling_unexecuted_workspace_fix_commit": "d31d5cd3a3ffc1fc6f7a60f2f07143f3d02a2a8b",
+  "final_generator_cli_sha256": "f2fbb2a0cedac4f49f58a53eb42d540162f14118c75e2f94b0c30b0e748ea536"
+}

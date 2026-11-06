@@ -1,0 +1,123 @@
+{
+  "date": "2026-11-06",
+  "scope": "Generator-only CUDA score-cache prototype; opt-in, not full-pipeline speed or musical-quality acceptance",
+  "ggml_revision": "e3db5210fe3ecdaa4d65b4c93d515f2cf15524b7",
+  "ggml_changed": false,
+  "frozen_abi_layouts_changed": false,
+  "default_enabled": false,
+  "flags": {
+    "profile": "MULACOVER_PROFILE=1",
+    "cache": "MULACOVER_SCORE_CACHE=1"
+  },
+  "workload": {
+    "gpu": "RTX 5070 Laptop 8GB",
+    "model": "Q4_K_M",
+    "guidance": 1.5,
+    "prompt_frames": 17,
+    "symbolic_frames": 540,
+    "capacity": 256,
+    "teacher_frames": 12,
+    "reset_replays": 2,
+    "frames_measured_each_run": 24,
+    "model_load_included": false,
+    "cold_cache_preparation_included": true,
+    "timed_dumps": false
+  },
+  "paired_runs": {
+    "trial_numbers": [
+      2,
+      3,
+      4
+    ],
+    "excluded_trial_1": "May overlap preceding GPU validation; excluded conservatively",
+    "seconds": {
+      "0": [
+        4.54084,
+        4.54228,
+        4.26324
+      ],
+      "1": [
+        4.08981,
+        3.78104,
+        4.00358
+      ]
+    },
+    "median_baseline": 4.54084,
+    "median_cached": 4.00358,
+    "time_reduction_percent": 11.831731573893812
+  },
+  "long_diagnostic": {
+    "teacher_frames": 64,
+    "replays": 2,
+    "baseline_seconds": 24.347,
+    "cached_seconds": 20.879,
+    "late_frame_dumps_included": true
+  },
+  "native_q4_tensor_comparisons": [
+    {
+      "baseline": "check-reference",
+      "candidate": "check-candidate",
+      "tensors_byte_exact": 100
+    },
+    {
+      "baseline": "long-0",
+      "candidate": "long-1",
+      "tensors_byte_exact": 100
+    }
+  ],
+  "fp32_spark_docker": {
+    "passed_existing_rules": true,
+    "tensors": 600,
+    "cache_hits_observed": {
+      "conditional": 4,
+      "cfg-1.5": 8
+    },
+    "flat_absolute_failures_retained": {
+      "conditional": [],
+      "cfg-1.5": [
+        "frame0.stage.backbone.layers.27",
+        "frame0.stage.peft_layers.27.0"
+      ]
+    },
+    "reference_manifest_sha256": "a42129fa97f295a3241bf46efb2a1a16937321d61723315b56391cfff8c0380a",
+    "model_sha256": "5f3bfcb7bd441301d272546e4bfb7ddd690df45447251100f5e223e036dab62c"
+  },
+  "sampled_provided_score": {
+    "symbolic_frames": 128,
+    "total_frames": 32,
+    "guide_frames": 12,
+    "new_frames": 20,
+    "rng": "torch-cuda",
+    "cap": 288,
+    "seed": "18446744073709551615",
+    "sampler_final_offset": 640,
+    "codes_count": 256,
+    "codes_byte_exact": true,
+    "codes_sha256": "a37a2f3b92fe28c4e5b1980d5606412645cf0559b989eed6b4c33289520ca7b5",
+    "eos_equal": true,
+    "baseline_seconds_including_checks": 8.38514,
+    "cached_seconds_including_checks": 8.11885
+  },
+  "lifecycle": {
+    "reset_replay_exact": true,
+    "changed_condition_observed": true,
+    "changed_condition_reset_exact": true,
+    "original_condition_restored_exact": true,
+    "tempo_conditioning_bypasses_cache": true
+  },
+  "memory": {
+    "host_score_bytes_cfg_540": 106168320,
+    "baseline_graph_bytes": 52042112,
+    "cached_graph_bytes": 85219712,
+    "device_peak_sampled": false,
+    "maximum_8192_cache_capacity_tested": false
+  },
+  "limits": [
+    "Only normal-tempo CUDA model execution validated for this optimization",
+    "CPU DLL CTests do not prove CPU model parity",
+    "No new Metal/Vulkan model performance claim",
+    "No new full-song/waveform parity claim",
+    "No EOS policy or RNG mapping change",
+    "Larger/long-running memory validation and review required before default adoption"
+  ]
+}

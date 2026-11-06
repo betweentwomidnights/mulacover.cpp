@@ -27,7 +27,7 @@ int main(int argc,char ** argv) {
         for(int i=1;i<argc;i+=2)if(i+1>=argc||!args.emplace(argv[i],argv[i+1]).second)throw std::runtime_error("Missing or duplicate option");
         for(auto key:{"--model","--input","--output","--prompt-frames","--symbolic-frames","--qwen-index","--muq-index"})
             if(!args.count(key))throw std::runtime_error(std::string("Missing ")+key);
-        for(auto & pair:args)if(pair.first!="--model"&&pair.first!="--input"&&pair.first!="--output"&&pair.first!="--prompt-frames"&&pair.first!="--symbolic-frames"&&
+        for(auto & pair:args)if(pair.first!="--model"&&pair.first!="--input"&&pair.first!="--output"&&pair.first!="--check-condition-reuse"&&pair.first!="--prompt-frames"&&pair.first!="--symbolic-frames"&&
             pair.first!="--qwen-index"&&pair.first!="--muq-index"&&pair.first!="--guidance"&&pair.first!="--backend"&&pair.first!="--capacity"&&pair.first!="--frames"&&pair.first!="--dump-frames"&&pair.first!="--sampling-noise"&&pair.first!="--experimental-bpm"&&pair.first!="--tempo-width-beats"&&pair.first!="--tempo-offset-beats"&&pair.first!="--tempo-local-window")throw std::runtime_error("Unknown option: "+pair.first);
         const std::filesystem::path input(args.at("--input")),output(args.at("--output"));
         int prompt=std::stoi(args.at("--prompt-frames")),symbolic=std::stoi(args.at("--symbolic-frames"));
@@ -105,6 +105,31 @@ int main(int argc,char ** argv) {
         std::ofstream stats(output/"stats.json");stats<<"{\"weight_bytes\":"<<memory.weight_bytes<<",\"cache_bytes\":"<<memory.cache_bytes<<",\"graph_bytes\":"<<memory.graph_bytes
             <<",\"cache_capacity\":"<<config.cache_capacity<<",\"elapsed_seconds\":"<<elapsed<<",\"replay_bit_exact\":true,\"cache_tail_zero\":true,\"ggml_commit\":\""<<ggml_commit()
             <<"\",\"ggml_version\":\""<<ggml_version()<<"\"}\n";
+        if(args.count("--check-condition-reuse")){
+            if(args.at("--check-condition-reuse")!="1")throw std::runtime_error("Condition reuse check requires 1");
+            mulacover_frame_free_v1(&result);const float original=piano[0];piano[0]=original==1?0:1;
+            if(mulacover_session_begin_v1(c,&condition,&error)||mulacover_teacher_frame_v1(c,teacher.data(),nullptr,&result,&error))throw std::runtime_error(error.message);
+            if(std::equal(result.logits,result.logits+8*8197,first_logits.begin()))throw std::runtime_error("Changed score was not observed");
+            std::vector<float> changed(result.logits,result.logits+8*8197);mulacover_frame_free_v1(&result);
+            if(mulacover_session_reset_v1(c,&error)||mulacover_teacher_frame_v1(c,teacher.data(),nullptr,&result,&error)||!std::equal(changed.begin(),changed.end(),result.logits))throw std::runtime_error("Changed-condition reset differs");
+            mulacover_frame_free_v1(&result);piano[0]=original;
+            if(mulacover_session_begin_v1(c,&condition,&error)||mulacover_teacher_frame_v1(c,teacher.data(),nullptr,&result,&error)||!std::equal(first_logits.begin(),first_logits.begin()+8*8197,result.logits))throw std::runtime_error("Restored condition differs");
+            mulacover_frame_free_v1(&result);const float original_style=qwen[0];qwen[0]+=1;
+            if(mulacover_session_begin_v1(c,&condition,&error)||mulacover_teacher_frame_v1(c,teacher.data(),nullptr,&result,&error))throw std::runtime_error(error.message);
+            if(std::equal(first_logits.begin(),first_logits.begin()+8*8197,result.logits))throw std::runtime_error("Changed style was not observed");
+            mulacover_frame_free_v1(&result);qwen[0]=original_style;
+            // Reuse the same model/workspaces with different symbolic shapes and
+            // CFG branch count, then restore the original cold result.
+            auto short_condition=condition;uint8_t visible=0;short_condition.symbolic_frames=1;
+            short_condition.context_mask=&visible;short_condition.guidance=1;
+            if(mulacover_session_begin_v1(c,&short_condition,&error)||mulacover_teacher_frame_v1(c,teacher.data(),nullptr,&result,&error)||result.branches!=1)throw std::runtime_error("Changed shape/branch begin failed");
+            std::vector<float> short_logits(result.logits,result.logits+8*8197);mulacover_frame_free_v1(&result);
+            if(mulacover_session_reset_v1(c,&error)||mulacover_teacher_frame_v1(c,teacher.data(),nullptr,&result,&error)||!std::equal(short_logits.begin(),short_logits.end(),result.logits))throw std::runtime_error("Changed-shape reset differs");
+            mulacover_frame_free_v1(&result);
+            if(mulacover_session_begin_v1(c,&condition,&error)||mulacover_teacher_frame_v1(c,teacher.data(),nullptr,&result,&error)||!std::equal(first_logits.begin(),first_logits.begin()+8*8197,result.logits))throw std::runtime_error("Restored shape/branches differ");
+            std::cout<<"condition replacement/reset/restoration exact\n";
+            std::cout<<"style/shape/branch replacement and restoration exact\n";
+        }
         const float saved=result.logits[0];mulacover_destroy_v1(c);c=nullptr;
         if(!std::isfinite(result.logits[0])||result.logits[0]!=saved)throw std::runtime_error("Frame result did not survive context destruction");
         mulacover_frame_free_v1(&result);mulacover_frame_free_v1(&result);return 0;
