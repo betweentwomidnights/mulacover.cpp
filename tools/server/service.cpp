@@ -7,6 +7,7 @@
 #include <atomic>
 #include <chrono>
 #include <cmath>
+#include <cstdlib>
 #include <filesystem>
 #include <fstream>
 #include <random>
@@ -110,7 +111,10 @@ mulacover_job_request_v1 request(const Config & c,const Input & in) {
 mulacover_job_plan_v1 plan(const Config & c,const mulacover_job_request_v1 & r) {
     mulacover_job_plan_v1 p{};p.size=sizeof(p);mulacover_error_v1 e{};e.size=sizeof(e);
     if(mulacover_job_plan_build_v1(&r,&p,&e))throw std::invalid_argument(e.message);
-    if(p.cache_capacity>c.max_cache_capacity)throw std::invalid_argument("Context plus new audio exceeds the server cache budget; shorten the guide or duration");
+    if(p.cache_capacity>c.max_cache_capacity){
+        const auto detail="Request needs "+std::to_string(p.cache_capacity)+" cache positions; this server allows "+std::to_string(c.max_cache_capacity)+". ";
+        throw std::invalid_argument(detail+"Use a larger --max-cache-capacity or less total audio. For source-length remix, shortening the guide does not reduce the total source-length target.");
+    }
     return p;
 }
 Input parse_input(const HttpRequest & req,const Config & config) {
@@ -183,6 +187,14 @@ struct Callbacks {
     static void MULACOVER_CALL style(void * u,int64_t n,int64_t total)noexcept{static_cast<Callbacks *>(u)->emit(total?.1*double(n)/total:0,"preparing style",n,total);}
     static void MULACOVER_CALL job(void * u,const mulacover_job_progress_v1 * p)noexcept{static_cast<Callbacks *>(u)->emit(.1+.9*p->fraction,p->stage_name,p->completed,p->total);}
 };
+json::Value optimization_requests(){
+    auto enabled=[](const char * name){const auto * p=std::getenv(name);return p&&std::string(p)=="1";};
+    auto v=json::object();
+    v.object["device_cache"]=json::from_bool(enabled("MULACOVER_DEVICE_CACHE"));
+    v.object["graph_reuse"]=json::from_bool(enabled("MULACOVER_GRAPH_REUSE"));
+    v.object["host_score_cache"]=json::from_bool(enabled("MULACOVER_SCORE_CACHE")&&!enabled("MULACOVER_DEVICE_CACHE"));
+    return v; // Process requests; actual hits/memory remain in native profile logs.
+}
 }
 void Config::resolve_models() {
     auto model=[&](const std::string & dir,const char * name){return fs::absolute(fs::u8path(dir)/name).lexically_normal().u8string();};
@@ -208,6 +220,7 @@ std::string props(const Config & c) {
     o["ggml_version"]=json::from_string(runtime->ggml_version());
     o["ggml_commit"]=json::from_string(runtime->ggml_commit());o["backend"]=json::from_string(c.backend);
     o["source_dirty"]=json::from_bool(MULACOVER_SOURCE_DIRTY!=0);
+    o["optimization_requests"]=optimization_requests();
     o["http_api_version"]=json::from_integer(1);o["sample_rate"]=json::from_integer(48000);o["channels"]=json::from_integer(2);
     o["max_cache_capacity"]=json::from_integer(c.max_cache_capacity);o["natural_max_seconds"]=json::from_double(30);
     o["early_eos"]=json::from_bool(true);o["transcription"]=json::from_bool(c.transcription_port>0);o["bpm_lock"]=json::from_bool(false);
@@ -262,6 +275,11 @@ Outcome run_native(const Config & config,const Input & in,const Progress & progr
     auto & result=owned.result;Outcome out;out.wav=wav(result.samples,result.num_samples,result.sample_rate);
     if(result.full_samples)out.full_wav=wav(result.full_samples,result.full_num_samples,result.sample_rate);
     auto & meta=out.meta.object;
+    meta["optimization_requests"]=optimization_requests();
+    auto settings=json::object();settings.object["lyrics"]=json::from_string(lyrics);settings.object["tags"]=json::from_string(tags);
+    settings.object["guidance"]=json::from_double(job.conditioning.guidance);settings.object["temperature"]=json::from_double(job.sampling.temperature);settings.object["top_k"]=json::from_integer(job.sampling.top_k);
+    settings.object["score_mode"]=json::from_string(job.score_mode?"provided":"none");
+    meta["settings"]=std::move(settings);
     const bool source_length=json::boolean(in.options,"match_source_duration",false);
     meta["duration_policy"]=json::from_string(source_length?"source":"natural_max");
     meta["target_total_duration"]=json::from_double(source_length?double(in.audio.samples.size()/in.audio.channels)/in.audio.rate:double(result.plan.guide_frames+result.plan.new_frames)*.08);

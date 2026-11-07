@@ -22,7 +22,7 @@ int main(int argc,char ** argv){try{
               "  --model-dir DIR         generator, tokenizers and style GGUFs\n"
               "  --codec-model-dir DIR   encoder, flow and SQ GGUFs\n"
               "  --backend cpu|cuda|vulkan|metal\n"
-              "  --port 8010 --threads 4 --max-cache-capacity 1536\n"
+              "  --port 8010 --threads 4 --max-cache-capacity 2048\n"
               "  --transcription-port 8011  local Yue2/SheetSage2 service (0 disables)\n"
               "  --allow-origin URL      optional exact downstream browser origin\n"
               "  --props | --version     model-free installer probes\n"

@@ -36,6 +36,16 @@ total duration and identifies early endings. No silence padding, time stretching
 EOS suppression or forced minimum is applied. The continuation-only API remains
 available independently of the remix's full-audio download.
 
+The default server cache budget is 2048 positions. Audio frames and text prompt
+share that budget; the planner rounds allocations up to 256 positions. A
+132-second source needs at least 1792 positions with a short prompt, so the
+former 1536-position server limit rejected it before inference. Shortening a
+remix guide does not reduce its whole-source target. Budget errors now report
+the required/configured position counts. `--max-cache-capacity` configures a
+server ceiling, not a request to allocate that much for every job. A long score
+also consumes device memory; the 8192-position model limit is not a laptop
+memory guarantee.
+
 For example, 30 seconds of context always uses source seconds 0..30. There is no
 cursor or separate tail-guide control in this basic UI. Durations are floored to
 complete 80ms frames **before** choosing the opening; a 1-second request uses
@@ -98,6 +108,21 @@ commit and dirty flag, linked GGML identity, selected backend and model-file
 presence. Presence is not a model-integrity or inference-readiness check.
 Disable this executable/support code with `-DMULACOVER_BUILD_SERVER=OFF`.
 
+Health and completed-job metadata include `optimization_requests`, the three
+generator cache/workspace flags requested by the process environment at context
+creation. They are not hit counters; use `MULACOVER_PROFILE=1` native logs for
+actual cache hits and persistent storage. The UI labels optimized/standard
+requests, and its connection badge tooltip gives the build commit. Completed
+metadata also preserves lyrics/style, guidance, temperature and top-k alongside
+the resolved sampling/decoder seeds and timeline.
+
+For a separate development executable while another server is running, configure
+`-DCMAKE_RUNTIME_OUTPUT_DIRECTORY=C:/dev/mulacover.cpp/refdata/verified-ui` and
+build normally. Visual Studio places executables under its `Release` child.
+Do not relocate a build with MSBuild `/p:OutDir`: CMake's explicit static-library
+dependencies retain their original paths and can silently link stale libraries.
+Check `--props`/`/health` against the intended commit after staging a build.
+
 ## HTTP v1
 
 This is a staging contract with the sibling session/poll pattern; it is not yet a
@@ -151,7 +176,7 @@ to this clock; it does not use AudioContext's device-rate sample count.
 
 `natural_max_seconds` is a new-audio ceiling, independent of guide/context length.
 Early EOS is honored. The default is 30 seconds. Native planning and the default
-1536-position server cache budget bound the combined prompt/guide/new sequence.
+2048-position server cache budget bound the combined prompt/guide/new sequence.
 `--max-cache-capacity` can change that budget (256..8192); larger values are not
 a claim that the laptop can allocate or use them effectively. Actual prompt
 length is checked again after preparation and before encoder/generator work.
