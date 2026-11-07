@@ -1,4 +1,5 @@
 #include "mulacover_job.h"
+#include "mulacover_overlap.h"
 #include "sampling.h"
 #include "heartcodec_work.h"
 #include "heartcodec_rng.h"
@@ -7,14 +8,27 @@
 #include <chrono>
 #include <cmath>
 #include <cstdio>
+#include <cstdlib>
 #include <cstring>
+#include <iomanip>
 #include <limits>
 #include <memory>
 #include <stdexcept>
+#include <sstream>
 #include <vector>
 
 namespace {
 struct Cancelled {};
+void trace_terminal(const char * event,const mulacover_frame_v1 & frame,const mulacover_sampling_config_v1 & sampling,int64_t new_before){
+    std::ostringstream out;out<<std::setprecision(9)<<"[mulacover-eos] {\"event\":\""<<event<<"\",\"seed\":\""<<sampling.seed<<"\",\"new_frames_before\":"<<std::max<int64_t>(0,new_before)<<",\"relative_cursor_frame\":"<<new_before<<",\"heads\":[";
+    for(int q=0;q<8;++q){
+        const auto * logits=frame.logits+q*8197;const auto p=mula::sampling_probabilities(logits,sampling.temperature,sampling.top_k);
+        const float eos=*std::max_element(logits+8193,logits+8197);float probability=0;int rank=1;
+        for(int i=8193;i<8197;++i)probability+=p[size_t(i)];for(int i=0;i<8197;++i)if(logits[i]>eos)++rank;
+        if(q)out<<',';out<<"{\"head\":"<<q<<",\"selected\":"<<frame.codes[q]<<",\"eos_probability\":"<<probability<<",\"eos_rank\":"<<rank<<",\"eos_logit\":"<<eos<<",\"best_logit\":"<<*std::max_element(logits,logits+8197)<<'}';
+    }
+    out<<"]}";std::fprintf(stderr,"%s\n",out.str().c_str());
+}
 template<class T> void init(T * p){if(!p||p->size<sizeof(*p))return;const auto size=p->size;std::memset(p,0,sizeof(*p));p->size=size;}
 int status(mulacover_error_v1 * e,int code,const char * message){if(e&&e->size>=sizeof(*e)){e->status=code;std::snprintf(e->message,sizeof(e->message),"%s",message);}return code;}
 template<class F> int guard(mulacover_error_v1 * e,F && f){try{f();return status(e,0,"");}catch(const Cancelled &){return status(e,MULACOVER_JOB_CANCELLED_V1,"Continuation job cancelled");}catch(const std::invalid_argument & x){return status(e,1,x.what());}catch(const std::exception & x){return status(e,2,x.what());}catch(...){return status(e,2,"Unknown continuation job failure");}}
@@ -87,11 +101,13 @@ void MULACOVER_CALL mulacover_job_result_free_v1(mulacover_job_result_v1 * r){if
 int MULACOVER_CALL mulacover_job_plan_build_v1(const mulacover_job_request_v1 * r,mulacover_job_plan_v1 * p,mulacover_error_v1 * e){
     return guard(e,[&]{if(!r||!p||p->size<sizeof(*p))throw std::invalid_argument("Invalid job plan arguments");mulacover_job_plan_v1 next{};next.size=p->size;plan(*r,next);*p=next;});
 }
-int MULACOVER_CALL mulacover_job_run_v1(const mulacover_job_request_v1 * request,mulacover_job_result_v1 * output,mulacover_error_v1 * error){
+static int run_job_impl(const mulacover_job_request_v1 * request,mulacover_job_result_v1 * output,int64_t overlap_frames,mulacover_error_v1 * error){
     return guard(error,[&]{
         if(!request||!output||output->size<sizeof(*output)||output->samples||output->full_samples||output->codes||output->num_samples||output->full_num_samples||output->sample_rate||output->guide_frames||output->new_frames)
             throw std::invalid_argument("Invalid job request or occupied result");
         const auto & r=*request;mulacover_job_plan_v1 p{};p.size=sizeof(p);plan(r,p);
+        if(overlap_frames<0||overlap_frames>=p.guide_frames)throw std::invalid_argument("Invalid effective overlap");
+        const int64_t model_guide=p.guide_frames-overlap_frames;
         require_path(r.encoder_model);require_path(r.generator_model);require_path(r.flow_model);require_path(r.sq_model);
         if(!r.input_audio.samples||!mula::known_backend(r.backend)||r.cpu_threads<1||r.cpu_threads>1024||
            (r.score_mode!=MULACOVER_JOB_SCORE_NONE_V1&&r.score_mode!=MULACOVER_JOB_SCORE_PROVIDED_V1)||(r.rng_mode!=0&&r.rng_mode!=1)||r.rng_device<0||r.rng_cuda_blocks>1048576||(r.rng_mode==1&&!r.rng_cuda_blocks)||
@@ -99,6 +115,7 @@ int MULACOVER_CALL mulacover_job_run_v1(const mulacover_job_request_v1 * request
            (r.include_full_audio!=0&&r.include_full_audio!=1)||r.sampling.exponential_noise||r.sampling.noise_count)
             throw std::invalid_argument("Invalid continuation job configuration");
         mula::validate_sampling(r.sampling);
+        const auto * trace_flag=std::getenv("MULACOVER_EOS_TRACE");const bool trace=trace_flag&&std::strcmp(trace_flag,"1")==0;
         auto condition=r.conditioning;
         if(!condition.tokens||!condition.tokens_mask||condition.symbolic_frames<1||condition.symbolic_frames>5000||condition.qwen_index<0||condition.qwen_index>=condition.prompt_frames||
            condition.muq_index<0||condition.muq_index>=condition.prompt_frames||condition.qwen_index==condition.muq_index||!std::isfinite(condition.guidance)||condition.guidance<=0)
@@ -137,11 +154,14 @@ int MULACOVER_CALL mulacover_job_run_v1(const mulacover_job_request_v1 * request
         const auto generate_start=std::chrono::steady_clock::now();Frame frame;std::vector<int32_t> codes;codes.reserve(size_t(p.guide_frames+p.new_frames)*8);
         auto sampling=r.sampling;int32_t stop=0;const int64_t total=p.guide_frames+p.new_frames;
         for(int64_t f=0;f<total;++f){
-            const bool priming=f<p.guide_frames;observer.progress(priming?MULACOVER_JOB_PRIMING_V1:MULACOVER_JOB_SAMPLING_V1,priming?"priming":"sampling",priming?f:f-p.guide_frames,priming?p.guide_frames:p.new_frames,.1+.8*double(f)/double(total));
+            const bool priming=f<model_guide,regenerating=f>=model_guide&&f<p.guide_frames;
+            observer.progress(f<p.guide_frames?MULACOVER_JOB_PRIMING_V1:MULACOVER_JOB_SAMPLING_V1,regenerating?"regenerating overlap":priming?"priming":"sampling",f<p.guide_frames?f:f-p.guide_frames,f<p.guide_frames?p.guide_frames:p.new_frames,.1+.8*double(f)/double(total));
             if(priming){if(mulacover_teacher_frame_v1(generator.get(),encoded.value.data+(p.guide_start_frame+f)*8,nullptr,&frame.value,&ge))throw std::runtime_error(ge.message);}
             else {
                 if(r.rng_mode==MULACOVER_JOB_RNG_TORCH_CUDA_V1){if(!entropy.value.data)next_noise();sampling.exponential_noise=entropy.value.data;sampling.noise_count=8*8197;}
                 if(mulacover_sample_frame_v1(generator.get(),&sampling,nullptr,&frame.value,&stop,&ge))throw std::runtime_error(ge.message);
+                if(trace&&(f==model_guide||f==p.guide_frames||stop==MULACOVER_EOS_V1||f==total-1))
+                    trace_terminal(stop==MULACOVER_EOS_V1?"eos":regenerating?"overlap_start":f==p.guide_frames?"first_new":"ceiling",frame.value,sampling,f-p.guide_frames);
                 if(r.rng_mode==MULACOVER_JOB_RNG_TORCH_CUDA_V1){offset=entropy.value.next_offset;entropy.clear();sampling.exponential_noise=nullptr;sampling.noise_count=0;}
             }
             observer.check();if(stop==MULACOVER_PADDING_V1)throw std::runtime_error("Generator emitted padding");
@@ -176,6 +196,30 @@ int MULACOVER_CALL mulacover_job_run_v1(const mulacover_job_request_v1 * request
         result.encoder_weight_bytes=em.weight_buffer_bytes;result.encoder_graph_bytes=em.graph_buffer_bytes;result.generator_weight_bytes=gm.weight_bytes;result.generator_cache_bytes=gm.cache_bytes;result.generator_graph_bytes=gm.graph_bytes;
         *output=result;
     });
+}
+int MULACOVER_CALL mulacover_job_run_v1(const mulacover_job_request_v1 * r,mulacover_job_result_v1 * out,mulacover_error_v1 * e){return run_job_impl(r,out,0,e);}
+void MULACOVER_CALL mulacover_overlap_config_init_v1(mulacover_overlap_config_v1 * c){init(c);}
+void MULACOVER_CALL mulacover_overlap_plan_init_v1(mulacover_overlap_plan_v1 * p){if(!p||p->size<sizeof(*p))return;init(p);p->source.size=sizeof(p->source);}
+void MULACOVER_CALL mulacover_overlap_result_init_v1(mulacover_overlap_result_v1 * r){if(!r||r->size<sizeof(*r))return;init(r);r->job.size=sizeof(r->job);mulacover_job_result_init_v1(&r->job);r->staging.size=sizeof(r->staging);mulacover_overlap_plan_init_v1(&r->staging);}
+void MULACOVER_CALL mulacover_overlap_result_free_v1(mulacover_overlap_result_v1 * r){if(!r||r->size<sizeof(*r))return;mulacover_job_result_free_v1(&r->job);mulacover_overlap_result_init_v1(r);}
+int MULACOVER_CALL mulacover_overlap_plan_build_v1(const mulacover_job_request_v1 * r,const mulacover_overlap_config_v1 * c,mulacover_overlap_plan_v1 * out,mulacover_error_v1 * e){
+    return guard(e,[&]{
+        if(!r||!c||c->size<sizeof(*c)||c->overlap_frames<0||c->overlap_frames>8192||!out||out->size<sizeof(*out))throw std::invalid_argument("Invalid overlap configuration/plan");
+        mulacover_overlap_plan_v1 next{};next.size=out->size;next.source.size=sizeof(next.source);plan(*r,next.source);
+        next.overlap_frames=std::min(c->overlap_frames,next.source.guide_frames-1);next.model_guide_frames=next.source.guide_frames-next.overlap_frames;
+        next.generated_frames_ceiling=next.source.new_frames+next.overlap_frames;*out=next;
+    });
+}
+int MULACOVER_CALL mulacover_overlap_run_v1(const mulacover_job_request_v1 * r,const mulacover_overlap_config_v1 * c,mulacover_overlap_result_v1 * out,mulacover_error_v1 * e){
+    if(!out||out->size<sizeof(*out)||out->job.size<sizeof(out->job)||out->staging.size<sizeof(out->staging)||out->staging.source.size<sizeof(out->staging.source)||out->staging.model_guide_frames||out->staging.overlap_frames||out->staging.generated_frames_ceiling)
+        return status(e,1,"Invalid or occupied overlap result");
+    mulacover_overlap_plan_v1 next{};next.size=sizeof(next);mulacover_overlap_plan_init_v1(&next);
+    const int planned=mulacover_overlap_plan_build_v1(r,c,&next,e);if(planned)return planned;
+    const int code=run_job_impl(r,&out->job,next.overlap_frames,e);if(code)return code;
+    const auto size=out->staging.size;out->staging=next;out->staging.size=size;return 0;
+}
+const mulacover_overlap_api_v1 * MULACOVER_CALL mulacover_get_overlap_api(uint32_t v){
+    static const mulacover_overlap_api_v1 api={sizeof(api),1,mulacover_overlap_config_init_v1,mulacover_overlap_plan_init_v1,mulacover_overlap_result_init_v1,mulacover_overlap_result_free_v1,mulacover_overlap_plan_build_v1,mulacover_overlap_run_v1};return v==1?&api:nullptr;
 }
 const mulacover_job_api_v1 * MULACOVER_CALL mulacover_get_job_api(uint32_t version){
     static const mulacover_job_api_v1 api={MULACOVER_JOB_API_V1_SIZE,1,mulacover_job_request_init_v1,mulacover_job_plan_init_v1,mulacover_job_result_init_v1,mulacover_job_result_free_v1,mulacover_job_plan_build_v1,mulacover_job_run_v1};return version==1?&api:nullptr;

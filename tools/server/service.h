@@ -16,6 +16,7 @@ struct Config {
     int port=8010;
     int transcription_port=8011;
     std::string allow_origin;
+    std::string diagnostic_dir; // Explicit local developer export; never an HTTP path.
     std::string tokenizers, style, encoder, generator, flow, sq;
     void resolve_models();
 };

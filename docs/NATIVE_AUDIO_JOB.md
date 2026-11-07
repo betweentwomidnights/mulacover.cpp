@@ -15,6 +15,11 @@ The separate [native conditioning capability](NATIVE_CONDITIONING.md) now builds
 the borrowed prompt/style/score view before this job. The CLI supports either
 native text/MIDI inputs or a cached preset; this job's original ABI is unchanged.
 
+The separate experimental [overlap capability](OVERLAP_CONTINUATION.md) can sample
+replacement past frames before continuing at the same cursor. It has its own
+config/result/table; the job capability documented here retains its full
+teacher-forced guide and existing behavior.
+
 ## Host contract
 
 Initialize the request and result with their size prefixes. Keep paths, borrowed

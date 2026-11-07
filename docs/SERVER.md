@@ -205,6 +205,10 @@ cursor. Future arrangements remain available for score-guided transformation.
 Other options: `guidance` (1.5), `temperature` (1), `top_k` (250),
 `cache_capacity` (0/automatic), `decoder_seed` (1701, independent stream),
 `decoder_steps` (10), `segment_codes` (372), `rng` and `rng_cuda_blocks` (288).
+Experimental `overlap_frames` (integer 0--8192, default 0) regenerates a past
+guide tail while preserving the original new-audio boundary. The Continue audio
+UI offers an unchecked 0.64-second option. See `OVERLAP_CONTINUATION.md` for
+ownership, RNG and preview semantics and the limited listening evidence.
 Pass uint64 seeds as decimal strings to avoid JavaScript's integer precision loss.
 The UI/server seed defaults to `-1` (number or string), resolved once per accepted
 job to a fresh uint64 seed. Admission/poll responses expose that resolved decimal
@@ -239,5 +243,7 @@ option. Initial CUDA HTTP/CLI and browser checks are recorded in
 `docs/validation/server.json`; simplified UI/transcription checks are in
 `docs/validation/transcribe-remix-ui.json`. Musical quality and all existing numerical parity
 limits keep their earlier scope; these short checks validate service wiring.
+`--diagnostic-dir DIR` and `MULACOVER_EOS_TRACE=1` enable local investigation;
+both default off. See `SERVER_LIFECYCLE_EOS.md` for artifacts and privacy/lifetime.
 Release packaging, installed SDK exports and the final gary4local adapter are
 separate work. No release workflow is dispatched by this implementation.

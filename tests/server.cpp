@@ -49,6 +49,7 @@ int main(){try{
     auto invalid=submission();invalid.body="bad";CHECK(s.handle(invalid).status==400);
     CHECK(s.handle(submission("{\"audio_context_seconds\":1,\"cursor_sample\":1}")).status==400);
     CHECK(s.handle(submission("{\"audio_context_seconds\":0.01}")).status==400);
+    for(const auto * v:{"{\"overlap_frames\":-1}","{\"overlap_frames\":8193}","{\"overlap_frames\":0.5}","{\"overlap_frames\":\"8\"}"})CHECK(s.handle(submission(v)).status==400);
     CHECK(s.handle(submission("{\"transcription_scope\":\"invalid\"}")).status==400);
     auto origin=submission();origin.headers["origin"]="https://untrusted.example";CHECK(s.handle(origin).status==403);
     auto r=s.handle(submission("{\"seed\":\"18446744073709551615\"}"));CHECK(r.status==202);auto id=json::string(json::parse(r.body),"session_id");
@@ -58,7 +59,7 @@ int main(){try{
     CHECK(route(s,"/cancel/"+id,"POST").status==200);CHECK(json::string(terminal(s,id),"status")=="cancelled");CHECK(route(s,"/audio/"+id).status==409);
     CHECK(route(s,"/release/"+id,"POST").status==200);CHECK(route(s,"/poll_status/"+id).status==404);
     r=s.handle(submission("{\"tags\":\"fail\"}"));CHECK(r.status==202);id=json::string(json::parse(r.body),"session_id");CHECK(json::string(terminal(s,id),"status")=="failed");
-    finish=true;r=s.handle(submission("{\"audio_context_seconds\":1}"));CHECK(r.status==202);id=json::string(json::parse(r.body),"session_id");auto done=terminal(s,id);CHECK(json::string(done,"status")=="completed");CHECK(route(s,json::string(done,"audio_url")).body=="test-wav");CHECK(route(s,"/full_audio/"+id).status==404);
+    finish=true;r=s.handle(submission("{\"audio_context_seconds\":1,\"overlap_frames\":8}"));CHECK(r.status==202);id=json::string(json::parse(r.body),"session_id");auto done=terminal(s,id);CHECK(json::string(done,"status")=="completed");CHECK(route(s,json::string(done,"audio_url")).body=="test-wav");CHECK(route(s,"/full_audio/"+id).status==404);
     CHECK(route(s,"/unload","POST").status==200);CHECK(route(s,"/audio/"+id).status==404);CHECK(maximum==1);
     finish=false;entered=false;r=s.handle(submission());CHECK(r.status==202);s.shutdown();CHECK(active==0);s.shutdown();
     std::cout<<"server admission, validation, cancellation, replay lifecycle, download and shutdown passed\n";return 0;

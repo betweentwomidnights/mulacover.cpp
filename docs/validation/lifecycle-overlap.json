@@ -1,0 +1,318 @@
+{
+  "date": "2026-11-07",
+  "purpose": "Bounded server lifecycle audit and explicit past-only overlap continuation; not a root-cause or parity waiver",
+  "source_base": "9acd31dade11ef94f8c8c9649a0b82a52877c510",
+  "ggml_revision": "e3db5210fe3ecdaa4d65b4c93d515f2cf15524b7",
+  "ggml_changed": false,
+  "frozen_abi_layouts_changed": false,
+  "backend": "RTX 5070 Laptop 8GB, native Q4_K_M generator, strict F32 encoder/flow/SQ, Torch CUDA Philox cap 288",
+  "optimizations": {
+    "graph_reuse": 1,
+    "device_cache": 1,
+    "host_score_cache": 0
+  },
+  "lifecycle": {
+    "intervening_jobs": [
+      "different source",
+      "cancelled during priming",
+      "post-style failure after corrected admission",
+      "full-source SheetSage2 transcription"
+    ],
+    "eos_trace": {
+      "case": "A",
+      "head0_rank": 1,
+      "extra_rng_draws": 0,
+      "new_frames": 108,
+      "head0_probability": 0.999484658,
+      "all_selected_ids": 8193,
+      "probability_after_existing_temperature_top_k": true
+    },
+    "degradation_reproduced": false,
+    "after_release": {
+      "pid": 70120,
+      "working_set_bytes": 602370048,
+      "gpu_total_used_mib": 757,
+      "private_bytes": 1070243840
+    },
+    "pid_before_restart": 70120,
+    "general_leak_absence_proved": false,
+    "observed_terminal_gpu_mib": 757,
+    "anchors": [
+      {
+        "new_frames": 108,
+        "eos": true,
+        "options": {
+          "tags": "lofi hip hop",
+          "guidance": 1.5,
+          "temperature": 1,
+          "include_full_audio": true,
+          "lyrics": "[Instrumental]",
+          "natural_max_seconds": 30,
+          "seed": "17442424470364887450",
+          "top_k": 250,
+          "score_mode": "none",
+          "audio_context_seconds": 26.76
+        },
+        "name": "A",
+        "comparisons": {
+          "piano.f32": {
+            "sha256": "566f114d8d795c2b19b81914dff5ffddc522f06b616ee1b3721ec5f01336cffa",
+            "before_after_exact": true,
+            "restart_exact": true
+          },
+          "tokens.i32": {
+            "sha256": "4eb1acce3c22b7b6b887280f61cd7dab1f30399b2cf1743feb287629b69134c1",
+            "before_after_exact": true,
+            "restart_exact": true
+          },
+          "chord.f32": {
+            "sha256": "b9eb4cf6bf18223c2cc356b1e589228841fd273c698b6fefd0298e40323c3aa8",
+            "before_after_exact": true,
+            "restart_exact": true
+          },
+          "mask.u8": {
+            "sha256": "7e12c2867a3a340553cdfe47618de08b4090d14f2d1a82509f93e5dee078cc9a",
+            "before_after_exact": true,
+            "restart_exact": true
+          },
+          "guide.i32": {
+            "sha256": "8b3794d24546c41f0709099714a9bc8b8d794beee417586ba9b31f42d747a366",
+            "before_after_exact": true,
+            "restart_exact": true
+          },
+          "drum.f32": {
+            "sha256": "b9ba3a9f848d0adbe5e4d76bbebd31785d3db492e11435d292a5a65b47c72a46",
+            "before_after_exact": true,
+            "restart_exact": true
+          },
+          "context-mask.u8": {
+            "sha256": "f7bce5f450d01d8da55246e6c310697e2e1f3f6b90b328177d64d793d06fcea8",
+            "before_after_exact": true,
+            "restart_exact": true
+          },
+          "audio.wav": {
+            "sha256": "3a404c5e0b02a3c9da564dc1a471816a498d2e70d73679fb7b77d7f62ef9b750",
+            "before_after_exact": true,
+            "restart_exact": true
+          },
+          "codes.i32": {
+            "sha256": "57dfafb8f60934fe31e5b82ec6b9c1ef28df2292fe38941e682444673d41c2c2",
+            "before_after_exact": true,
+            "restart_exact": true
+          },
+          "continuation.wav": {
+            "sha256": "b397b135caf39af58cc4c93647d7d43891f211d62c63cab5f20295f7090c9572",
+            "before_after_exact": true,
+            "restart_exact": true
+          },
+          "qwen.f32": {
+            "sha256": "34b1ce6bdbabdf648fe38e9ca8180b2ee41d624e283bd59ff5badbbd844b51c5",
+            "before_after_exact": true,
+            "restart_exact": true
+          },
+          "muq.f32": {
+            "sha256": "e5a00aa9991ac8a5ee3109844d84a55583bd20572ad3ffcd42792f3c36b183ad",
+            "before_after_exact": true,
+            "restart_exact": true
+          }
+        }
+      },
+      {
+        "new_frames": 200,
+        "eos": false,
+        "options": {
+          "tags": "warm acoustic pop, soft drums, instrumental, no vocals",
+          "guidance": 1.5,
+          "temperature": 1,
+          "include_full_audio": true,
+          "lyrics": "[Instrumental]",
+          "natural_max_seconds": 16,
+          "seed": "1701",
+          "top_k": 250,
+          "score_mode": "none",
+          "audio_context_seconds": 29.76
+        },
+        "name": "G",
+        "comparisons": {
+          "piano.f32": {
+            "sha256": "566f114d8d795c2b19b81914dff5ffddc522f06b616ee1b3721ec5f01336cffa",
+            "before_after_exact": true,
+            "restart_exact": true
+          },
+          "tokens.i32": {
+            "sha256": "5c23088145c6c4f1c14d0f05dfb32cb385cf23e24698ce47bc33c130a5221971",
+            "before_after_exact": true,
+            "restart_exact": true
+          },
+          "chord.f32": {
+            "sha256": "b9eb4cf6bf18223c2cc356b1e589228841fd273c698b6fefd0298e40323c3aa8",
+            "before_after_exact": true,
+            "restart_exact": true
+          },
+          "mask.u8": {
+            "sha256": "846fd932ac265879aaaf529cbda82f50243f00bf66438fded7253c22b10c58d1",
+            "before_after_exact": true,
+            "restart_exact": true
+          },
+          "guide.i32": {
+            "sha256": "bdbeab789d35496a3744f41410ab4ffeaecf91e7a0a9759dd1a9e7ae075ab342",
+            "before_after_exact": true,
+            "restart_exact": true
+          },
+          "drum.f32": {
+            "sha256": "b9ba3a9f848d0adbe5e4d76bbebd31785d3db492e11435d292a5a65b47c72a46",
+            "before_after_exact": true,
+            "restart_exact": true
+          },
+          "context-mask.u8": {
+            "sha256": "f7bce5f450d01d8da55246e6c310697e2e1f3f6b90b328177d64d793d06fcea8",
+            "before_after_exact": true,
+            "restart_exact": true
+          },
+          "audio.wav": {
+            "sha256": "796e73c1ade6013b8a2fb76180bbe814c642ff8c8c94e6d3374020db4b3f701e",
+            "before_after_exact": true,
+            "restart_exact": true
+          },
+          "codes.i32": {
+            "sha256": "188b3c33901dac1b9044a5578664c5adfb1b6ebbac05d19a76a6dedb957fd3c2",
+            "before_after_exact": true,
+            "restart_exact": true
+          },
+          "continuation.wav": {
+            "sha256": "3fa6feef0b8b3368f2172668fc21406bd33d0236a0748d6c7e6ff875b78d36e6",
+            "before_after_exact": true,
+            "restart_exact": true
+          },
+          "qwen.f32": {
+            "sha256": "4c58bcfce13bab323cb5c9f412fa48506a3af4ce17c19512ce5e6a888754cf33",
+            "before_after_exact": true,
+            "restart_exact": true
+          },
+          "muq.f32": {
+            "sha256": "e5a00aa9991ac8a5ee3109844d84a55583bd20572ad3ffcd42792f3c36b183ad",
+            "before_after_exact": true,
+            "restart_exact": true
+          }
+        }
+      }
+    ],
+    "aged_server_failing_anchor_wav_exact": true
+  },
+  "overlap_controls": [
+    {
+      "eos": true,
+      "offset_only_256_new_seconds": 29.6,
+      "context_seconds": 26.72,
+      "listener_assessment": null,
+      "maximum_new_seconds": 30,
+      "source": "billiegasm_yuey.wav",
+      "baseline_new_seconds": 8.64,
+      "overlap_frames": 8,
+      "overlap_new_seconds_after_original_cursor": 20.8,
+      "seed": "17442424470364887450"
+    },
+    {
+      "eos": true,
+      "offset_only_256_new_seconds": 0.16,
+      "context_seconds": 20,
+      "listener_assessment": "Coherent and useful continuation",
+      "maximum_new_seconds": 40,
+      "source": "love_is_blue_billied.wav",
+      "baseline_new_seconds": 0.08,
+      "overlap_frames": 8,
+      "overlap_new_seconds_after_original_cursor": 24.16,
+      "seed": "1701"
+    },
+    {
+      "eos": true,
+      "score": "provided, full source",
+      "new_seconds_after_original_cursor": 7.12,
+      "context_seconds": 20,
+      "listener_assessment": null,
+      "sampled_seconds_including_overlap": 7.76,
+      "source": "love_is_blue_billied.wav",
+      "overlap_frames": 8,
+      "seed": "1701"
+    }
+  ],
+  "native_integration": {
+    "http_cancel_stage": {
+      "stage": "regenerating overlap",
+      "step": 243,
+      "total_steps": 250
+    },
+    "suffix_sha256": "96ca5786ec6c26d27b1669cbff9fb0db788b68e7cdbba312ce22f56da355cc32",
+    "http_cancel_status": "cancelled",
+    "checks": {
+      "zero_overlap_continuation.wav": true,
+      "zero_overlap_audio.wav": true,
+      "http_native_continuation.wav": true,
+      "http_native_audio.wav": true,
+      "zero_overlap_codes_exact": true,
+      "overlap_experiment_codes_exact": true,
+      "overlap_experiment_suffix_exact": true,
+      "overlap_experiment_full_exact": true,
+      "http_native_codes.i32": true,
+      "http_native_guide.i32": true
+    },
+    "subsequent_http_new_frames": 302,
+    "codes_sha256": "56a4686df13144ee0b8f5ea8d5fb859084cb8f3c67bdb6f494e2d4a2dc413f9f",
+    "result": {
+      "native_pcm_job": true,
+      "native_conditioning": false,
+      "backend": "cuda",
+      "score_mode": "none",
+      "rng": "torch-cuda",
+      "rng_cuda_blocks": 288,
+      "seed": 1701,
+      "decoder_seed": 1701,
+      "cursor_sample": 882000,
+      "context_start_sample": 0,
+      "context_samples": 882000,
+      "context_frames": 250,
+      "guide_start_frame": 0,
+      "guide_frames": 250,
+      "new_frames": 302,
+      "requested_new_frames": 500,
+      "cache_capacity": 1024,
+      "eos": true,
+      "regenerated_overlap_frames": 8,
+      "model_guide_frames": 242,
+      "sampler_final_offset": 9952,
+      "decoder_final_offset": 8,
+      "decoder_rng_windows": 2,
+      "samples_per_channel": 1159680,
+      "conditioning_seconds": 0.0004123,
+      "pipeline_seconds": 73.7951366,
+      "style_weight_bytes": 0,
+      "style_graph_bytes": 0,
+      "encode_seconds": 2.1328565,
+      "generate_seconds": 40.6585948,
+      "decode_seconds": 16.6837198,
+      "total_seconds": 73.7947243,
+      "encoder_weight_bytes": 2157091968,
+      "encoder_graph_bytes": 2156167168,
+      "generator_weight_bytes": 2939920896,
+      "generator_cache_bytes": 470351872,
+      "generator_graph_bytes": 52675072
+    }
+  },
+  "validation": {
+    "future_audio_used": false,
+    "ui": "Continue option unchecked by default, hidden in Transcribe + remix; seed -1 retained",
+    "eos_suppressed": false,
+    "minimum_duration_forced": false,
+    "training_started": false,
+    "cuda_build_model_free_ctest": "16/16 passed",
+    "cpu_dll_c_and_overlap_abi": "2/2 passed",
+    "strict_historical_failures_preserved": true
+  },
+  "limits": [
+    "Bounded lifecycle sequence, not a soak",
+    "One accepted Love score-free overlap listening example",
+    "RNG offset explains some improvement in Billiegasm; root cause remains open",
+    "Provided-score overlap still ends early",
+    "Existing upstream waveform/encoder and expanded activation failures remain"
+  ]
+}

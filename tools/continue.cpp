@@ -1,4 +1,5 @@
 #include "mulacover_job.h"
+#include "mulacover_overlap.h"
 #include "wave-io.h"
 #include "conditioning-args.h"
 #include <chrono>
@@ -28,12 +29,13 @@ template<class T> void write(const std::filesystem::path & path,const T * data,s
 }
 }
 int main(int argc,char ** argv){
-    mulacover_job_result_v1 result{};result.size=sizeof(result);mulacover_job_result_init_v1(&result);
-    struct Owner{mulacover_job_result_v1 * r;~Owner(){mulacover_job_result_free_v1(r);}} owner{&result};
+    mulacover_overlap_result_v1 staged{};staged.size=sizeof(staged);mulacover_overlap_result_init_v1(&staged);
+    auto & result=staged.job;
+    struct Owner{mulacover_overlap_result_v1 * r;~Owner(){mulacover_overlap_result_free_v1(r);}} owner{&staged};
     try{
-        if(argc==1)throw std::runtime_error("Usage: mulacover-continue --audio INPUT.wav --output FRESH_DIR --encoder-model GGUF --model GGUF --flow-model GGUF --sq-model GGUF; conditioning: --tokenizers-model GGUF --style-model GGUF --lyrics-file UTF8 --tags-file UTF8, or --input PRESET_DIR --prompt-frames N --qwen-index N --muq-index N; controls: --symbolic-frames N --cursor-sample N --context-samples N --guide-samples N --natural-max-seconds 30 --score-mode none|provided --melody-midi MIDI --chord-midi MIDI --drum-midi MIDI --include-full-audio 0|1");
+        if(argc==1)throw std::runtime_error("Usage: mulacover-continue --audio INPUT.wav --output FRESH_DIR --encoder-model GGUF --model GGUF --flow-model GGUF --sq-model GGUF; conditioning: --tokenizers-model GGUF --style-model GGUF --lyrics-file UTF8 --tags-file UTF8, or --input PRESET_DIR --prompt-frames N --qwen-index N --muq-index N; controls: --symbolic-frames N --cursor-sample N --context-samples N --guide-samples N --natural-max-seconds 30 --score-mode none|provided --melody-midi MIDI --chord-midi MIDI --drum-midi MIDI --include-full-audio 0|1 --overlap-frames 0 (experimental)");
         std::map<std::string,std::string> args;
-        const std::set<std::string> known={"--audio","--input","--output","--encoder-model","--model","--flow-model","--sq-model","--prompt-frames","--symbolic-frames","--qwen-index","--muq-index","--cursor-sample","--context-samples","--guide-samples","--natural-max-seconds","--capacity","--backend","--threads","--score-mode","--guidance","--temperature","--top-k","--seed","--decoder-seed","--decoder-steps","--segment-codes","--rng","--rng-cuda-blocks","--rng-device","--sampler-offset","--include-full-audio","--tokenizers-model","--style-model","--lyrics-file","--tags-file","--melody-midi","--chord-midi","--drum-midi"};
+        const std::set<std::string> known={"--audio","--input","--output","--encoder-model","--model","--flow-model","--sq-model","--prompt-frames","--symbolic-frames","--qwen-index","--muq-index","--cursor-sample","--context-samples","--guide-samples","--natural-max-seconds","--capacity","--backend","--threads","--score-mode","--guidance","--temperature","--top-k","--seed","--decoder-seed","--decoder-steps","--segment-codes","--rng","--rng-cuda-blocks","--rng-device","--sampler-offset","--include-full-audio","--tokenizers-model","--style-model","--lyrics-file","--tags-file","--melody-midi","--chord-midi","--drum-midi","--overlap-frames"};
         for(int i=1;i<argc;i+=2)if(i+1>=argc||!known.count(argv[i])||!args.emplace(argv[i],argv[i+1]).second)throw std::runtime_error("Unknown/missing/duplicate option");
         auto get=[&](const char * key,const char * fallback){return args.count(key)?args.at(key):std::string(fallback);};
         auto seed=[&](const char * key,const char * fallback){auto text=get(key,fallback);if(text.empty()||text.find_first_not_of("0123456789")!=std::string::npos)throw std::runtime_error("Invalid unsigned seed/offset");return std::stoull(text);};
@@ -77,7 +79,11 @@ int main(int argc,char ** argv){
         mulacover_error_v1 error{};error.size=sizeof(error);mulacover_job_plan_v1 plan{};plan.size=sizeof(plan);
         if(api->plan(&request,&plan,&error))throw std::runtime_error(error.message);
         std::cout<<"Context samples ["<<plan.context_start_sample<<","<<plan.cursor_sample<<"), guide "<<plan.guide_frames<<" frames, new ceiling "<<plan.new_frames<<", cache "<<plan.cache_capacity<<std::endl;
-        const auto start=std::chrono::steady_clock::now();const int status=api->run(&request,&result,&error);
+        mulacover_overlap_config_v1 overlap{};overlap.size=sizeof(overlap);mulacover_overlap_config_init_v1(&overlap);
+        const auto requested_overlap=seed("--overlap-frames","0");if(requested_overlap>8192)throw std::runtime_error("Invalid overlap frames");overlap.overlap_frames=int64_t(requested_overlap);
+        const auto * overlap_api=mulacover_get_overlap_api(1);
+        if(!overlap_api||overlap_api->size<MULACOVER_OVERLAP_API_V1_SIZE)throw std::runtime_error("Overlap capability unavailable");
+        const auto start=std::chrono::steady_clock::now();const int status=overlap.overlap_frames?overlap_api->run(&request,&overlap,&staged,&error):api->run(&request,&result,&error);
         if(status){std::cerr<<error.message<<std::endl;return status;}
         const double seconds=std::chrono::duration<double>(std::chrono::steady_clock::now()-start).count();
         std::filesystem::create_directories(output);wave_io::wav(output/"continuation.wav",result);
@@ -87,6 +93,7 @@ int main(int argc,char ** argv){
         std::ofstream report(output/"run.json");report<<std::setprecision(12)
           <<"{\"native_pcm_job\":true,\"native_conditioning\":"<<(native?"true":"false")<<",\"backend\":\""<<backend<<"\",\"score_mode\":\""<<score<<"\",\"rng\":\""<<rng<<"\",\"rng_cuda_blocks\":"<<request.rng_cuda_blocks
           <<",\"seed\":"<<request.sampling.seed<<",\"decoder_seed\":"<<request.decoder_seed<<",\"cursor_sample\":"<<plan.cursor_sample<<",\"context_start_sample\":"<<plan.context_start_sample<<",\"context_samples\":"<<plan.context_samples<<",\"context_frames\":"<<plan.context_frames<<",\"guide_start_frame\":"<<plan.guide_start_frame<<",\"guide_frames\":"<<result.guide_frames<<",\"new_frames\":"<<result.new_frames<<",\"requested_new_frames\":"<<plan.new_frames<<",\"cache_capacity\":"<<plan.cache_capacity<<",\"eos\":"<<(result.stop_reason==MULACOVER_EOS_V1?"true":"false")
+          <<",\"regenerated_overlap_frames\":"<<staged.staging.overlap_frames<<",\"model_guide_frames\":"<<result.guide_frames-staged.staging.overlap_frames
           <<",\"sampler_final_offset\":"<<result.sampler_final_offset<<",\"decoder_final_offset\":"<<result.decoder_final_offset<<",\"decoder_rng_windows\":"<<result.decoder_rng_windows<<",\"samples_per_channel\":"<<result.num_samples
           <<",\"conditioning_seconds\":"<<conditioning_seconds<<",\"pipeline_seconds\":"<<conditioning_seconds+seconds<<",\"style_weight_bytes\":"<<prepared.value.style_weight_bytes<<",\"style_graph_bytes\":"<<prepared.value.style_graph_bytes
           <<",\"encode_seconds\":"<<result.encode_seconds<<",\"generate_seconds\":"<<result.generate_seconds<<",\"decode_seconds\":"<<result.decode_seconds<<",\"total_seconds\":"<<seconds

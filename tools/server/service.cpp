@@ -3,6 +3,7 @@
 #include "transcription.h"
 #include "mulacover_conditioning.h"
 #include "mulacover_runtime.h"
+#include "mulacover_overlap.h"
 #include <algorithm>
 #include <atomic>
 #include <chrono>
@@ -62,6 +63,7 @@ mulacover_job_request_v1 request(const Config & c,const Input & in) {
     r.cursor_sample=integer(v,"cursor_sample",-1,-1,r.input_audio.num_samples);
     r.context_samples=integer(v,"context_samples",0,0,INT64_MAX);
     r.guide_samples=integer(v,"guide_samples",0,0,INT64_MAX);
+    integer(v,"overlap_frames",0,0,8192);
     if(v.find("audio_context_seconds")){
         if(v.find("cursor_sample")||v.find("context_samples")||v.find("guide_samples"))throw std::invalid_argument("Use audio_context_seconds or explicit cursor/context/guide, not both");
         const double seconds=real(v,"audio_context_seconds",29.76,.08,86400);
@@ -138,7 +140,7 @@ Input parse_input(const HttpRequest & req,const Config & config) {
     }
     if(!audio)throw std::invalid_argument("Missing audio WAV upload");
     if(in.options.type!=json::Type::object)throw std::invalid_argument("options must be a JSON object");
-    const std::set<std::string> keys={"lyrics","tags","audio_context_seconds","cursor_sample","context_samples","guide_samples","natural_max_seconds","cache_capacity","guidance","seed","top_k","temperature","decoder_seed","decoder_steps","segment_codes","rng","rng_cuda_blocks","score_mode","symbolic_frames","include_full_audio","transcribe","transcription_lane","transcription_scope","match_source_duration"};
+    const std::set<std::string> keys={"lyrics","tags","audio_context_seconds","cursor_sample","context_samples","guide_samples","natural_max_seconds","cache_capacity","guidance","seed","top_k","temperature","decoder_seed","decoder_steps","segment_codes","rng","rng_cuda_blocks","score_mode","symbolic_frames","include_full_audio","transcribe","transcription_lane","transcription_scope","match_source_duration","overlap_frames"};
     for(const auto & p:in.options.object)if(!keys.count(p.first))throw std::invalid_argument("Unknown option: "+p.first);
     for(const char * key:{"lyrics","tags"}){
         auto text=json::string(in.options,key,"");
@@ -195,6 +197,37 @@ json::Value optimization_requests(){
     v.object["host_score_cache"]=json::from_bool(enabled("MULACOVER_SCORE_CACHE")&&!enabled("MULACOVER_DEVICE_CACHE"));
     return v; // Process requests; actual hits/memory remain in native profile logs.
 }
+struct DiagnosticRun {
+    fs::path directory;
+    std::string key;
+    explicit DiagnosticRun(const Config & c,const Input & in){
+        if(c.diagnostic_dir.empty())return;
+        const auto root=fs::absolute(fs::u8path(c.diagnostic_dir));fs::create_directories(root);
+        do{key=id();directory=root/key;}while(!fs::create_directory(directory));
+        text("options.json",json::stringify(in.options));
+    }
+    template<class T> void data(const char * name,const T * p,size_t count){
+        if(directory.empty())return;
+        std::ofstream f(directory/name,std::ios::binary);
+        if(!f.write(reinterpret_cast<const char *>(p),std::streamsize(count*sizeof(T))))throw std::runtime_error("Cannot write diagnostic export");
+    }
+    void text(const char * name,const std::string & value){data(name,value.data(),value.size());}
+    void prepared(const mulacover_prepared_condition_v1 & r){
+        if(directory.empty())return;const auto & c=r.condition;
+        data("tokens.i32",r.tokens,size_t(c.prompt_frames)*9);data("mask.u8",r.tokens_mask,size_t(c.prompt_frames)*9);
+        data("qwen.f32",r.qwen,1024);data("muq.f32",r.muq,512);
+        data("piano.f32",r.pianoroll,size_t(c.symbolic_frames)*256);data("drum.f32",r.drum_pianoroll,size_t(c.symbolic_frames)*128);
+        data("chord.f32",r.chord,size_t(c.symbolic_frames)*12);data("context-mask.u8",r.context_mask,size_t(c.symbolic_frames));
+        auto v=json::object();v.object["prompt_frames"]=json::from_integer(c.prompt_frames);v.object["symbolic_frames"]=json::from_integer(c.symbolic_frames);
+        v.object["qwen_index"]=json::from_integer(c.qwen_index);v.object["muq_index"]=json::from_integer(c.muq_index);
+        text("prepared.json",json::stringify(v));
+    }
+    void finished(const mulacover_job_result_v1 & r,json::Value & meta){
+        if(directory.empty())return;
+        data("codes.i32",r.codes,size_t(r.guide_frames+r.new_frames)*8);data("guide.i32",r.codes,size_t(r.guide_frames)*8);
+        meta.object["diagnostic_id"]=json::from_string(key);text("metadata.json",json::stringify(meta));
+    }
+};
 }
 void Config::resolve_models() {
     auto model=[&](const std::string & dir,const char * name){return fs::absolute(fs::u8path(dir)/name).lexically_normal().u8string();};
@@ -237,6 +270,7 @@ std::string props(const Config & c) {
 }
 Outcome run_native(const Config & config,const Input & in,const Progress & progress,const Cancel & cancel) {
     if(cancel())throw Cancelled{};
+    DiagnosticRun diagnostic(config,in);
     auto job=request(config,in);auto preliminary=plan(config,job);
     const bool automatic=json::boolean(in.options,"transcribe",false);TranscribedScore transcribed;
     if(automatic){
@@ -248,13 +282,15 @@ Outcome run_native(const Config & config,const Input & in,const Progress & progr
     Progress pipeline_progress=[&](double p,const std::string & stage,int64_t n,int64_t total){progress((automatic?.25:0)+(automatic?.75:1)*p,stage,n,total);};
     const auto * conditioning=mulacover_get_conditioning_api(1);const auto * jobs=mulacover_get_job_api(1);
     if(!conditioning||conditioning->size<MULACOVER_CONDITIONING_API_V1_SIZE||!jobs||jobs->size<MULACOVER_JOB_API_V1_SIZE)throw std::runtime_error("Required native capability unavailable");
+    const auto * overlap_api=mulacover_get_overlap_api(1);
+    if(!overlap_api||overlap_api->size<MULACOVER_OVERLAP_API_V1_SIZE)throw std::runtime_error("Overlap capability unavailable");
     struct Owned {
-        const mulacover_conditioning_api_v1 * c;const mulacover_job_api_v1 * j;
+        const mulacover_conditioning_api_v1 * c;
         mulacover_conditioning_context * context=nullptr;
-        mulacover_prepared_condition_v1 prepared{};mulacover_job_result_v1 result{};
-        Owned(const mulacover_conditioning_api_v1 * a,const mulacover_job_api_v1 * b):c(a),j(b){prepared.size=sizeof(prepared);c->result_init(&prepared);result.size=sizeof(result);j->result_init(&result);}
-        ~Owned(){j->result_free(&result);c->result_free(&prepared);if(context)c->destroy(context);}
-    } owned(conditioning,jobs);
+        mulacover_prepared_condition_v1 prepared{};mulacover_overlap_result_v1 staged{};
+        explicit Owned(const mulacover_conditioning_api_v1 * a):c(a){prepared.size=sizeof(prepared);c->result_init(&prepared);staged.size=sizeof(staged);mulacover_overlap_result_init_v1(&staged);}
+        ~Owned(){mulacover_overlap_result_free_v1(&staged);c->result_free(&prepared);if(context)c->destroy(context);}
+    } owned(conditioning);
     mulacover_error_v1 e{};e.size=sizeof(e);
     auto check=[&](int code){if(code==3)throw Cancelled{};if(code)throw std::runtime_error(e.message);};
     pipeline_progress(0,"loading tokenizers",0,0);check(conditioning->create(config.tokenizers.c_str(),&owned.context,&e));
@@ -268,11 +304,13 @@ Outcome run_native(const Config & config,const Input & in,const Progress & progr
     r.guidance=job.conditioning.guidance;r.max_audio_frames=preliminary.guide_frames+preliminary.new_frames;
     Callbacks callbacks{pipeline_progress,cancel};r.should_cancel=Callbacks::poll;r.callback_user=&callbacks;r.on_style_progress=Callbacks::style;
     check(conditioning->prepare(owned.context,&r,&owned.prepared,&e));
+    diagnostic.prepared(owned.prepared);
     conditioning->destroy(owned.context);owned.context=nullptr;
     job.conditioning=owned.prepared.condition;plan(config,job); // actual text prompt budget
     job.on_progress=Callbacks::job;job.should_cancel=Callbacks::poll;job.callback_user=&callbacks;
-    check(jobs->run(&job,&owned.result,&e));if(cancel())throw Cancelled{};
-    auto & result=owned.result;Outcome out;out.wav=wav(result.samples,result.num_samples,result.sample_rate);
+    mulacover_overlap_config_v1 overlap{};overlap.size=sizeof(overlap);overlap_api->config_init(&overlap);overlap.overlap_frames=integer(in.options,"overlap_frames",0,0,8192);
+    check(overlap.overlap_frames?overlap_api->run(&job,&overlap,&owned.staged,&e):jobs->run(&job,&owned.staged.job,&e));if(cancel())throw Cancelled{};
+    auto & result=owned.staged.job;Outcome out;out.wav=wav(result.samples,result.num_samples,result.sample_rate);
     if(result.full_samples)out.full_wav=wav(result.full_samples,result.full_num_samples,result.sample_rate);
     auto & meta=out.meta.object;
     meta["optimization_requests"]=optimization_requests();
@@ -287,12 +325,15 @@ Outcome run_native(const Config & config,const Input & in,const Progress & progr
     meta["ended_early"]=json::from_bool(result.new_frames<result.plan.new_frames);
     if(automatic)meta["transcription"]=std::move(transcribed.metadata);
     meta["new_frames"]=json::from_integer(result.new_frames);meta["guide_frames"]=json::from_integer(result.guide_frames);
+    meta["regenerated_overlap_frames"]=json::from_integer(owned.staged.staging.overlap_frames);
+    meta["model_guide_frames"]=json::from_integer(result.guide_frames-owned.staged.staging.overlap_frames);
     meta["duration"]=json::from_double(double(result.num_samples)/result.sample_rate);meta["sample_rate"]=json::from_integer(result.sample_rate);meta["channels"]=json::from_integer(2);
     meta["eos"]=json::from_bool(result.stop_reason==MULACOVER_EOS_V1);meta["cache_capacity"]=json::from_integer(result.plan.cache_capacity);
     meta["cursor_sample"]=json::from_integer(result.plan.cursor_sample);meta["context_start_sample"]=json::from_integer(result.plan.context_start_sample);
     meta["seed"]=json::from_string(std::to_string(job.sampling.seed));meta["decoder_seed"]=json::from_string(std::to_string(job.decoder_seed));meta["sampler_final_offset"]=json::from_string(std::to_string(result.sampler_final_offset));
     meta["decoder_final_offset"]=json::from_string(std::to_string(result.decoder_final_offset));
     meta["encode_seconds"]=json::from_double(result.encode_seconds);meta["generate_seconds"]=json::from_double(result.generate_seconds);meta["decode_seconds"]=json::from_double(result.decode_seconds);
+    diagnostic.finished(result,out.meta);
     return out;
 }
 struct Service::Job {

@@ -3,10 +3,15 @@
 #include "mulacover_tempo.h"
 #include "mulacover_continuation.h"
 #include "mulacover_job.h"
+#include "mulacover_overlap.h"
 #include "mulacover_conditioning.h"
 #include "mulacover_runtime.h"
 #include <string.h>
 int main(void) {
+    const mulacover_overlap_api_v1 * overlap=mulacover_get_overlap_api(1);
+    if(!overlap||overlap->size<MULACOVER_OVERLAP_API_V1_SIZE||overlap->version!=1||mulacover_get_overlap_api(0)||mulacover_get_overlap_api(2))return 1;
+    mulacover_overlap_result_v1 staged={0};staged.size=sizeof(staged);overlap->result_init(&staged);
+    overlap->result_free(&staged);overlap->result_free(&staged);
     const mulacover_runtime_api_v1 * runtime=mulacover_get_runtime_api(1);
     if(!runtime||runtime->size<MULACOVER_RUNTIME_API_V1_SIZE||runtime->version!=1||mulacover_get_runtime_api(0)||mulacover_get_runtime_api(2))return 1;
     if(!runtime->library_version()[0]||!runtime->ggml_version()[0]||!runtime->ggml_commit()[0])return 1;

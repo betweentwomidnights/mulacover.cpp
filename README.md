@@ -67,6 +67,13 @@ context/guide lengths, `natural_max_seconds`, progress and cancellation. It retu
 only new audio and stages all models on the laptop. Its native conditioning path
 also prepares text/Qwen/MIDI inputs. See the [extended run report](docs/validation/extended-continuation.json).
 
+An experimental [overlap capability](docs/OVERLAP_CONTINUATION.md) can regenerate
+the final 0.64s of past context before returning new audio at the original cursor.
+It helped one listener-approved score-free Love Is Blue continuation. The native
+API, CLI and Continue audio UI expose it explicitly; it defaults off and still
+honors early EOS. The [bounded lifecycle audit](docs/SERVER_LIFECYCLE_EOS.md)
+reproduced both good and prematurely ending anchors across mixed requests/restart.
+
 **Native FP32 teacher-forced frame/logit/cache parity passes all 600 tensors on
 Spark CUDA at `e3db5210`.** Exact reset/replay also passes; see
 [the new-pin validation](docs/validation/ggml-029-adoption.json).
