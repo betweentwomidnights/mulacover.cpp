@@ -5,6 +5,11 @@ new music instead of the baseline 0.08 seconds. The user heard a coherent,
 useful continuation. This is listening acceptance of one source/seed/preset,
 not a duration guarantee or a general musical-quality result.
 
+Follow-up (2026-11-08): the user reports that results remain hit or miss and
+premature endings are still severe. Keep this option experimental and off by
+default; [issue #6](https://github.com/betweentwomidnights/mulacover.cpp/issues/6)
+tracks the unresolved problem independently of the implementation merge.
+
 ## Native staging and ownership
 
 Negotiate `mulacover_get_overlap_api(1)` from `mulacover_overlap.h`. Existing

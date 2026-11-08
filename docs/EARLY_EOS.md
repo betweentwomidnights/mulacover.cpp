@@ -1,5 +1,11 @@
 # Early-ending investigation
 
+Status (2026-11-08): **open, severe usability problem**. The user reports that
+continuation remains hit or miss after the overlap experiment. The successful
+listening example does not establish reliable extension or source-length remix.
+Track follow-up in [issue #6](https://github.com/betweentwomidnights/mulacover.cpp/issues/6).
+Merging the working native implementation does not resolve this issue.
+
 The reported Billiegasm case is reproducible: `[Instrumental]`, `lofi hip hop`,
 seed **17442424470364887450**, guidance 1.5, temperature 1, top-k 250, 26.76s
 requested context (26.72s / 334 complete frames), and a 30s new-audio ceiling.
