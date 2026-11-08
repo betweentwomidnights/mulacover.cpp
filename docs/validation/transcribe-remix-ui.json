@@ -1,0 +1,127 @@
+{
+  "date": "2026-11-06",
+  "scope": "Simplified opening-context UI and automatic native SheetSage2-to-MuLaCover handoff; no new musical-quality or strict numerical-parity acceptance",
+  "base_commit": "71f4fac209bd7936e8d113d1a41cddb99c9897e8",
+  "mulacover_ggml": "e3db5210fe3ecdaa4d65b4c93d515f2cf15524b7",
+  "existing_abi_layouts_changed": false,
+  "ui": {
+    "modes": [
+      "Continue audio",
+      "Transcribe + remix"
+    ],
+    "timing_controls": [
+      "Audio context duration",
+      "Maximum new audio"
+    ],
+    "audio_starts_at_zero": true,
+    "manual_midi_required": false,
+    "audio_context_api_option": "audio_context_seconds",
+    "remix_transcription_scope": "source",
+    "api_context_only_scope_preserved": true,
+    "partial_frame_end_aligned_before_selecting_opening": true,
+    "one_second_at_48k_test": {
+      "start_sample": 0,
+      "end_sample": 46080,
+      "actual_seconds": 0.96
+    },
+    "short_source_clamps_to_first_complete_frame": true,
+    "javascript_syntax_passed": true
+  },
+  "builds": [
+    {
+      "platform": "Windows CPU static",
+      "tests_passed": 14,
+      "failed": 0
+    },
+    {
+      "platform": "Windows CPU DLL",
+      "tests_passed": 14,
+      "failed": 0
+    },
+    {
+      "platform": "Windows CUDA laptop",
+      "tests_passed": 14,
+      "failed": 0
+    },
+    {
+      "platform": "Spark dedicated Docker CUDA",
+      "tests_passed": 14,
+      "failed": 0
+    }
+  ],
+  "transcription_provider": {
+    "service": "yue2-server 0.3.0, native SheetSage2",
+    "transport": "Loopback HTTP, port 8011; no Python or CLI process launched by MuLaCover",
+    "local_validation_source": "37835fd13e1e01d46ad4478e1432d10f929ca874",
+    "local_validation_ggml": "0da5e65448c95279e38babf4b46c2d8e93585c70",
+    "provider_provenance_note": "Read-only existing coordinated-check CUDA artifacts copied to ignored refdata. Compared with e3db5210, only Metal/Vulkan source and a test differ; CUDA/CPU/core source is identical. This is a separate process, not a second GGML target or a new consumer-pin adoption.",
+    "model": "sheetsage2-mert2-f16.gguf",
+    "keep_models": false,
+    "pickup": "keep",
+    "lane": "combined",
+    "chords": true,
+    "drums_exported_by_sheetsage2": false,
+    "provider_unloaded_before_generator_observed": true,
+    "only_owned_session_polled_cancelled_and_consumed": true,
+    "no_global_provider_unload": true,
+    "no_transcriber_implementation_copied": true,
+    "other_worktrees_or_bump_check_modified": false,
+    "executable_sha256": "d2b822aa5b76e0f5a81f02c47f3b4d928f89e7df9f007d5313e155389790634b",
+    "cuda_dll_sha256": "23d2f03857837bb43d1a1f563706b824a8926447a9a37e62397a8ff1210040d3"
+  },
+  "model_free_controls": {
+    "context_window_only_sent_when_requested": true,
+    "nan_future_pcm_excluded_from_context_scope": true,
+    "provider_midi_lane_transport_exact": true,
+    "cancel_waits_for_owned_provider_session_terminal": true,
+    "mixed_basic_and_advanced_time_options_rejected": true,
+    "invalid_scope_and_durations_rejected": true
+  },
+  "source_sha256": "140f18292989b1026113f02e0b6e2c9c1eaea29df05965f9404e40d76f74af9a",
+  "whole_song_remix": {
+    "directory": "refdata/simple-remix-preset",
+    "transcribed_start_sample": 0,
+    "transcribed_source_samples": 3086344,
+    "audio_context_seconds": 29.76,
+    "context_start_sample": 0,
+    "cursor_sample": 1312416,
+    "guide_frames": 372,
+    "new_seconds_ceiling": 30,
+    "actual_new_frames": 375,
+    "actual_new_seconds": 30,
+    "eos": false,
+    "lyrics": "[Instrumental]",
+    "tags": "warm acoustic pop, soft drums, instrumental, no vocals",
+    "rng": "torch-cuda",
+    "grid_cap": 288,
+    "seed": "1701",
+    "sampler_final_offset": "12000",
+    "decoder_final_offset": "12",
+    "cache_capacity": 1024,
+    "new_wav_sha256": "bcd2a44ff870983d6298b998e93dd2be1520d0dabd4014a347a1ef7fd85b1956",
+    "full_wav_sha256": "16fb14cb7ffe71dbce2d96c23d9863ce3d4dfa2d1ea681a9638425fd9ebdcc72",
+    "wall_seconds": 180.89099999994505,
+    "progress_monotonic": true,
+    "runtime_python_or_subprocess_inference": false
+  },
+  "early_eos_control": {
+    "directory": "refdata/simple-remix",
+    "audio_context_seconds": 30,
+    "tags": "",
+    "new_seconds_ceiling": 30,
+    "actual_new_seconds": 0.08,
+    "eos": true,
+    "not_an_isolated_context_or_style_comparison": true,
+    "eos_suppression_or_forced_minimum_added": false
+  },
+  "browser_prototype_check": {
+    "automatic_transcription_to_audio_completed": true,
+    "initial_context_scope_test_seconds": 8,
+    "manual_midi_uploads": 0,
+    "audio_and_download_controls_visible": true,
+    "final_source_scope_exercised_by_native_http_check_above": true
+  },
+  "listening_quality_accepted": null,
+  "existing_encoder_rvq_and_waveform_numerical_limits_unchanged": true,
+  "release_workflows_dispatched": false
+}

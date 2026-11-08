@@ -1,5 +1,6 @@
 #include "mulacover_conditioning.h"
 #include "../tools/conditioning-args.h"
+#include <algorithm>
 #include <cstring>
 #include <memory>
 int main(int argc,char ** argv){try{
@@ -12,7 +13,18 @@ int main(int argc,char ** argv){try{
     struct Owner{const mulacover_conditioning_api_v1 * a;mulacover_prepared_condition_v1 * p;~Owner(){a->result_free(p);}} owner{api,&out};
     if(api->prepare(ctx.get(),&r,&out,&e))throw std::runtime_error(e.message);
     for(auto pair:{std::make_pair("pianoroll.f32",static_cast<const void *>(out.pianoroll)),{"drum_pianoroll.f32",out.drum_pianoroll},{"chord.f32",out.chord},{"context_mask.u8",out.context_mask}}){auto bytes=conditioning_tool::text((root/pair.first).string());const std::string name=pair.first;const size_t row=name=="pianoroll.f32"?256*4:name=="drum_pianoroll.f32"?128*4:name=="chord.f32"?12*4:1;if(bytes.size()!=size_t(out.condition.symbolic_frames)*row||std::memcmp(pair.second,bytes.data(),bytes.size()))throw std::runtime_error("Score fixture shape or values differ");}
-    api->result_free(&out);std::ifstream file(root/"invalid.txt");std::string line;int count=0;
+    const std::vector<float> expected_melody(out.pianoroll,out.pianoroll+out.condition.symbolic_frames*256);
+    api->result_free(&out);
+    r.chord_midi=nullptr;r.drum_midi=nullptr;
+    if(api->prepare(ctx.get(),&r,&out,&e))throw std::runtime_error("Melody-only MIDI failed: "+std::string(e.message));
+    const auto n=out.condition.symbolic_frames;
+    if(size_t(n*256)>expected_melody.size()||std::memcmp(out.pianoroll,expected_melody.data(),size_t(n*256)*sizeof(float))||
+       !std::all_of(out.chord,out.chord+n*12,[](float x){return x==0;})||
+       !std::all_of(out.drum_pianoroll,out.drum_pianoroll+n*128,[](float x){return x==0;}))throw std::runtime_error("Melody-only MIDI changed melody or nonempty optional lanes");
+    api->result_free(&out);r.melody_midi=nullptr;r.chord_midi=chord.c_str();
+    if(api->prepare(ctx.get(),&r,&out,&e)!=MULACOVER_INVALID_ARGUMENT_V1||std::memcmp(&empty,&out,sizeof(out)))throw std::runtime_error("Missing melody MIDI was accepted");
+    r.chord_midi=chord.c_str();r.drum_midi=drum.c_str();
+    std::ifstream file(root/"invalid.txt");std::string line;int count=0;
     while(std::getline(file,line)){if(line.empty())continue;const auto path=(root/line).string();r.melody_midi=path.c_str();if(api->prepare(ctx.get(),&r,&out,&e)!=MULACOVER_INVALID_ARGUMENT_V1||std::memcmp(&empty,&out,sizeof(out)))throw std::runtime_error("Negative MIDI was accepted or published output: "+line);++count;}
     if(!count)throw std::runtime_error("Missing negative MIDI fixtures");std::cout<<"Score tensors exact; "<<count<<" upstream-rejected MIDI cases rejected without output"<<std::endl;return 0;
 }catch(const std::exception & e){std::cerr<<e.what()<<std::endl;return 1;}}

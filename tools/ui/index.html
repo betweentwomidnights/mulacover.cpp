@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>MuLaCover · Continuation studio</title>
+<style>
+[hidden]{display:none!important}
+:root{color-scheme:dark;--bg:#121716;--panel:#1b2320;--line:#35443c;--ink:#e8efe6;--dim:#a7b8ac;--accent:#c6eb9c;font:15px/1.5 system-ui,sans-serif}*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink)}main{max-width:1100px;margin:auto;padding:36px 28px}header{display:flex;justify-content:space-between;gap:24px;align-items:center;border-bottom:1px solid var(--line);padding-bottom:24px;margin-bottom:28px}.brand{letter-spacing:.15em;text-transform:uppercase;font-size:12px;color:var(--accent)}h1{font-size:32px;letter-spacing:-.03em;margin:8px 0}h2{font-size:19px;margin:0 0 18px}p{color:var(--dim);margin:8px 0 20px}.badge{border:1px solid var(--line);border-radius:24px;padding:8px 14px;white-space:nowrap;font-size:13px}.layout{display:grid;grid-template-columns:1.5fr 1fr;gap:20px}.panel{padding:24px;background:var(--panel);border:1px solid var(--line);border-radius:14px;margin-bottom:20px}.row{display:grid;grid-template-columns:1fr 1fr;gap:16px}label{display:block;color:var(--dim);font-size:13px;margin-bottom:16px}input,select,textarea{width:100%;display:block;margin-top:7px;padding:10px 12px;border:1px solid var(--line);border-radius:7px;background:var(--bg);color:var(--ink);font:inherit}textarea{resize:vertical;min-height:78px}input[type=file]{font-size:13px;padding:12px}input[type=checkbox]{width:auto;display:inline;margin-right:8px}button,.download{border:1px solid var(--accent);background:var(--accent);color:#192415;font:600 14px system-ui;padding:12px 20px;border-radius:8px;cursor:pointer;text-decoration:none;display:inline-block}button.secondary{background:transparent;color:var(--ink);border-color:var(--line)}button:disabled{opacity:.45;cursor:default}button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible,a:focus-visible{outline:2px solid var(--accent);outline-offset:3px}.actions{display:flex;gap:12px;align-items:center}.small{font-size:12px;color:var(--dim)}audio{width:100%;margin:10px 0}progress{width:100%;height:8px;accent-color:var(--accent);margin:18px 0}#stage{font-size:18px;color:var(--ink)}#error{color:#ffbcab;white-space:pre-wrap;overflow-wrap:anywhere}details{margin:10px 0}summary{cursor:pointer;color:var(--dim);padding-bottom:12px}.check{display:flex;align-items:center;margin-top:10px}footer{font-size:12px;color:var(--dim);padding-top:6px}#result p{font-variant-numeric:tabular-nums}#sourceInfo{min-height:20px}@media(max-width:760px){.layout{grid-template-columns:1fr}main{padding:22px 16px}header{align-items:flex-start;flex-direction:column}.row{grid-template-columns:1fr}h1{font-size:28px}}
+</style></head><body><main>
+<header><div><div class="brand">MuLaCover / Native audio</div><h1>Give your music a next chapter.</h1><p>Continue your audio, or transcribe the song into a remix.</p></div><span class="badge" id="connection">Connecting…</span></header>
+<form id="form"><div class="layout"><div>
+<section class="panel"><h2>01 / Source audio</h2><label>Mode<select id="mode"><option value="none">Continue audio</option><option value="remix">Transcribe + remix</option></select></label><p id="modeHelp" class="small">Continue directly from the selected opening audio.</p><label>Source WAV<input id="audio" type="file" accept=".wav,audio/wav" required></label><audio id="source" controls hidden></audio><div class="small" id="sourceInfo">Mono or stereo PCM WAV. Your original file stays unchanged.</div>
+<div class="row" style="margin-top:20px"><label>Audio context duration (seconds)<input id="context" type="number" min="0.08" step="any" value="29.76" required></label><label id="durationRow">Maximum new audio (seconds)<input id="duration" type="number" min="0.08" max="655.36" step="any" value="30" required></label></div>
+<p id="remixTarget" class="small" hidden>Remix length matches the uploaded song.</p><div class="small" id="selection">Uses the beginning of your upload. The model may finish before the new-audio maximum.</div></section>
+<section class="panel"><h2>02 / Musical direction</h2>
+
+<label>Lyrics<textarea id="lyrics" spellcheck="false">[Instrumental]</textarea></label><label>Style tags<textarea id="tags">warm acoustic pop, soft drums, instrumental, no vocals</textarea></label>
+<details><summary>Generation settings</summary><label id="laneRow" hidden>Melody focus<select id="lane"><option value="combined">All melodies</option><option value="vocal">Singer</option><option value="instrumental">Instruments</option></select></label><div class="row"><label>Seed<input id="seed" type="text" inputmode="numeric" pattern="-1|[0-9]+" value="-1" required></label><label>Guidance<input id="guidance" type="number" min="0.001" max="20" step="any" value="1.5" required></label></div><div class="row"><label>Temperature<input id="temperature" type="number" min="0.001" max="10" step="any" value="1" required></label><label>Top K<input id="topk" type="number" min="1" max="8197" step="1" value="250" required></label></div><label class="check" id="fullRow"><input id="full" type="checkbox" checked>Also return context + continuation preview</label></details>
+<div class="actions"><button type="submit" id="generate" disabled>Create continuation</button><button type="button" class="secondary" id="cancel" disabled>Cancel</button></div></section>
+</div><aside><section class="panel" aria-live="polite"><h2>03 / Session</h2><div id="stage">Ready when you are.</div><progress id="progress" value="0" max="1"></progress><p id="detail" class="small">One job runs at a time. New audio is returned as 48 kHz stereo WAV.</p><div id="error" role="alert"></div><div id="resolvedSeed" class="small"></div><div id="result" hidden><h2 style="margin-top:24px" id="resultTitle">Your continuation</h2><audio id="output" controls></audio><a id="download" class="download" download="continuation.wav">Download new audio</a><div id="fullResult" hidden><h2 style="margin-top:24px" id="secondaryTitle">Context + continuation</h2><audio id="fullOutput" controls></audio><a id="fullDownload" download="guide-and-continuation.wav">Download full preview</a></div><p id="metadata" class="small"></p></div></section><p class="small">Instrumental lyrics express intent; they do not guarantee silence from the vocalist. Audio priming can carry the source’s pulse, but BPM is not clock-locked.</p></aside></div></form>
+<footer>Processed locally. Your original audio stays unchanged.</footer>
+</main><script>
+const $=id=>document.getElementById(id);let session=null,sourceURL=null,sourceRate=0,sourceSamples=0,busy=false,ready=false;
+async function api(path,options){const r=await fetch(path,options);const data=await r.json();if(!r.ok)throw Error(data.error?.message||`HTTP ${r.status}`);return data;}
+function buttons(){ $('generate').disabled=busy||!ready;$('cancel').disabled=!busy; }
+function message(text){$('error').textContent=text;}
+async function health(){try{const p=await api('/health');ready=p.models_present;$('connection').textContent=`${p.backend.toUpperCase()} · ${p.version}`;$('detail').textContent=ready?'Ready · 48 kHz stereo': 'Model files are missing. Start the server with the model and codec directories.';buttons();}catch(e){message(e.message);}}
+// Read the WAV's original rate/sample count: AudioContext would resample it to
+// the browser device rate and move the native original-clock cursor.
+async function wavInfo(file){const buffer=await file.arrayBuffer(),v=new DataView(buffer);const tag=i=>String.fromCharCode(...new Uint8Array(buffer,i,4));if(buffer.byteLength<44||tag(0)!=='RIFF'||tag(8)!=='WAVE')throw Error('Choose a little-endian PCM WAV.');let rate=0,align=0,data=0;for(let i=12;i+8<=buffer.byteLength;){const n=v.getUint32(i+4,true),p=i+8;if(n>buffer.byteLength-p)throw Error('Truncated WAV chunk.');if(tag(i)==='fmt '&&n>=16){rate=v.getUint32(p+4,true);align=v.getUint16(p+12,true);}if(tag(i)==='data')data=n;i=p+n+(n%2);}if(!rate||!align||!data||data%align)throw Error('Unsupported WAV geometry.');return {rate,samples:data/align};}
+function selectedSamples(){const frame=Math.floor(sourceRate*2/25);return frame?Math.floor(Math.min(sourceSamples,Math.round(Number($('context').value)*sourceRate))/frame)*frame:0;}
+function selection(){
+ const remix=$('mode').value==='remix';
+ if(sourceRate){
+  const seconds=sourceSamples/sourceRate,context=selectedSamples()/sourceRate;
+  $('selection').textContent=`Uses the first ${context.toFixed(2)} seconds of your upload as audio context.`;
+  $('remixTarget').textContent=`Target remix length: ${seconds.toFixed(2)} seconds, including the audio context. The model may end early; timing uses 80 ms frames.`;
+  $('context').setCustomValidity(remix&&selectedSamples()>=Math.floor(sourceSamples/Math.floor(sourceRate*2/25))*Math.floor(sourceRate*2/25)?'Choose an audio context shorter than the song.':'');
+ }
+}
+$('audio').onchange=async()=>{sourceRate=0;sourceSamples=0;const f=$('audio').files[0];if(!f)return;try{const w=await wavInfo(f);sourceRate=w.rate;sourceSamples=w.samples;$('context').max=String(w.samples/w.rate);$('context').value=String(Math.min(Number($('context').value),w.samples/w.rate));if(sourceURL)URL.revokeObjectURL(sourceURL);sourceURL=URL.createObjectURL(f);$('source').src=sourceURL;$('source').hidden=false;$('sourceInfo').textContent=`${(w.samples/w.rate).toFixed(2)} seconds · ${w.rate.toLocaleString()} Hz`;selection();message('');}catch(e){message(e.message);}};
+$('context').oninput=selection;
+$('mode').onchange=()=>{const remix=$('mode').value==='remix';$('laneRow').hidden=!remix;$('durationRow').hidden=remix;$('duration').disabled=remix;$('remixTarget').hidden=!remix;$('fullRow').hidden=remix;selection();$('modeHelp').textContent=remix?'SheetSage2 transcribes your song automatically. Its melody and chords guide the remix, using your selected opening as audio context.':'Continue directly from the selected opening audio.';};
+$('form').onsubmit=async e=>{
+ e.preventDefault();if(busy)return;message('');
+ try{
+  const file=$('audio').files[0];if(!file||!sourceRate)throw Error('Choose a valid WAV first.');
+  const remix=$('mode').value==='remix';
+  const payload={lyrics:$('lyrics').value,tags:$('tags').value,score_mode:remix?'provided':'none',transcribe:remix,transcription_lane:$('lane').value,transcription_scope:'source',
+   seed:$('seed').value,guidance:Number($('guidance').value),temperature:Number($('temperature').value),top_k:Number($('topk').value),
+   audio_context_seconds:Number($('context').value),include_full_audio:remix||$('full').checked};
+  if(remix)payload.match_source_duration=true;else payload.natural_max_seconds=Number($('duration').value);
+  const form=new FormData();form.append('audio',file);form.append('options',JSON.stringify(payload));
+  busy=true;buttons();$('stage').textContent='Uploading…';$('progress').value=0;
+  if(session){await api('/release/'+session,{method:'POST'}).catch(()=>{});session=null;}
+  $('result').hidden=true;const j=await api('/continue',{method:'POST',body:form});session=j.session_id;$('resolvedSeed').textContent=`Seed: ${j.seed}`;localStorage.setItem('mulacover-session',session);poll();
+ }catch(err){message(err.message);busy=false;buttons();}
+};
+async function poll(){
+ if(!session)return;
+ try{
+  const s=await api('/poll_status/'+session);if(s.seed)$('resolvedSeed').textContent=`Seed: ${s.seed}`;$('stage').textContent=s.stage;$('progress').value=s.progress;busy=s.generation_in_progress;buttons();
+  if(busy){$('detail').textContent=s.total_steps?`${s.step} / ${s.total_steps}`:'Loading the next model stage…';setTimeout(poll,1000);return;}
+  localStorage.removeItem('mulacover-session');
+  if(s.status==='completed'){
+   const remix=s.meta.duration_policy==='source',primary=remix?s.full_audio_url:s.audio_url;
+   $('resultTitle').textContent=remix?'Your remix':'Your continuation';$('output').src=primary;$('download').href=primary;
+   $('download').textContent=remix?'Download remix':'Download new audio';$('download').download=remix?'remix.wav':'continuation.wav';
+   $('fullResult').hidden=remix||!s.full_audio_url;
+   if(!remix&&s.full_audio_url){$('fullOutput').src=s.full_audio_url;$('fullDownload').href=s.full_audio_url;}
+   $('metadata').textContent=remix?`Target ${s.meta.target_total_duration.toFixed(2)}s · actual ${s.meta.actual_total_duration.toFixed(2)}s · ${s.meta.ended_early?'ended early':'source-length target reached'} · seed ${s.meta.seed}`:`${s.meta.duration.toFixed(2)} new seconds · ${s.meta.eos?'natural ending':'duration ceiling'} · seed ${s.meta.seed}`;
+   $('result').hidden=false;$('detail').textContent='Finished. Download your audio before starting another session.';
+  }else message(s.error||'Session cancelled.');
+ }catch(e){busy=false;buttons();message(e.message+' Reload to reconnect to this session.');}
+}
+$('cancel').onclick=async()=>{if(!session)return;try{await api('/cancel/'+session,{method:'POST'});$('stage').textContent='Cancelling after the current operation…';}catch(e){message(e.message);}};
+health();const saved=localStorage.getItem('mulacover-session');if(saved){session=saved;busy=true;buttons();poll();}
+</script></body></html>
