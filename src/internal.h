@@ -1,6 +1,7 @@
 #pragma once
 #include "mulacover.h"
 #include "mulacover_sampling.h"
+#include "tempo.h"
 #include "ggml.h"
 #include "ggml-backend.h"
 #include "ggml-alloc.h"
@@ -60,7 +61,8 @@ struct Graph {
     ggml_tensor * keep(const std::string &,ggml_tensor *);
     ggml_tensor * rope(ggml_tensor *,ggml_tensor * positions,int head_dim);
     ggml_tensor * attention(const std::string &,ggml_tensor * x,ggml_tensor * context,int heads,int kv_heads,
-                           int pos,bool causal,const std::vector<uint8_t> & padding,Cache * cache=nullptr,int layer=0,int branch=0);
+                           int pos,bool causal,const std::vector<uint8_t> & padding,Cache * cache=nullptr,int layer=0,int branch=0,
+                           const std::vector<float> & score_bias={});
     ggml_tensor * transformer(const std::string &,ggml_tensor *,int heads,int kv_heads,int pos,bool causal,
                              const std::vector<uint8_t> & padding,Cache * cache=nullptr,int layer=0,int branch=0);
     void execute();
@@ -77,6 +79,7 @@ struct Session {
     Model model;
     Cache backbone,decoder;
     Condition condition;
+    mulacover_tempo_config_v1 tempo{sizeof(mulacover_tempo_config_v1),0,1,0};
     int capacity=8192,branches=0,position=0,frame_index=0;
     bool stopped=false;
     std::array<int32_t,8> previous{};

@@ -1,0 +1,315 @@
+{
+  "date": "2026-11-04",
+  "base_commit": "39c99f7",
+  "branch": "experiment/score-clock",
+  "purpose": "Long-guide feasibility probe requested by the user: source seconds 0--50 as all guide context, then 16 requested new seconds",
+  "cursor_seconds": 50,
+  "guide_seconds": 50,
+  "guide_frames": 625,
+  "requested_new_seconds": 16,
+  "requested_new_frames": 200,
+  "actual_new_seconds": 6.8,
+  "source_audio_sha256": "140f18292989b1026113f02e0b6e2c9c1eaea29df05965f9404e40d76f74af9a",
+  "source_prefix": {
+    "sha256": "f9b1b354227d81199f3b69c2164d981a712aa3c5cdfedd0b4def7e660df90d1c",
+    "seconds": 50,
+    "samples_per_channel": 2205000,
+    "sample_rate": 44100,
+    "source_prefix_pcm_bit_exact": true,
+    "audio_after_cursor_supplied": false
+  },
+  "encoder": {
+    "manifest": {
+      "heartlib_revision": "5858ca8f1ffe58d62be7c007ea55f1033c5ca456",
+      "encoder": {
+        "repository": "HeartMuLa/HeartCodec-oss-encoder",
+        "revision": "e6020510612d6653b73d6cd54393ef80929e3c81",
+        "snapshot": "/workspace/.cache/huggingface/hub/models--HeartMuLa--HeartCodec-oss-encoder/snapshots/e6020510612d6653b73d6cd54393ef80929e3c81",
+        "weights_sha256": "19b3c0284fecac70983731433a213ad20eb08d096be3b9a287078171de0d4e79"
+      },
+      "codec_revision": "f889dab0532cfa4bf459f2a3367eb6d346b8eeda",
+      "source_excerpt_sha256": "f9b1b354227d81199f3b69c2164d981a712aa3c5cdfedd0b4def7e660df90d1c",
+      "harness_sha256": "f09c43035b9fed472e10c8cb6a3a2dc5b055db17ce49219c174462ee2a457186",
+      "torch": "2.7.1+cu128",
+      "cuda": "12.8",
+      "device": "cpu",
+      "cases": [
+        {
+          "speed_factor": 1.0,
+          "frames": 625,
+          "guide_seconds": 50.0,
+          "complete_token_seconds": 50.0,
+          "codes_file": "guide-1.i32",
+          "codes_sha256": "47441c0b3ddd1f8544502e3704b92aebb0c2e7f9446b7b5c558105156e9f19c9",
+          "guide_sha256": "f9b1b354227d81199f3b69c2164d981a712aa3c5cdfedd0b4def7e660df90d1c"
+        }
+      ],
+      "intervention": "Pitch-preserving ffmpeg atempo on input guide only, then original FP32 encoder and decoder RVQ; generated continuations must be measured excluding the guide"
+    },
+    "input_audit": {
+      "cursor_seconds": 50,
+      "source_samples_per_channel": 2205000,
+      "source_rate": 44100,
+      "source_prefix_pcm_bit_exact": true,
+      "guide_frames": 625,
+      "codes_hash_matches_encoder_manifest": true,
+      "encoder_chunks": 2,
+      "first_372_codes_changed_compared_with_shorter_encoding": 5,
+      "note": "The longer encoding has extra source context before its 50-second cursor; earlier chunk resampling edges may differ from an input ending at 29.76s."
+    },
+    "chunks": 2,
+    "device": "cpu",
+    "docker_image": "heartcodec-reference:20261101",
+    "docker_image_id": "sha256:70947194330272d2aed83dfa51923165ef013a32b0a03f9be8afb2d65957524b",
+    "network": "none",
+    "host_python_used": false,
+    "dependencies_installed": false,
+    "reference_helper": "reference/run-spark.sh encode-prefix"
+  },
+  "native_cli_sha256": "b12258e48eb466ec62a92c324347e1de67e98241ef1cd46a53cd8283c07dad53",
+  "models": {
+    "generator_sha256": "74ebd8a8537f55ea3f3566cfa17c7e28734fc555af5fbc1a254bec94a182f814",
+    "flow_sha256": "5c9cdbfae26ccd3e96355c541cade0feca37cfd8696746b724c294095949f523",
+    "sq_sha256": "2f72b85f924c629aae33004703cc02e16600abee15c01e928b2878e5d0f29ae6"
+  },
+  "prepared_inputs": [
+    {
+      "file": "tokens.i32",
+      "sha256": "5c23088145c6c4f1c14d0f05dfb32cb385cf23e24698ce47bc33c130a5221971",
+      "matches_previous_score_free_input": true
+    },
+    {
+      "file": "mask.u8",
+      "sha256": "846fd932ac265879aaaf529cbda82f50243f00bf66438fded7253c22b10c58d1",
+      "matches_previous_score_free_input": true
+    },
+    {
+      "file": "qwen.f32",
+      "sha256": "2e20d4b2b825908f309770f6bbd5e78d2870f3e34b7482ec3896cbdbcd0ab427",
+      "matches_previous_score_free_input": true
+    },
+    {
+      "file": "muq.f32",
+      "sha256": "e5a00aa9991ac8a5ee3109844d84a55583bd20572ad3ffcd42792f3c36b183ad",
+      "matches_previous_score_free_input": true
+    }
+  ],
+  "symbolic_condition": {
+    "mode": "none",
+    "frames": 540,
+    "piano": -1,
+    "drum": -1,
+    "chord": -1,
+    "context_mask": 0,
+    "score_files_present": false,
+    "future_score_notes_supplied": false
+  },
+  "native_generation_and_decode_invoked_python": false,
+  "run": {
+    "frames": 710,
+    "prompt_frames": 25,
+    "symbolic_frames": 540,
+    "score_mode": "none",
+    "cache_capacity": 1024,
+    "audio_prefix_frames": 625,
+    "newly_generated_frames": 85,
+    "guide_source_frames": 625,
+    "guide_source_start_frame": 0,
+    "requested_new_frames": 200,
+    "continuation_samples_per_channel": 326400,
+    "guidance": 1.5,
+    "temperature": 1,
+    "top_k": 250,
+    "seed": 1701,
+    "experimental_tempo": {
+      "method": "conditional-cross-attention-gaussian-v1",
+      "bpm": 0,
+      "width_beats": 1,
+      "offset_beats": 0,
+      "local_window": 0
+    },
+    "eos": true,
+    "replay_checked": true,
+    "terminal_contract_passed": true,
+    "generator_released_before_decode": true,
+    "generation_with_checks_seconds": 240.612,
+    "weight_bytes": 2939920896,
+    "cache_bytes": 470351872,
+    "graph_bytes": 53535232,
+    "audio_samples_per_channel": 2726400,
+    "audio_peak": 0.793794,
+    "audio_rms": 0.144131,
+    "decode_seconds": 35.8384,
+    "decoder_seed": 1701,
+    "decoder_steps": 10,
+    "segment_codes": 372,
+    "decoder_guidance": 1.25,
+    "rng": "torch-cuda",
+    "rng_cuda_blocks": 288,
+    "sampler_offset_per_head": 4,
+    "sampler_start_offset": 0,
+    "sampler_final_offset": 2752,
+    "decoder_final_offset": 12,
+    "decoder_rng_windows": 3,
+    "ggml_commit": "0f2ed045"
+  },
+  "validation": {
+    "all_5000_guide_codes_bit_exact": true,
+    "suffix_pcm_copy_bit_exact": true,
+    "required_cache_positions": 849,
+    "cache_capacity": 1024,
+    "shared_ggml_pin": "b77ae790e628270af46a8af1eca38441c23f1252",
+    "development_ggml": "0f2ed045eaff6bf01bed074878b6988248efbc22",
+    "consumer_pins_changed": false,
+    "ggml_bump_check_started": false
+  },
+  "tempo_analysis": {
+    "numpy": "2.2.6",
+    "method": "Positive log-spectral flux, 2048-sample Hann window, approximately 100Hz envelope; normalized lag autocorrelation, local maxima between 40 and 240 BPM",
+    "limitation": "Candidates include beat subdivisions and half/double-time aliases. Rank is not a musical beat annotation. Score-clock estimates are also model predictions. No hard adherence claim from either estimator alone.",
+    "cases": {
+      "guide50": {
+        "audio_path": "refdata/cursor-continuation/guide50/continuation.wav",
+        "sha256": "3f8a6e23f293dc88a58649f539b1db3f0a9c7417b33d42ed26a06c49b29b1a51",
+        "duration_seconds": 6.8,
+        "onset_autocorrelation_candidates": [
+          {
+            "bpm": 117.63765184305387,
+            "correlation": 0.45165108115964664
+          },
+          {
+            "bpm": 239.76366471815396,
+            "correlation": 0.38962357844470674
+          },
+          {
+            "bpm": 59.80890420150102,
+            "correlation": 0.33395019779077945
+          },
+          {
+            "bpm": 79.6732097702997,
+            "correlation": 0.304602377853406
+          },
+          {
+            "bpm": 47.89398818784063,
+            "correlation": 0.2033879116748068
+          },
+          {
+            "bpm": 58.373916664772636,
+            "correlation": 0.1961588620611554
+          }
+        ],
+        "windows": [
+          {
+            "start_seconds": 0,
+            "candidates": [
+              {
+                "bpm": 117.63765184305387,
+                "correlation": 0.45165108115964664
+              },
+              {
+                "bpm": 239.76366471815396,
+                "correlation": 0.38962357844470674
+              },
+              {
+                "bpm": 59.80890420150102,
+                "correlation": 0.33395019779077945
+              }
+            ]
+          }
+        ]
+      },
+      "source50_tail": {
+        "audio_path": "refdata/cursor-continuation/source50-last8.wav",
+        "sha256": "b69d4c426244eaa5e2fc031d624289859ac3e99ed93cedcc469acf815f8a2e05",
+        "duration_seconds": 8.0,
+        "onset_autocorrelation_candidates": [
+          {
+            "bpm": 60.01006938546439,
+            "correlation": 0.4665206537047058
+          },
+          {
+            "bpm": 120.09894429279788,
+            "correlation": 0.4478149747299181
+          },
+          {
+            "bpm": 80.00700439310914,
+            "correlation": 0.3697396314606502
+          },
+          {
+            "bpm": 40.00563860985503,
+            "correlation": 0.3345539909611193
+          },
+          {
+            "bpm": 48.0016364299031,
+            "correlation": 0.2983673093754778
+          },
+          {
+            "bpm": 189.77728471097413,
+            "correlation": 0.19262267110860995
+          }
+        ],
+        "windows": [
+          {
+            "start_seconds": 0,
+            "candidates": [
+              {
+                "bpm": 60.01006938546439,
+                "correlation": 0.4665206537047058
+              },
+              {
+                "bpm": 120.09894429279788,
+                "correlation": 0.4478149747299181
+              },
+              {
+                "bpm": 80.00700439310914,
+                "correlation": 0.3697396314606502
+              }
+            ]
+          }
+        ]
+      }
+    }
+  },
+  "files": [
+    {
+      "file": "codes.i32",
+      "sha256": "39e95a542310dfc38fced3c0aaec261cca1bc4314be649f95707c7a5bf1c8917"
+    },
+    {
+      "file": "audio.wav",
+      "sha256": "feb0b141ad016d56429554d6e7006b4b790ddb04f2f428278dfe24cfe51af9f8"
+    },
+    {
+      "file": "continuation.wav",
+      "sha256": "3f8a6e23f293dc88a58649f539b1db3f0a9c7417b33d42ed26a06c49b29b1a51"
+    },
+    {
+      "file": "listen-last8-plus-new.wav",
+      "sha256": "a82df419d55934e6c07f4a4bb9dd8004c54e0300218a2ba9aebe084254edcf84"
+    },
+    {
+      "file": "continuation-listen.wav",
+      "sha256": "78b2613c663e197364da9d47e42167cee427afb83697768d9db48c93e1a85dfc"
+    }
+  ],
+  "listening": {
+    "gain_db": -3,
+    "preview": "listen-last8-plus-new.wav",
+    "preview_full_decode_start_seconds": 42,
+    "preview_guide_seconds": 8,
+    "all_guide_seconds_used_by_generator": 50,
+    "new_audio_begins_at_preview_seconds": 8,
+    "raw_source_spliced": false,
+    "time_stretching": false,
+    "normalization": false,
+    "assessment": "User hears the model produce an ending and finds this short completion interesting; no guaranteed-length or general-fidelity acceptance"
+  },
+  "limitations": [
+    "Different cursor and requested length from the 4/8/16 tail study; this is a feasibility probe, not an isolated length comparison.",
+    "One source and seed, Q4 generator and experimental dropped-score conditioning.",
+    "Native raw-PCM encoder remains unported. The only Python inference stage ran in dedicated Spark Docker.",
+    "Native cache is finite: prompt+guide+new-1 must fit the chosen capacity, with an 8192-position API limit. Larger-cache memory and quality are unvalidated.",
+    "Noncausal codec may alter reconstructed guide with generated suffix; existing host PCM join is not yet validated.",
+    "Existing expanded activation and strict upstream waveform-parity failures remain unresolved."
+  ]
+}

@@ -1,0 +1,303 @@
+{
+  "date": "2026-11-04",
+  "base_commit": "9bba0ef",
+  "branch": "experiment/score-clock",
+  "purpose": "Longer score-free native continuation from approximately 30 seconds of the selected source",
+  "cursor_seconds": 29.76,
+  "guide_seconds": 29.76,
+  "guide_frames": 372,
+  "requested_new_seconds": 90,
+  "actual_new_seconds": 57.84,
+  "total_output_seconds": 87.6,
+  "source_audio_sha256": "140f18292989b1026113f02e0b6e2c9c1eaea29df05965f9404e40d76f74af9a",
+  "source_prefix_sha256": "ff700ca0aa7a9bca414e4a6bb0877a5f4eb47d0912232d563be9bd6e50311a0c",
+  "encoded_guide_sha256": "bdbeab789d35496a3744f41410ab4ffeaecf91e7a0a9759dd1a9e7ae075ab342",
+  "encoder_context_seconds": 29.76,
+  "encoder_reused": true,
+  "audio_after_cursor_supplied": false,
+  "native_cli_sha256": "b12258e48eb466ec62a92c324347e1de67e98241ef1cd46a53cd8283c07dad53",
+  "models": {
+    "generator_sha256": "74ebd8a8537f55ea3f3566cfa17c7e28734fc555af5fbc1a254bec94a182f814",
+    "flow_sha256": "5c9cdbfae26ccd3e96355c541cade0feca37cfd8696746b724c294095949f523",
+    "sq_sha256": "2f72b85f924c629aae33004703cc02e16600abee15c01e928b2878e5d0f29ae6"
+  },
+  "prepared_inputs": [
+    {
+      "file": "tokens.i32",
+      "sha256": "5c23088145c6c4f1c14d0f05dfb32cb385cf23e24698ce47bc33c130a5221971",
+      "matches_previous_score_free_input": true
+    },
+    {
+      "file": "mask.u8",
+      "sha256": "846fd932ac265879aaaf529cbda82f50243f00bf66438fded7253c22b10c58d1",
+      "matches_previous_score_free_input": true
+    },
+    {
+      "file": "qwen.f32",
+      "sha256": "2e20d4b2b825908f309770f6bbd5e78d2870f3e34b7482ec3896cbdbcd0ab427",
+      "matches_previous_score_free_input": true
+    },
+    {
+      "file": "muq.f32",
+      "sha256": "e5a00aa9991ac8a5ee3109844d84a55583bd20572ad3ffcd42792f3c36b183ad",
+      "matches_previous_score_free_input": true
+    }
+  ],
+  "symbolic_condition": {
+    "mode": "none",
+    "frames": 540,
+    "piano": -1,
+    "drum": -1,
+    "chord": -1,
+    "context_mask": 0,
+    "symbolic_files_present": false,
+    "future_symbolic_notes_supplied": false,
+    "shape": "Fixed null-context shape retained across all cases; no score values are loaded"
+  },
+  "native_runtime_invoked_python": false,
+  "run": {
+    "frames": 1095,
+    "prompt_frames": 25,
+    "symbolic_frames": 540,
+    "score_mode": "none",
+    "cache_capacity": 1536,
+    "audio_prefix_frames": 372,
+    "newly_generated_frames": 723,
+    "guide_source_frames": 372,
+    "guide_source_start_frame": 0,
+    "requested_new_frames": 1125,
+    "continuation_samples_per_channel": 2776320,
+    "guidance": 1.5,
+    "temperature": 1,
+    "top_k": 250,
+    "seed": 1701,
+    "experimental_tempo": {
+      "method": "conditional-cross-attention-gaussian-v1",
+      "bpm": 0,
+      "width_beats": 1,
+      "offset_beats": 0,
+      "local_window": 0
+    },
+    "eos": true,
+    "replay_checked": false,
+    "terminal_contract_passed": true,
+    "generator_released_before_decode": true,
+    "generation_with_checks_seconds": 194.611,
+    "weight_bytes": 2939920896,
+    "cache_bytes": 705232896,
+    "graph_bytes": 54968832,
+    "audio_samples_per_channel": 4204800,
+    "audio_peak": 0.974264,
+    "audio_rms": 0.166555,
+    "decode_seconds": 42.7246,
+    "decoder_seed": 1701,
+    "decoder_steps": 10,
+    "segment_codes": 372,
+    "decoder_guidance": 1.25,
+    "rng": "torch-cuda",
+    "rng_cuda_blocks": 288,
+    "sampler_offset_per_head": 4,
+    "sampler_start_offset": 0,
+    "sampler_final_offset": 23168,
+    "decoder_final_offset": 16,
+    "decoder_rng_windows": 4,
+    "ggml_commit": "0f2ed045"
+  },
+  "validation": {
+    "all_2976_guide_codes_bit_exact": true,
+    "suffix_pcm_copy_bit_exact": true,
+    "replay_checked": false,
+    "replay_omission": "Listening run omits duplicate pass; four shorter fixtures already replay exactly",
+    "terminal_reset_contract_passed": true,
+    "requested_cache_positions": 1521,
+    "cache_capacity": 1536,
+    "first_25_6_seconds_match_independent_source_only_decode_bit_exact": true
+  },
+  "context_limit": {
+    "api_positions": 8192,
+    "prompt_frames": 25,
+    "max_audio_frames": 8168,
+    "max_total_audio_seconds": 653.44,
+    "max_new_seconds_with_30_second_guide": 623.44,
+    "largest_cache_laptop_memory_validated": false
+  },
+  "tempo_analysis": {
+    "numpy": "2.2.6",
+    "method": "Positive log-spectral flux, 2048-sample Hann window, approximately 100Hz envelope; normalized lag autocorrelation, local maxima between 40 and 240 BPM",
+    "limitation": "Candidates include beat subdivisions and half/double-time aliases. Rank is not a musical beat annotation. Score-clock estimates are also model predictions. No hard adherence claim from either estimator alone.",
+    "cases": {
+      "guide30_long": {
+        "audio_path": "refdata/cursor-continuation/guide30-long/continuation.wav",
+        "sha256": "47493d786031a8b11ab51a6fa0e040302b19d0b5ed455ef21af66856ac4246ac",
+        "duration_seconds": 57.84,
+        "onset_autocorrelation_candidates": [
+          {
+            "bpm": 59.85548813307835,
+            "correlation": 0.6191635352949262
+          },
+          {
+            "bpm": 119.80944915127544,
+            "correlation": 0.6066112900768699
+          },
+          {
+            "bpm": 79.77926158908879,
+            "correlation": 0.5684839297619155
+          },
+          {
+            "bpm": 47.895379725811246,
+            "correlation": 0.5303988167324091
+          },
+          {
+            "bpm": 163.87202239205806,
+            "correlation": 0.2336185637293294
+          },
+          {
+            "bpm": 190.35452845836997,
+            "correlation": 0.22577849083646462
+          }
+        ],
+        "windows": [
+          {
+            "start_seconds": 0,
+            "candidates": [
+              {
+                "bpm": 59.87476307903381,
+                "correlation": 0.40577107873057716
+              },
+              {
+                "bpm": 120.53221552181398,
+                "correlation": 0.23809458373273407
+              },
+              {
+                "bpm": 239.33214786716644,
+                "correlation": 0.21716636493592123
+              }
+            ]
+          },
+          {
+            "start_seconds": 10,
+            "candidates": [
+              {
+                "bpm": 59.82779185549363,
+                "correlation": 0.508578024061469
+              },
+              {
+                "bpm": 239.93590241653783,
+                "correlation": 0.38918645407347996
+              },
+              {
+                "bpm": 119.63844558610315,
+                "correlation": 0.38188320042950397
+              }
+            ]
+          },
+          {
+            "start_seconds": 20,
+            "candidates": [
+              {
+                "bpm": 59.92823751880863,
+                "correlation": 0.5131611139876001
+              },
+              {
+                "bpm": 119.72551856226345,
+                "correlation": 0.5072774785275952
+              },
+              {
+                "bpm": 79.9346625417543,
+                "correlation": 0.4964531316004673
+              }
+            ]
+          },
+          {
+            "start_seconds": 30,
+            "candidates": [
+              {
+                "bpm": 119.82478993859255,
+                "correlation": 0.6734721293029153
+              },
+              {
+                "bpm": 59.88948833405475,
+                "correlation": 0.6495465610700066
+              },
+              {
+                "bpm": 79.74387991906494,
+                "correlation": 0.6418594989407627
+              }
+            ]
+          },
+          {
+            "start_seconds": 40,
+            "candidates": [
+              {
+                "bpm": 119.71404847717467,
+                "correlation": 0.6730307550784034
+              },
+              {
+                "bpm": 79.67569539718386,
+                "correlation": 0.6501030231384494
+              },
+              {
+                "bpm": 59.82652809386623,
+                "correlation": 0.6305307032686542
+              }
+            ]
+          }
+        ]
+      }
+    }
+  },
+  "files": [
+    {
+      "file": "codes.i32",
+      "sha256": "0a72c959b0f677761877f4f96c9f8281f4e8f43e44d5493e04932d682bb02a18"
+    },
+    {
+      "file": "audio.wav",
+      "sha256": "b40778a842f0fbea75a71120bb262fb5d5f0a4b4f6ec9095899a009ab9799fa3"
+    },
+    {
+      "file": "continuation.wav",
+      "sha256": "47493d786031a8b11ab51a6fa0e040302b19d0b5ed455ef21af66856ac4246ac"
+    },
+    {
+      "file": "full-listen.wav",
+      "sha256": "0767a02572047650442cc9e06bf7b466b81668b0cd07cc98b3890ce07edd6f3a"
+    },
+    {
+      "file": "listen-last8-plus-new.wav",
+      "sha256": "dde72ecd8e9829f0abc2d93331d96a2f631598d726d14bc0d88099e72fd31815"
+    },
+    {
+      "file": "continuation-listen.wav",
+      "sha256": "46b598bbc1cf4e6e91ba7caaf1c70bc507364e4500a2120044f1d821b204d463"
+    }
+  ],
+  "listening": {
+    "gain_db": -3,
+    "preview": "listen-last8-plus-new.wav",
+    "preview_start_seconds_in_full_decode": 21.76,
+    "preview_guide_seconds": 8,
+    "preview_new_seconds": 57.84,
+    "model_received_guide_seconds": 29.76,
+    "new_audio_start_seconds_in_player": 8,
+    "raw_source_spliced": false,
+    "time_stretching": false,
+    "normalization": false,
+    "assessment": "User strongly positively assesses this longer continuation; accepted listening baseline for this source, seed and preset",
+    "case_musical_acceptance": true,
+    "exact_melody_or_bpm_lock_accepted": false,
+    "general_source_quality_established": false
+  },
+  "shared_ggml_pin": "b77ae790e628270af46a8af1eca38441c23f1252",
+  "development_ggml": "0f2ed045eaff6bf01bed074878b6988248efbc22",
+  "consumer_pins_changed": false,
+  "ggml_bump_check_started": false,
+  "limitations": [
+    "One source and seed, Q4 generator and experimental dropped-score mode; general quality, exact melody preservation and hard BPM lock are not established.",
+    "EOS ends this run before its 90-new-second request despite sufficient cache.",
+    "Native raw-PCM encoder remains unported; this run reuses validated cached encoding and prepared style.",
+    "The 8192-position API ceiling is not a measured maximum laptop configuration or a quality guarantee.",
+    "Preview uses reconstructed guide; preserving existing DAW PCM and a clean host join remain separate work.",
+    "Existing expanded activation and strict upstream decoder waveform-parity failures remain unresolved."
+  ]
+}

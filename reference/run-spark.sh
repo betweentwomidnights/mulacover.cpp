@@ -29,6 +29,18 @@ common=(--rm --user "$(id -u):$(id -g)" -e USER=heartcodec -e LOGNAME=heartcodec
   -e CUBLAS_WORKSPACE_CONFIG=:4096:8 -e GGML_CUDA_TF32=0 -e GGML_CUDA_CUBLAS_COMPUTE_TYPE=auto
   -v "$project_root:/workspace" -w /workspace)
 case "$command" in
+  encode-prefix)
+    # Pinned CPU reference avoids the image's unsupported GB10 NVRTC STFT path.
+    # The host only orchestrates Docker; input may span multiple encoder chunks.
+    encoder_audio="${MULACOVER_ENCODER_AUDIO:?Set the container-relative input WAV path}"
+    encoder_output="${MULACOVER_ENCODER_OUTPUT:?Set a fresh container-relative output directory}"
+    codec_snapshot=/codec/.cache/huggingface/hub/models--HeartMuLa--HeartCodec-oss-20260123/snapshots/f889dab0532cfa4bf459f2a3367eb6d346b8eeda
+    docker run "${common[@]}" --network none \
+      -e HF_HOME=/workspace/.cache/huggingface -v "$codec:/codec:ro" -v "$refs:/refs:ro" \
+      "$image" /opt/sa3-venv/bin/python reference/encode-prefix.py \
+      --upstream /refs/heartlib --codec-snapshot "$codec_snapshot" \
+      --audio "$encoder_audio" --output "$encoder_output" --device cpu
+    ;;
   convert)
     docker run "${common[@]}" --network none -e PYTHONPATH=/gguf-deps \
       -v "$refs:/refs:ro" -v "$codec/.python-deps:/gguf-deps:ro" "$image" \
@@ -107,5 +119,5 @@ case "$command" in
       "$image" /opt/sa3-venv/bin/python reference/export_reference.py --upstream /refs/MuLaCover \
       --output "refdata/upstream-$suffix" --dtype "$1"
     ;;
-  *) echo 'Usage: bash reference/run-spark.sh prepare|float32|bfloat16|convert|sampling-oracle|sequence-oracle|build-development|parity-development|quantize-development|measure-development|sampling-development|sequence-development|generate-development (build/parity also support the shared baseline)' >&2; exit 2 ;;
+  *) echo 'Usage: bash reference/run-spark.sh encode-prefix|prepare|float32|bfloat16|convert|sampling-oracle|sequence-oracle|build-development|parity-development|quantize-development|measure-development|sampling-development|sequence-development|generate-development (build/parity also support the shared baseline)' >&2; exit 2 ;;
 esac

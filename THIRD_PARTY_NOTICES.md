@@ -8,6 +8,7 @@ components retain their respective licenses.
 | Component or reference | Source / terms |
 | --- | --- |
 | HeartMuLa/MuLaCover at `e27fa7fa0da7c9817879cc6210cc5693f9327946` | Apache-2.0 source; copy retained in `LICENSES/MuLaCover-Apache-2.0.txt`. Model architecture, symbolic conditioning, sampling and reference pipeline are attributed to its authors. |
+| HeartMuLa/heartlib at `5858ca8f1ffe58d62be7c007ea55f1033c5ca456` | External Apache-2.0 reference source for the audio-guide encoder experiment. `HeartCodec-oss-encoder` is separately pinned to `e6020510612d6653b73d6cd54393ef80929e3c81`; source, checkpoint and output terms remain separate. No encoder source or weights are vendored here. |
 | MuLaCover checkpoint weights and generated outputs | Separate upstream terms retained in `LICENSES/MuLaCover-model-and-output-terms.txt`; the source MIT license does not replace these terms. No weights or audio are bundled. |
 | betweentwomidnights/heartcodec.cpp | Linked sibling dependency, MIT project source with its own third-party inventory and RNG notices. |
 | betweentwomidnights/ggml | Shared pinned dependency supplied by HeartCodec; retain that fork's license when distributing it. No second GGML copy is bundled here. |

@@ -95,3 +95,83 @@
   fixture and build exclusions. HeartCodec's GitHub-initialized MIT LICENSE
   commit is preserved in local history; MulaCover uses matching own-source MIT
   with separate upstream source/model notices. Shared-GGML adoption stays deferred.
+- BPM intervention work is isolated on `experiment/score-clock`.
+  `docs/SCORE_CLOCK_EXPERIMENT.md` records conditional Gaussian score-attention
+  bias and optional local symbolic masks. The initial 1,404 public logit/KV
+  oracle comparisons pass unchanged gates; attention did not reliably control
+  tempo. Audio priming follows the source's ~120 BPM in full F32/Q4 runs (eight
+  guided seconds + 62 new seconds) and one shorter Q4 seed-1702 replication.
+  Slow-guide control misses its target; no arbitrary-BPM or hard-lock claim.
+  Do not enable these controls by default. Audio-token priming is experimental:
+  output includes teacher-forced guide frames, which must be excluded from
+  continuation tempo/quality measurements. Teacher-forced frames draw no RNG;
+  an explicit sampler offset can resume an existing Philox stream.
+- User positively assessed the source-guided Q4 continuation and encoding and
+  identifies continuation as the intended DAW use case. Do not keep treating
+  the source lead-in as a blocker to that workflow, or infer exact melody/beat
+  lock acceptance from this feedback. The prepared-input driver now selects
+  cached guide start/duration with `--guide-start-seconds` / `--guide-seconds`
+  and independently requests new audio with `--continuation-seconds` (80-ms
+  resolution). It automatically sizes the cache unless explicitly configured
+  and exports `continuation.wav` without the guide. Encoder context and guide
+  duration are separate: the accepted example encodes 29.76s and feeds 8s.
+- Native continuation controls and suffix export now live in
+  `mulacover_continuation.h` / `src/continuation.cpp` and the C++ generator CLI;
+  `tools/generate.py` delegates them and independently validates outputs. Core
+  and existing capability layouts are frozen. See `docs/NATIVE_CONTINUATION.md`.
+  The audio-to-RVQ encoder is now native in sibling HeartCodec; Qwen/prompt
+  preprocessing remains reference Python. Raw-PCM inference with prepared
+  conditioning now runs through the native job. The user values both score-guided
+  transformation/continuation and score-free audio continuation; preserve both
+  workflows. `--score-mode none` uses the upstream -1 dropped-score convention
+  without reading symbolic files; this is experimental. See
+  `docs/SCORE_FREE_CONTINUATION.md`. A strict DAW baseline must use only
+  pre-cursor audio/transcription and a tail guide: the prior demo has a whole-song
+  score and encoder lookahead beyond the selected beginning-of-song guide.
+  Initial score-free listener feedback concerned the missing source opening;
+  the presented clip excluded the first eight guide seconds. After comparing
+  full openings, the user understands that distinction, finds score-free output
+  wilder, and explicitly wants to retain its primitives. Keep score-free mode
+  available and opt-in; do not infer precise source preservation or hard BPM
+  lock acceptance. Guide
+  codes are identical in both runs, but joint noncausal 29.76-second decoding
+  changes even their guide waveform when later generated codes differ. Matched
+  full openings and independent source-token reconstruction are now available;
+  the observed difference does not establish changed source encoding.
+- The cursor-ending test uses the cached encoding of exactly source seconds
+  0--29.76, with 4/8/16-second tail guides and no score. In the eight-second case,
+  the user hears a seamless transition into a wilder but interesting continuation.
+  This is listener acceptance of that handoff, not precise melody or BPM lock.
+  See `docs/CURSOR_CONTINUATION.md`. The user also requests exploring 50 seconds
+  of context: official encoding supports multiple 29.76-second chunks; guide and
+  new frames share the finite native cache budget. The `encode-prefix` action in
+  `reference/run-spark.sh` runs the existing FP32 CPU encoder only in dedicated
+  Spark Docker. A native F32 encoder now exists in HeartCodec.
+  All tail runs replay exactly: 4s and 8s guides yield 32 new seconds; 16s yields
+  31.84 seconds then EOS. The 50s guide accepts all 625 frames/5,000 codes and
+  yields 6.8 new seconds then EOS despite a 16s request and sufficient cache.
+  Do not claim unlimited context or guaranteed continuation length. The user
+  hears the long-guide model produce an ending; that probe changes cursor and
+  requested length, so it is not an isolated length comparison. Source encoder inputs are frozen
+  independently: the longer input changes five earlier RVQ code positions.
+- The user's longer listening request uses the entire cached 29.76s source
+  guide and requests 90 new seconds, without a score. It produces 57.84 new
+  seconds then EOS (87.6s total), using an automatically planned 1536-position
+  cache on the laptop. No forced minimum or EOS suppression. This listening
+  run omits duplicate replay; guide-code, suffix-copy and terminal/reset checks
+  pass. See `docs/validation/extended-continuation.json`. The native API's
+  8192-position limit allows 653.44 total audio seconds with a 25-frame prompt;
+  maximum-cache laptop memory and quality are unvalidated. Keep duration ceiling,
+  EOS behavior and practical hardware limits distinct.
+  The user strongly positively assesses this longer clip. Treat it as an
+  accepted listening baseline for this source/seed/preset, while keeping
+  numerical parity gates and generalization claims separate. The full native
+  audio-to-RVQ encoder now exists in HeartCodec with documented numerical limits.
+
+- Raw-PCM continuation now lives in the separate negotiated mulacover_job.h capability
+  and mulacover-continue CLI. See docs/NATIVE_AUDIO_JOB.md. It trims context backwards
+  from the exact original-clock cursor before encoding, selects a tail guide, honors
+  natural_max_seconds/EOS, stages models, reports progress and cooperatively cancels.
+  Prepared text/Qwen/MuQ and optional score remain a caller/offline boundary. Reuse
+  HeartCodec's validated Torch CUDA Philox (cap 288); do not substitute sibling RNG
+  mappings or change legacy defaults. Earlier paragraphs describe historical runs.

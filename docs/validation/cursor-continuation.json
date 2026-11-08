@@ -1,0 +1,624 @@
+{
+  "date": "2026-11-04",
+  "base_commit": "39c99f7",
+  "branch": "experiment/score-clock",
+  "purpose": "Past-only audio input ending at a simulated DAW cursor; compare 4/8/16-second tail guides without symbolic score",
+  "cursor_seconds": 29.76,
+  "source_audio_sha256": "140f18292989b1026113f02e0b6e2c9c1eaea29df05965f9404e40d76f74af9a",
+  "source_prefix": {
+    "sha256": "ff700ca0aa7a9bca414e4a6bb0877a5f4eb47d0912232d563be9bd6e50311a0c",
+    "samples": 1312416,
+    "sample_rate": 44100,
+    "seconds": 29.76,
+    "pcm_matches_original_prefix": true,
+    "encoder_received_audio_after_cursor": false,
+    "encoded_frames": 372,
+    "codes_sha256": "bdbeab789d35496a3744f41410ab4ffeaecf91e7a0a9759dd1a9e7ae075ab342",
+    "encoder_manifest_sha256": "f2783d2cf9f76655ffde677c6be3356d0507b80f3b4e166debeb4c89833f3051",
+    "encoder_manifest": {
+      "heartlib_revision": "5858ca8f1ffe58d62be7c007ea55f1033c5ca456",
+      "encoder": {
+        "repository": "HeartMuLa/HeartCodec-oss-encoder",
+        "revision": "e6020510612d6653b73d6cd54393ef80929e3c81",
+        "snapshot": "/workspace/.cache/huggingface/hub/models--HeartMuLa--HeartCodec-oss-encoder/snapshots/e6020510612d6653b73d6cd54393ef80929e3c81",
+        "weights_sha256": "19b3c0284fecac70983731433a213ad20eb08d096be3b9a287078171de0d4e79"
+      },
+      "codec_revision": "f889dab0532cfa4bf459f2a3367eb6d346b8eeda",
+      "source_excerpt_sha256": "ff700ca0aa7a9bca414e4a6bb0877a5f4eb47d0912232d563be9bd6e50311a0c",
+      "harness_sha256": "707cc8b07ab4b2c38cdcf3850f81bf6290edc356d83ece94342ee73493af4987",
+      "torch": "2.7.1+cu128",
+      "cuda": "12.8",
+      "device": "cpu",
+      "cases": [
+        {
+          "speed_factor": 1.0,
+          "frames": 372,
+          "guide_seconds": 29.76,
+          "complete_token_seconds": 29.76,
+          "codes_file": "guide-1.i32",
+          "codes_sha256": "bdbeab789d35496a3744f41410ab4ffeaecf91e7a0a9759dd1a9e7ae075ab342",
+          "guide_sha256": "ff700ca0aa7a9bca414e4a6bb0877a5f4eb47d0912232d563be9bd6e50311a0c"
+        }
+      ],
+      "intervention": "Pitch-preserving ffmpeg atempo on input guide only, then original FP32 encoder and decoder RVQ; generated continuations must be measured excluding the guide"
+    },
+    "encoding_reused": true
+  },
+  "native_cli_sha256": "b12258e48eb466ec62a92c324347e1de67e98241ef1cd46a53cd8283c07dad53",
+  "models": {
+    "generator_sha256": "74ebd8a8537f55ea3f3566cfa17c7e28734fc555af5fbc1a254bec94a182f814",
+    "flow_sha256": "5c9cdbfae26ccd3e96355c541cade0feca37cfd8696746b724c294095949f523",
+    "sq_sha256": "2f72b85f924c629aae33004703cc02e16600abee15c01e928b2878e5d0f29ae6"
+  },
+  "input_files": [
+    {
+      "file": "tokens.i32",
+      "sha256": "5c23088145c6c4f1c14d0f05dfb32cb385cf23e24698ce47bc33c130a5221971",
+      "matches_previous_score_free_input": true
+    },
+    {
+      "file": "mask.u8",
+      "sha256": "846fd932ac265879aaaf529cbda82f50243f00bf66438fded7253c22b10c58d1",
+      "matches_previous_score_free_input": true
+    },
+    {
+      "file": "qwen.f32",
+      "sha256": "2e20d4b2b825908f309770f6bbd5e78d2870f3e34b7482ec3896cbdbcd0ab427",
+      "matches_previous_score_free_input": true
+    },
+    {
+      "file": "muq.f32",
+      "sha256": "e5a00aa9991ac8a5ee3109844d84a55583bd20572ad3ffcd42792f3c36b183ad",
+      "matches_previous_score_free_input": true
+    }
+  ],
+  "symbolic_condition": {
+    "mode": "none",
+    "frames": 540,
+    "piano": -1,
+    "drum": -1,
+    "chord": -1,
+    "context_mask": 0,
+    "symbolic_files_present": false,
+    "future_symbolic_notes_supplied": false,
+    "shape": "Fixed null-context shape retained across all cases; no score values are loaded"
+  },
+  "preset": {
+    "lyrics": "[Instrumental]",
+    "tags": "warm acoustic pop, soft drums, instrumental, no vocals",
+    "song_specific_future_lyrics": false
+  },
+  "native_runtime_invoked_python": false,
+  "cases": [
+    {
+      "name": "guide4",
+      "source_start_seconds": 25.76,
+      "source_end_seconds": 29.76,
+      "source_start_frame": 322.0,
+      "source_end_exclusive": 372,
+      "guide_frames": 50.0,
+      "guide_codes_bit_exact": true,
+      "suffix_pcm_copy_bit_exact": true,
+      "requested_new_seconds": 32,
+      "actual_new_seconds": 32.0,
+      "actual_source_timeline_end_seconds": 61.760000000000005,
+      "run": {
+        "frames": 450,
+        "prompt_frames": 25,
+        "symbolic_frames": 540,
+        "score_mode": "none",
+        "cache_capacity": 1024,
+        "audio_prefix_frames": 50,
+        "newly_generated_frames": 400,
+        "guide_source_frames": 372,
+        "guide_source_start_frame": 322,
+        "requested_new_frames": 400,
+        "continuation_samples_per_channel": 1536000,
+        "guidance": 1.5,
+        "temperature": 1,
+        "top_k": 250,
+        "seed": 1701,
+        "experimental_tempo": {
+          "method": "conditional-cross-attention-gaussian-v1",
+          "bpm": 0,
+          "width_beats": 1,
+          "offset_beats": 0,
+          "local_window": 0
+        },
+        "eos": false,
+        "replay_checked": true,
+        "terminal_contract_passed": true,
+        "generator_released_before_decode": true,
+        "generation_with_checks_seconds": 167.874,
+        "weight_bytes": 2939920896,
+        "cache_bytes": 470351872,
+        "graph_bytes": 53535232,
+        "audio_samples_per_channel": 1728000,
+        "audio_peak": 1.03185,
+        "audio_rms": 0.165751,
+        "decode_seconds": 25.5235,
+        "decoder_seed": 1701,
+        "decoder_steps": 10,
+        "segment_codes": 372,
+        "decoder_guidance": 1.25,
+        "rng": "torch-cuda",
+        "rng_cuda_blocks": 288,
+        "sampler_offset_per_head": 4,
+        "sampler_start_offset": 0,
+        "sampler_final_offset": 12800,
+        "decoder_final_offset": 8,
+        "decoder_rng_windows": 2,
+        "ggml_commit": "0f2ed045"
+      },
+      "files": [
+        {
+          "file": "codes.i32",
+          "sha256": "47a24372b788d209258e1f738c37cff753e26e5abc74234e966f51ee27da58fa"
+        },
+        {
+          "file": "audio.wav",
+          "sha256": "ebb505f61af77e535a3b153710ca3b3bb8e12dbd28b96054af46d67098c82955"
+        },
+        {
+          "file": "continuation.wav",
+          "sha256": "839a1bf24e671040cd6ae62fa90ce4484feea2abc459316c91577796f3159316"
+        },
+        {
+          "file": "context-and-continuation-listen.wav",
+          "sha256": "a3cc39c6749aaba38e77bf4fc0354240bfcf29e54f56f0d39de6e2c49748c58e"
+        },
+        {
+          "file": "continuation-listen.wav",
+          "sha256": "dd58bddb0ea54a9c7793c8b73127fd5765bb249986089e256a7fb750d5e31a64"
+        }
+      ]
+    },
+    {
+      "name": "guide8",
+      "source_start_seconds": 21.76,
+      "source_end_seconds": 29.76,
+      "source_start_frame": 272.0,
+      "source_end_exclusive": 372,
+      "guide_frames": 100.0,
+      "guide_codes_bit_exact": true,
+      "suffix_pcm_copy_bit_exact": true,
+      "requested_new_seconds": 32,
+      "actual_new_seconds": 32.0,
+      "actual_source_timeline_end_seconds": 61.760000000000005,
+      "run": {
+        "frames": 500,
+        "prompt_frames": 25,
+        "symbolic_frames": 540,
+        "score_mode": "none",
+        "cache_capacity": 1024,
+        "audio_prefix_frames": 100,
+        "newly_generated_frames": 400,
+        "guide_source_frames": 372,
+        "guide_source_start_frame": 272,
+        "requested_new_frames": 400,
+        "continuation_samples_per_channel": 1536000,
+        "guidance": 1.5,
+        "temperature": 1,
+        "top_k": 250,
+        "seed": 1701,
+        "experimental_tempo": {
+          "method": "conditional-cross-attention-gaussian-v1",
+          "bpm": 0,
+          "width_beats": 1,
+          "offset_beats": 0,
+          "local_window": 0
+        },
+        "eos": false,
+        "replay_checked": true,
+        "terminal_contract_passed": true,
+        "generator_released_before_decode": true,
+        "generation_with_checks_seconds": 189.832,
+        "weight_bytes": 2939920896,
+        "cache_bytes": 470351872,
+        "graph_bytes": 53535232,
+        "audio_samples_per_channel": 1920000,
+        "audio_peak": 1.03111,
+        "audio_rms": 0.220647,
+        "decode_seconds": 32.7378,
+        "decoder_seed": 1701,
+        "decoder_steps": 10,
+        "segment_codes": 372,
+        "decoder_guidance": 1.25,
+        "rng": "torch-cuda",
+        "rng_cuda_blocks": 288,
+        "sampler_offset_per_head": 4,
+        "sampler_start_offset": 0,
+        "sampler_final_offset": 12800,
+        "decoder_final_offset": 8,
+        "decoder_rng_windows": 2,
+        "ggml_commit": "0f2ed045"
+      },
+      "files": [
+        {
+          "file": "codes.i32",
+          "sha256": "49bedbf758c2cdab5f7fb5af23b19404fc32278a7e293ecfb7eaab2273e70abf"
+        },
+        {
+          "file": "audio.wav",
+          "sha256": "803b83aca32db8e414741ca9e6e966afbd854d5166cbca2f2276d9e6cf323b3c"
+        },
+        {
+          "file": "continuation.wav",
+          "sha256": "baabddb0cfa08b69fb9f204a09537e48a803befbc47166f268da9f22d0cf47aa"
+        },
+        {
+          "file": "context-and-continuation-listen.wav",
+          "sha256": "6e6ffe3ddfd52028d3f5ac787696b7133ebd14a36f4d5f8f1bfb54777e9fdffe"
+        },
+        {
+          "file": "continuation-listen.wav",
+          "sha256": "e49a81bbec3680ce4e123250ed64ec13aae5bc393b5f2dbdae91ca205b61a40a"
+        }
+      ]
+    },
+    {
+      "name": "guide16",
+      "source_start_seconds": 13.760000000000002,
+      "source_end_seconds": 29.76,
+      "source_start_frame": 172.0,
+      "source_end_exclusive": 372,
+      "guide_frames": 200.0,
+      "guide_codes_bit_exact": true,
+      "suffix_pcm_copy_bit_exact": true,
+      "requested_new_seconds": 32,
+      "actual_new_seconds": 31.84,
+      "actual_source_timeline_end_seconds": 61.6,
+      "run": {
+        "frames": 598,
+        "prompt_frames": 25,
+        "symbolic_frames": 540,
+        "score_mode": "none",
+        "cache_capacity": 1024,
+        "audio_prefix_frames": 200,
+        "newly_generated_frames": 398,
+        "guide_source_frames": 372,
+        "guide_source_start_frame": 172,
+        "requested_new_frames": 400,
+        "continuation_samples_per_channel": 1528320,
+        "guidance": 1.5,
+        "temperature": 1,
+        "top_k": 250,
+        "seed": 1701,
+        "experimental_tempo": {
+          "method": "conditional-cross-attention-gaussian-v1",
+          "bpm": 0,
+          "width_beats": 1,
+          "offset_beats": 0,
+          "local_window": 0
+        },
+        "eos": true,
+        "replay_checked": true,
+        "terminal_contract_passed": true,
+        "generator_released_before_decode": true,
+        "generation_with_checks_seconds": 208.732,
+        "weight_bytes": 2939920896,
+        "cache_bytes": 470351872,
+        "graph_bytes": 53535232,
+        "audio_samples_per_channel": 2296320,
+        "audio_peak": 0.970698,
+        "audio_rms": 0.168605,
+        "decode_seconds": 27.7064,
+        "decoder_seed": 1701,
+        "decoder_steps": 10,
+        "segment_codes": 372,
+        "decoder_guidance": 1.25,
+        "rng": "torch-cuda",
+        "rng_cuda_blocks": 288,
+        "sampler_offset_per_head": 4,
+        "sampler_start_offset": 0,
+        "sampler_final_offset": 12768,
+        "decoder_final_offset": 8,
+        "decoder_rng_windows": 2,
+        "ggml_commit": "0f2ed045"
+      },
+      "files": [
+        {
+          "file": "codes.i32",
+          "sha256": "643eecf0f14d89d8fad68888057cf93f41a72ec9e2fb1fb15ad46710d93851ca"
+        },
+        {
+          "file": "audio.wav",
+          "sha256": "e26c39d00a247afcb83f86748596abe61b570c4c54f829af25b7bc135ec8ff06"
+        },
+        {
+          "file": "continuation.wav",
+          "sha256": "4fdb8920394c0b37e9f73c95c4d157d350351882992f15d4c9ff9e08573fb343"
+        },
+        {
+          "file": "context-and-continuation-listen.wav",
+          "sha256": "9bf2d5739e886b675b8f0071eda93676d92d3fa4b0c4d20615af6ca0e4826834"
+        },
+        {
+          "file": "continuation-listen.wav",
+          "sha256": "7e369ccc48dfedb3d0b7540bfec69548ec8c797a340b3ef36a31c1e47de3259c"
+        }
+      ]
+    }
+  ],
+  "tempo_analysis": {
+    "numpy": "2.2.6",
+    "method": "Positive log-spectral flux, 2048-sample Hann window, approximately 100Hz envelope; normalized lag autocorrelation, local maxima between 40 and 240 BPM",
+    "limitation": "Candidates include beat subdivisions and half/double-time aliases. Rank is not a musical beat annotation. Score-clock estimates are also model predictions. No hard adherence claim from either estimator alone.",
+    "cases": {
+      "guide4": {
+        "audio_path": "refdata/cursor-continuation/guide4/continuation.wav",
+        "sha256": "839a1bf24e671040cd6ae62fa90ce4484feea2abc459316c91577796f3159316",
+        "duration_seconds": 32.0,
+        "onset_autocorrelation_candidates": [
+          {
+            "bpm": 119.20560479778494,
+            "correlation": 0.3931683905624398
+          },
+          {
+            "bpm": 59.71883489481704,
+            "correlation": 0.38441374722235544
+          },
+          {
+            "bpm": 239.48096569710313,
+            "correlation": 0.31208236330768674
+          },
+          {
+            "bpm": 79.32472831879096,
+            "correlation": 0.22223943834834803
+          },
+          {
+            "bpm": 47.77043356392567,
+            "correlation": 0.21615078636184498
+          },
+          {
+            "bpm": 192.29254076212308,
+            "correlation": 0.026293512672739154
+          }
+        ],
+        "windows": [
+          {
+            "start_seconds": 0,
+            "candidates": [
+              {
+                "bpm": 59.88346786671058,
+                "correlation": 0.49091688804946176
+              },
+              {
+                "bpm": 119.3006214857033,
+                "correlation": 0.403633360248593
+              },
+              {
+                "bpm": 239.68017522143248,
+                "correlation": 0.31975183523031586
+              }
+            ]
+          },
+          {
+            "start_seconds": 10,
+            "candidates": [
+              {
+                "bpm": 59.539149609394016,
+                "correlation": 0.31023343813681764
+              },
+              {
+                "bpm": 119.86235239439766,
+                "correlation": 0.30706268249195423
+              },
+              {
+                "bpm": 79.15189559148082,
+                "correlation": 0.1677735427823478
+              }
+            ]
+          }
+        ]
+      },
+      "guide8": {
+        "audio_path": "refdata/cursor-continuation/guide8/continuation.wav",
+        "sha256": "baabddb0cfa08b69fb9f204a09537e48a803befbc47166f268da9f22d0cf47aa",
+        "duration_seconds": 32.0,
+        "onset_autocorrelation_candidates": [
+          {
+            "bpm": 116.93696641301085,
+            "correlation": 0.6470403900146051
+          },
+          {
+            "bpm": 58.46279978956477,
+            "correlation": 0.6199944046146392
+          },
+          {
+            "bpm": 233.19180183438652,
+            "correlation": 0.6037368658686416
+          },
+          {
+            "bpm": 77.86881450785168,
+            "correlation": 0.5448759213504868
+          },
+          {
+            "bpm": 46.757724798726606,
+            "correlation": 0.44078442010668883
+          },
+          {
+            "bpm": 169.08986982632373,
+            "correlation": 0.21212470374962847
+          }
+        ],
+        "windows": [
+          {
+            "start_seconds": 0,
+            "candidates": [
+              {
+                "bpm": 116.41435520781646,
+                "correlation": 0.6258108405508059
+              },
+              {
+                "bpm": 232.95939415734986,
+                "correlation": 0.5922323387591389
+              },
+              {
+                "bpm": 58.17753631151113,
+                "correlation": 0.5863531447884688
+              }
+            ]
+          },
+          {
+            "start_seconds": 10,
+            "candidates": [
+              {
+                "bpm": 58.33935447351829,
+                "correlation": 0.5041864913817563
+              },
+              {
+                "bpm": 116.59861241086513,
+                "correlation": 0.4832355659701784
+              },
+              {
+                "bpm": 232.66563948178393,
+                "correlation": 0.4360171522934005
+              }
+            ]
+          }
+        ]
+      },
+      "guide16": {
+        "audio_path": "refdata/cursor-continuation/guide16/continuation.wav",
+        "sha256": "4fdb8920394c0b37e9f73c95c4d157d350351882992f15d4c9ff9e08573fb343",
+        "duration_seconds": 31.84,
+        "onset_autocorrelation_candidates": [
+          {
+            "bpm": 59.37446072010143,
+            "correlation": 0.4547333444540041
+          },
+          {
+            "bpm": 118.22448715978074,
+            "correlation": 0.4464118481427916
+          },
+          {
+            "bpm": 236.811941402004,
+            "correlation": 0.34026706191831646
+          },
+          {
+            "bpm": 78.99887087504966,
+            "correlation": 0.2806658203286516
+          },
+          {
+            "bpm": 47.451125683370066,
+            "correlation": 0.21567682919130646
+          },
+          {
+            "bpm": 161.47029263047358,
+            "correlation": 0.03907512224518802
+          }
+        ],
+        "windows": [
+          {
+            "start_seconds": 0,
+            "candidates": [
+              {
+                "bpm": 59.893289990550926,
+                "correlation": 0.48491705499528387
+              },
+              {
+                "bpm": 119.53408471188733,
+                "correlation": 0.4348639749080017
+              },
+              {
+                "bpm": 239.28324153732626,
+                "correlation": 0.364679636885981
+              }
+            ]
+          },
+          {
+            "start_seconds": 10,
+            "candidates": [
+              {
+                "bpm": 59.397918827451306,
+                "correlation": 0.5884239644852843
+              },
+              {
+                "bpm": 118.4302130811233,
+                "correlation": 0.4701186394202515
+              },
+              {
+                "bpm": 79.03311822038216,
+                "correlation": 0.30839575326789065
+              }
+            ]
+          }
+        ]
+      },
+      "source_tail": {
+        "audio_path": "refdata/cursor-continuation/original-tail8.wav",
+        "sha256": "6833a8711cf5bec3ed09f83eea22061fff8bc15ceb330202d1899fc5291ce66e",
+        "duration_seconds": 8.0,
+        "onset_autocorrelation_candidates": [
+          {
+            "bpm": 120.09721565474284,
+            "correlation": 0.32770541324501107
+          },
+          {
+            "bpm": 59.95362640937894,
+            "correlation": 0.24232389205462107
+          },
+          {
+            "bpm": 80.06372202118591,
+            "correlation": 0.21435503151369328
+          },
+          {
+            "bpm": 47.932245680866785,
+            "correlation": 0.17624535949600365
+          },
+          {
+            "bpm": 163.84042493537208,
+            "correlation": 0.035677323026351807
+          }
+        ],
+        "windows": [
+          {
+            "start_seconds": 0,
+            "candidates": [
+              {
+                "bpm": 120.09721565474284,
+                "correlation": 0.32770541324501107
+              },
+              {
+                "bpm": 59.95362640937894,
+                "correlation": 0.24232389205462107
+              },
+              {
+                "bpm": 80.06372202118591,
+                "correlation": 0.21435503151369328
+              }
+            ]
+          }
+        ]
+      }
+    }
+  },
+  "listening": {
+    "gain_db": -3,
+    "preview_transformation": "Native FFmpeg constant gain only; no time stretching, normalization or source PCM splice",
+    "source_reference": "original-tail8.wav",
+    "source_reference_sha256": "6833a8711cf5bec3ed09f83eea22061fff8bc15ceb330202d1899fc5291ce66e",
+    "context_previews_include_decoded_guide": true,
+    "continuation_previews_include_guide": false,
+    "listener_assessment": {
+      "guide8": "User hears a seamless transition through the eight-second boundary, with a wilder but interesting continuation",
+      "guide4": "Not yet assessed",
+      "guide16": "Not yet assessed",
+      "guide8_handoff_accepted": true,
+      "precise_melody_or_bpm_lock_accepted": false
+    }
+  },
+  "shared_ggml_pin": "b77ae790e628270af46a8af1eca38441c23f1252",
+  "isolated_development_ggml": "0f2ed045eaff6bf01bed074878b6988248efbc22",
+  "consumer_pins_changed": false,
+  "ggml_bump_check_started": false,
+  "limitations": [
+    "One source and seed, Q4 generator and experimental dropped-score conditioning; no general quality or hard BPM-lock claim.",
+    "Source context ends at cursor, but this is a cached prepared-input experiment, not a native raw-PCM encoder or streaming implementation.",
+    "Encoder analysis context is 29.76 seconds for all guides; guide duration does not change encoder context.",
+    "Cursor chosen at the existing encoder chunk boundary, not a manually selected phrase boundary.",
+    "Noncausal codec can change guide reconstruction when future generated tokens differ; host PCM preservation and a clean DAW join are not validated.",
+    "Original expanded activation failures and strict upstream waveform parity failures remain unresolved."
+  ]
+}

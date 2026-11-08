@@ -1,5 +1,6 @@
 #include "mulacover.h"
 #include "mulacover_sampling.h"
+#include "mulacover_tempo.h"
 #include "ggml.h"
 #include <algorithm>
 #include <chrono>
@@ -27,7 +28,7 @@ int main(int argc,char ** argv) {
         for(auto key:{"--model","--input","--output","--prompt-frames","--symbolic-frames","--qwen-index","--muq-index"})
             if(!args.count(key))throw std::runtime_error(std::string("Missing ")+key);
         for(auto & pair:args)if(pair.first!="--model"&&pair.first!="--input"&&pair.first!="--output"&&pair.first!="--prompt-frames"&&pair.first!="--symbolic-frames"&&
-            pair.first!="--qwen-index"&&pair.first!="--muq-index"&&pair.first!="--guidance"&&pair.first!="--backend"&&pair.first!="--capacity"&&pair.first!="--frames"&&pair.first!="--dump-frames"&&pair.first!="--sampling-noise")throw std::runtime_error("Unknown option: "+pair.first);
+            pair.first!="--qwen-index"&&pair.first!="--muq-index"&&pair.first!="--guidance"&&pair.first!="--backend"&&pair.first!="--capacity"&&pair.first!="--frames"&&pair.first!="--dump-frames"&&pair.first!="--sampling-noise"&&pair.first!="--experimental-bpm"&&pair.first!="--tempo-width-beats"&&pair.first!="--tempo-offset-beats"&&pair.first!="--tempo-local-window")throw std::runtime_error("Unknown option: "+pair.first);
         const std::filesystem::path input(args.at("--input")),output(args.at("--output"));
         int prompt=std::stoi(args.at("--prompt-frames")),symbolic=std::stoi(args.at("--symbolic-frames"));
         int frames=args.count("--frames")?std::stoi(args.at("--frames")):3;
@@ -53,6 +54,17 @@ int main(int argc,char ** argv) {
         condition.pianoroll=piano.data();condition.drum_pianoroll=drum.data();condition.chord=chord.data();condition.context_mask=context_mask.data();condition.symbolic_frames=symbolic;
         condition.guidance=args.count("--guidance")?std::stof(args.at("--guidance")):1.0f;
         if(mulacover_session_begin_v1(c,&condition,&error))throw std::runtime_error(error.message);
+        if(args.count("--experimental-bpm")) {
+            mulacover_tempo_config_v1 tempo{};tempo.size=sizeof(tempo);mulacover_tempo_config_init_v1(&tempo);
+            tempo.bpm=std::stod(args.at("--experimental-bpm"));
+            if(args.count("--tempo-width-beats"))tempo.width_beats=std::stod(args.at("--tempo-width-beats"));
+            if(args.count("--tempo-offset-beats"))tempo.offset_beats=std::stod(args.at("--tempo-offset-beats"));
+            if(args.count("--tempo-local-window")) {
+                if(args.at("--tempo-local-window")!="0"&&args.at("--tempo-local-window")!="1")throw std::runtime_error("Local score window must be 0 or 1");
+                tempo.local_window=args.at("--tempo-local-window")=="1";
+            }
+            if(mulacover_set_tempo_v1(c,&tempo,&error))throw std::runtime_error(error.message);
+        }else if(args.count("--tempo-width-beats")||args.count("--tempo-offset-beats")||args.count("--tempo-local-window"))throw std::runtime_error("Tempo options require --experimental-bpm");
         std::filesystem::create_directories(output);const auto start=std::chrono::steady_clock::now();
         std::vector<float> first_logits;
         for(int replay=0;replay<2;++replay) {

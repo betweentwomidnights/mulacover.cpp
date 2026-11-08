@@ -23,6 +23,32 @@ Q4 quality and the remaining numerical gaps are documented below.
 that MIDI tempo metadata leaves every model input unchanged; 80/160-BPM text
 requests also missed their targets in the tested Q4 excerpts. Plan downstream
 timing separately rather than treating BPM tags as a guarantee.
+The `experiment/score-clock` branch investigates inference-time score attention
+and audio-token guides; see [the experiment](docs/SCORE_CLOCK_EXPERIMENT.md).
+Audio priming follows the source's roughly 120 BPM in full-length F32/Q4 tests,
+with eight guided seconds and 62 new seconds. It remains an experimental
+continuation mode; arbitrary BPM, complete restyling and a hard lock are unproven.
+The user reports that this continuation fits the intended DAW use case.
+Guide start/duration and new-audio duration are independently selectable in the
+prepared-input driver; it also exports a guide-free `continuation.wav`.
+These controls and waveform export now run directly in the C++ CLI and a
+negotiated C capability. See [native continuation and the encoder roadmap](docs/NATIVE_CONTINUATION.md)
+for the prepared-input runtime boundary and remaining Python reference bridge.
+The native CLI also accepts experimental `--score-mode none` to remove symbolic
+conditioning while retaining the audio guide, text and style. Both score-guided
+transformation and score-free continuation are useful workflows to evaluate;
+see [the controlled comparison](docs/SCORE_FREE_CONTINUATION.md).
+The [cursor-ending guide baseline](docs/CURSOR_CONTINUATION.md) tests 4/8/16-second
+tail guides using only available past audio, plus a 50-second context probe.
+Guide length and new audio share a finite cache budget; the model may emit EOS
+before the requested end.
+A longer native score-free run uses 29.76 seconds of input and produces 57.84
+new seconds before EOS; the user positively assesses it as a listening baseline.
+The [native PCM job](docs/NATIVE_AUDIO_JOB.md) now accepts a raw audio buffer or
+WAV, an original-clock cursor and prepared conditioning, with separate encoder
+context/guide lengths, `natural_max_seconds`, progress and cancellation. It returns
+only new audio and stages all models on the laptop. Text/Qwen/MIDI preparation
+remains an offline reference bridge. See the [extended run report](docs/validation/extended-continuation.json).
 
 **Native FP32 teacher-forced frame/logit/cache parity passed on Spark CUDA at `07b77b0`.**
 The coordinated baseline is now `b77ae79`; its CUDA parity currently fails due to

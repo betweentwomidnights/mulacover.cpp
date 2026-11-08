@@ -128,6 +128,10 @@ def main():
             '--qwen-index',str(prepared['input.qwen_indices'][0]),'--muq-index',str(prepared['input.muq_indices'][0]),
             '--backend',a.backend,'--guidance',str(case['guidance']),'--capacity',str(a.capacity),'--frames',str(case['frames'])]
         if 'checkpoints' in case:command+=['--dump-frames',','.join(map(str,case['checkpoints']))]
+        if 'experimental_tempo' in case:
+            clock=case['experimental_tempo']
+            command+=['--experimental-bpm',str(clock['bpm']),'--tempo-width-beats',str(clock['width_beats']),'--tempo-offset-beats',str(clock['offset_beats'])]
+            if clock.get('local_window'):command+=['--tempo-local-window','1']
         if 'sampling_noise' in case['files']:
             noise=load(expected_root,case['files']['sampling_noise'])
             np.ascontiguousarray(noise,np.float32).tofile(inp/'sampling-noise.f32')

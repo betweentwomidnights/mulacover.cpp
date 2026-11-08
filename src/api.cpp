@@ -87,4 +87,20 @@ const mulacover_sampling_api_v1 * MULACOVER_CALL mulacover_get_sampling_api(uint
         mulacover_sampling_config_init_v1,mulacover_sample_frame_v1};
     return version==1?&api:nullptr;
 }
+void MULACOVER_CALL mulacover_tempo_config_init_v1(mulacover_tempo_config_v1 * c) {
+    if(!c||c->size<sizeof(*c))return;init(c);c->width_beats=1;
+}
+int MULACOVER_CALL mulacover_set_tempo_v1(mulacover_context * c,const mulacover_tempo_config_v1 * config,mulacover_error_v1 * e) {
+    return guard(e,[&]{
+        context(c);if(!config)throw std::invalid_argument("Missing score-clock configuration");
+        mula::validate_tempo(*config);
+        if(c->session->frame_index||c->session->stopped)throw std::invalid_argument("Reset before changing score clock");
+        c->session->tempo=*config;c->session->tempo.size=sizeof(*config);
+    });
+}
+const mulacover_tempo_api_v1 * MULACOVER_CALL mulacover_get_tempo_api(uint32_t version) {
+    static const mulacover_tempo_api_v1 api={uint32_t(MULACOVER_TEMPO_API_V1_SIZE),1,mulacover_get_api(1),
+        mulacover_tempo_config_init_v1,mulacover_set_tempo_v1};
+    return version==1?&api:nullptr;
+}
 }

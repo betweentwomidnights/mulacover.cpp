@@ -1,0 +1,2984 @@
+{
+  "date": "2026-11-02",
+  "branch": "experiment/score-clock",
+  "base_commit": "75b9203154bb55e6e24dd66ed1cb6ccb63572b4a",
+  "source_audio_sha256": "140f18292989b1026113f02e0b6e2c9c1eaea29df05965f9404e40d76f74af9a",
+  "prepared_manifest_sha256": "9d5aa1b513c2c598c3acebc4ac283629d692ea9431ea60051dc0f4f7e63f161e",
+  "shared_baseline": "b77ae790e628270af46a8af1eca38441c23f1252",
+  "ggml_candidate": "0f2ed045eaff6bf01bed074878b6988248efbc22",
+  "consumer_pins_changed": false,
+  "ggml_bump_check_started": false,
+  "default_path_changed": false,
+  "attention_clock_accepted": false,
+  "audio_guide_source_case_promising": true,
+  "hard_bpm_lock_established": false,
+  "musical_quality_accepted": false,
+  "limitations": [
+    "One user-selected source. Main seed 1701 and one shorter Q4 replication at seed 1702; no generalization across songs.",
+    "Onset candidates have half/double-time aliases. SheetSage2 is a second model estimate, not ground truth.",
+    "Melody metric permits octave equivalence but no fitted clock or transposition; not a listening verdict.",
+    "Guide priming is continuation conditioning and output includes real forced guide tokens. Metrics exclude them.",
+    "Only the input guides in counterfactual speed controls are stretched. Generated continuations are never stretched.",
+    "Source and style are acoustically similar; preservation under unrelated target styles remains untested.",
+    "Original long-prompt hidden-activation failures and strict decoder waveform failures remain open."
+  ],
+  "attention_cases": [
+    {
+      "name": "q4-baseline",
+      "target_bpm": null,
+      "audio_sha256": "6befac7b32d82f2ede6e221d62ad35dd04020b4b165cc2ea46140e58e19b9f50",
+      "duration_seconds": 29.76,
+      "onset_candidates": [
+        {
+          "bpm": 113.75783319712771,
+          "correlation": 0.6970528777580601
+        },
+        {
+          "bpm": 228.25694778858264,
+          "correlation": 0.6198263864123371
+        },
+        {
+          "bpm": 56.92756716837333,
+          "correlation": 0.5957065737549259
+        },
+        {
+          "bpm": 75.89559498481022,
+          "correlation": 0.536746267382025
+        },
+        {
+          "bpm": 45.53898038247339,
+          "correlation": 0.4605661894122184
+        },
+        {
+          "bpm": 152.98565555363928,
+          "correlation": 0.026769321569084747
+        }
+      ],
+      "onset_windows": [
+        {
+          "start_seconds": 0,
+          "candidates": [
+            {
+              "bpm": 57.101185383192416,
+              "correlation": 0.6899781829323064
+            },
+            {
+              "bpm": 228.85758965528925,
+              "correlation": 0.6774183062346494
+            },
+            {
+              "bpm": 114.03182360011932,
+              "correlation": 0.6720826550389164
+            }
+          ]
+        },
+        {
+          "start_seconds": 10,
+          "candidates": [
+            {
+              "bpm": 113.67066478195241,
+              "correlation": 0.7972264153677338
+            },
+            {
+              "bpm": 56.90566357874427,
+              "correlation": 0.7244814312360879
+            },
+            {
+              "bpm": 75.87835403903632,
+              "correlation": 0.5959984997952694
+            }
+          ]
+        },
+        {
+          "start_seconds": 14.760000000000002,
+          "candidates": [
+            {
+              "bpm": 113.55237757481936,
+              "correlation": 0.7097937087487413
+            },
+            {
+              "bpm": 56.67422975157906,
+              "correlation": 0.6152457317599637
+            },
+            {
+              "bpm": 227.63201177333028,
+              "correlation": 0.5727120034779541
+            }
+          ]
+        }
+      ],
+      "sheetsage2_score_clock": {
+        "estimated_bpm": 113.56235354163275,
+        "clock_residual_beats_rms": 0.051068480809268686,
+        "timestamped_events": 57,
+        "windows": [
+          {
+            "start_seconds": 0.0,
+            "end_seconds": 15.0,
+            "estimated_bpm": 113.65348753233594
+          },
+          {
+            "start_seconds": 10.0,
+            "end_seconds": 25.0,
+            "estimated_bpm": 113.60186744915464
+          }
+        ],
+        "warnings": [],
+        "method": "Linear fit of SheetSage2 decoded musical beats against its predicted source timestamps; estimated, not ground-truth tempo"
+      },
+      "timed_melody": {
+        "target_bpm": 120,
+        "duration_seconds": 29.76,
+        "onset_tolerance_seconds": 0.25,
+        "offset_beats": 0,
+        "reference_notes": 56,
+        "transcribed_instrumental_notes": 55,
+        "ordered_matches": 10,
+        "precision": 0.18181818181818182,
+        "recall": 0.17857142857142858,
+        "f1": 0.1801801801801802,
+        "matched_onset_error_median_seconds": 0.05999999999999983,
+        "matched_onset_error_absolute_median_seconds": 0.13999999999999968,
+        "reference_midi_sha256": "0fbef0ef0b8aa7b50c4c922f527510562d8ff856b42220328a00681b87f95107",
+        "events_sha256": "effa18b5fe71540428578c0f1bd0a011a05f51163d50997a0ea05e256cf0098e",
+        "limitation": "SheetSage2 re-transcription can make mistakes and choose another melody. Octave-equivalent pitches allowed; no transposition, fitted tempo or time warping. This estimates on-clock note preservation, not musical quality or a tempo guarantee."
+      },
+      "baseline_context": "Exact 372-frame crop of full-song output, followed by a fresh short transcription; codec used full-song context"
+    },
+    {
+      "name": "f32-baseline",
+      "target_bpm": null,
+      "audio_sha256": "9309e16755d428f34304ac8a8557910cb87a39975e08b1901b9f47bc485247d0",
+      "duration_seconds": 29.76,
+      "onset_candidates": [
+        {
+          "bpm": 65.596041028498,
+          "correlation": 0.662336557464808
+        },
+        {
+          "bpm": 131.1760546571167,
+          "correlation": 0.5965008904354248
+        },
+        {
+          "bpm": 43.755680899685366,
+          "correlation": 0.5522536439281077
+        },
+        {
+          "bpm": 87.5905339235769,
+          "correlation": 0.4669061559436568
+        },
+        {
+          "bpm": 52.437888365417784,
+          "correlation": 0.4337479376311354
+        }
+      ],
+      "onset_windows": [
+        {
+          "start_seconds": 0,
+          "candidates": [
+            {
+              "bpm": 65.7786904376844,
+              "correlation": 0.5777846333579635
+            },
+            {
+              "bpm": 87.90908582896829,
+              "correlation": 0.4479501301781775
+            },
+            {
+              "bpm": 131.87024390792976,
+              "correlation": 0.44044250370994037
+            }
+          ]
+        },
+        {
+          "start_seconds": 10,
+          "candidates": [
+            {
+              "bpm": 65.6081560071336,
+              "correlation": 0.6856682307168378
+            },
+            {
+              "bpm": 131.26151233151054,
+              "correlation": 0.653918955515408
+            },
+            {
+              "bpm": 43.75551371124922,
+              "correlation": 0.6008197126305923
+            }
+          ]
+        },
+        {
+          "start_seconds": 14.760000000000002,
+          "candidates": [
+            {
+              "bpm": 65.50194026512636,
+              "correlation": 0.7881897119603222
+            },
+            {
+              "bpm": 130.98291092429506,
+              "correlation": 0.703812363098169
+            },
+            {
+              "bpm": 43.70518073286825,
+              "correlation": 0.6712269303314082
+            }
+          ]
+        }
+      ],
+      "sheetsage2_score_clock": {
+        "estimated_bpm": 131.2700216625532,
+        "clock_residual_beats_rms": 0.061840069419709646,
+        "timestamped_events": 67,
+        "windows": [
+          {
+            "start_seconds": 0.0,
+            "end_seconds": 15.0,
+            "estimated_bpm": 131.6091118234911
+          },
+          {
+            "start_seconds": 10.0,
+            "end_seconds": 25.0,
+            "estimated_bpm": 131.16118811308436
+          }
+        ],
+        "warnings": [],
+        "method": "Linear fit of SheetSage2 decoded musical beats against its predicted source timestamps; estimated, not ground-truth tempo"
+      },
+      "timed_melody": {
+        "target_bpm": 120,
+        "duration_seconds": 29.76,
+        "onset_tolerance_seconds": 0.25,
+        "offset_beats": 0,
+        "reference_notes": 56,
+        "transcribed_instrumental_notes": 46,
+        "ordered_matches": 7,
+        "precision": 0.15217391304347827,
+        "recall": 0.125,
+        "f1": 0.13725490196078433,
+        "matched_onset_error_median_seconds": 0.0600000000000005,
+        "matched_onset_error_absolute_median_seconds": 0.09999999999999964,
+        "reference_midi_sha256": "0fbef0ef0b8aa7b50c4c922f527510562d8ff856b42220328a00681b87f95107",
+        "events_sha256": "fedc02051e9e98bc877555da5a9afb8c91ac305a2efddbd60dd295a6df8fccbf",
+        "limitation": "SheetSage2 re-transcription can make mistakes and choose another melody. Octave-equivalent pitches allowed; no transposition, fitted tempo or time warping. This estimates on-clock note preservation, not musical quality or a tempo guarantee."
+      },
+      "baseline_context": "Exact 372-frame crop of full-song output, followed by a fresh short transcription; codec used full-song context"
+    },
+    {
+      "name": "q4-gaussian-90",
+      "target_bpm": 90,
+      "audio_sha256": "006aa37204dcde85bfbdb1df1d64bbe79cbbe6113b9dc8440ca1347201d1a864",
+      "duration_seconds": 29.76,
+      "onset_candidates": [
+        {
+          "bpm": 135.6761002385503,
+          "correlation": 0.4452929552256103
+        },
+        {
+          "bpm": 68.24705444135772,
+          "correlation": 0.3840552934097431
+        },
+        {
+          "bpm": 92.57939909745188,
+          "correlation": 0.35758244404879647
+        },
+        {
+          "bpm": 45.11637035750793,
+          "correlation": 0.2921702581589921
+        },
+        {
+          "bpm": 54.644585678781496,
+          "correlation": 0.2507237300291579
+        },
+        {
+          "bpm": 46.4198386518499,
+          "correlation": 0.1814079819303461
+        }
+      ],
+      "onset_windows": [
+        {
+          "start_seconds": 0,
+          "candidates": [
+            {
+              "bpm": 131.28202138589663,
+              "correlation": 0.36199707986301166
+            },
+            {
+              "bpm": 86.9941101890422,
+              "correlation": 0.23677230195831592
+            },
+            {
+              "bpm": 223.2526926754785,
+              "correlation": 0.17210590253179467
+            }
+          ]
+        },
+        {
+          "start_seconds": 10,
+          "candidates": [
+            {
+              "bpm": 139.90628989504276,
+              "correlation": 0.2825002731423699
+            },
+            {
+              "bpm": 94.1130639848549,
+              "correlation": 0.25529591481252417
+            },
+            {
+              "bpm": 131.70791963131904,
+              "correlation": 0.24221566499885974
+            }
+          ]
+        },
+        {
+          "start_seconds": 14.760000000000002,
+          "candidates": [
+            {
+              "bpm": 137.03686127148003,
+              "correlation": 0.4449131111150889
+            },
+            {
+              "bpm": 68.27441258713723,
+              "correlation": 0.409315473156301
+            },
+            {
+              "bpm": 92.60498294596434,
+              "correlation": 0.3660118342557471
+            }
+          ]
+        }
+      ],
+      "sheetsage2_score_clock": {
+        "estimated_bpm": 138.5173233843641,
+        "clock_residual_beats_rms": 0.14131197823611433,
+        "timestamped_events": 69,
+        "windows": [
+          {
+            "start_seconds": 0.0,
+            "end_seconds": 15.0,
+            "estimated_bpm": 139.86108546677352
+          },
+          {
+            "start_seconds": 10.0,
+            "end_seconds": 25.0,
+            "estimated_bpm": 137.75589971802376
+          }
+        ],
+        "warnings": [],
+        "method": "Linear fit of SheetSage2 decoded musical beats against its predicted source timestamps; estimated, not ground-truth tempo"
+      },
+      "timed_melody": {
+        "target_bpm": 90,
+        "duration_seconds": 29.76,
+        "onset_tolerance_seconds": 0.25,
+        "offset_beats": 0,
+        "reference_notes": 50,
+        "transcribed_instrumental_notes": 55,
+        "ordered_matches": 9,
+        "precision": 0.16363636363636364,
+        "recall": 0.18,
+        "f1": 0.17142857142857143,
+        "matched_onset_error_median_seconds": -0.053333333333334565,
+        "matched_onset_error_absolute_median_seconds": 0.11333333333333329,
+        "reference_midi_sha256": "0fbef0ef0b8aa7b50c4c922f527510562d8ff856b42220328a00681b87f95107",
+        "events_sha256": "bfd76971fd7fb9202e817316db9a7f46ea3e2b7cddae315c9c5afcbfa1da6db0",
+        "limitation": "SheetSage2 re-transcription can make mistakes and choose another melody. Octave-equivalent pitches allowed; no transposition, fitted tempo or time warping. This estimates on-clock note preservation, not musical quality or a tempo guarantee."
+      },
+      "run": {
+        "frames": 372,
+        "prompt_frames": 25,
+        "symbolic_frames": 540,
+        "cache_capacity": 1024,
+        "guidance": 1.5,
+        "temperature": 1,
+        "top_k": 250,
+        "seed": 1701,
+        "experimental_tempo": {
+          "method": "conditional-cross-attention-gaussian-v1",
+          "bpm": 90,
+          "width_beats": 1,
+          "offset_beats": 0
+        },
+        "eos": false,
+        "replay_checked": true,
+        "terminal_contract_passed": true,
+        "generator_released_before_decode": true,
+        "generation_with_checks_seconds": 130.812,
+        "weight_bytes": 2939920896,
+        "cache_bytes": 470351872,
+        "graph_bytes": 53535232,
+        "audio_samples_per_channel": 1428480,
+        "audio_peak": 0.917986,
+        "audio_rms": 0.105217,
+        "decode_seconds": 19.886,
+        "decoder_seed": 1701,
+        "decoder_steps": 10,
+        "segment_codes": 372,
+        "decoder_guidance": 1.25,
+        "rng": "torch-cuda",
+        "rng_cuda_blocks": 288,
+        "sampler_offset_per_head": 4,
+        "sampler_final_offset": 11904,
+        "decoder_final_offset": 4,
+        "decoder_rng_windows": 1,
+        "ggml_commit": "0f2ed045"
+      },
+      "model_sha256": "74ebd8a8537f55ea3f3566cfa17c7e28734fc555af5fbc1a254bec94a182f814",
+      "cli_sha256": "78a3775e02fd6283606e6202313ed28adcbe83c8c74bcfa9cb2eb1653e9f19e4",
+      "codes_sha256": "4692d326087e1b3902de037277bc5fd13050edcbce4e9f9b140f1865fabf5a10"
+    },
+    {
+      "name": "q4-gaussian-120",
+      "target_bpm": 120,
+      "audio_sha256": "631be3f35250864afe2515c04edd31c9740ec6990039c7b354b50ab03dbf727c",
+      "duration_seconds": 29.76,
+      "onset_candidates": [
+        {
+          "bpm": 125.14953613507625,
+          "correlation": 0.7681238833790313
+        },
+        {
+          "bpm": 62.52666649806077,
+          "correlation": 0.7118221149856822
+        },
+        {
+          "bpm": 41.709968447987634,
+          "correlation": 0.6595821314484003
+        },
+        {
+          "bpm": 83.37395562936426,
+          "correlation": 0.6048164283908722
+        },
+        {
+          "bpm": 50.06922880741474,
+          "correlation": 0.533628017277955
+        },
+        {
+          "bpm": 161.4292906856271,
+          "correlation": 0.036084346302937914
+        }
+      ],
+      "onset_windows": [
+        {
+          "start_seconds": 0,
+          "candidates": [
+            {
+              "bpm": 125.33060666621925,
+              "correlation": 0.5691032688754819
+            },
+            {
+              "bpm": 62.489016887359206,
+              "correlation": 0.5332206780700184
+            },
+            {
+              "bpm": 41.70738631985086,
+              "correlation": 0.48223739702343205
+            }
+          ]
+        },
+        {
+          "start_seconds": 10,
+          "candidates": [
+            {
+              "bpm": 125.10478883420055,
+              "correlation": 0.7699727492571155
+            },
+            {
+              "bpm": 62.465658384259505,
+              "correlation": 0.6752869385199077
+            },
+            {
+              "bpm": 41.71012923972602,
+              "correlation": 0.6242972287556244
+            }
+          ]
+        },
+        {
+          "start_seconds": 14.760000000000002,
+          "candidates": [
+            {
+              "bpm": 125.11014030292132,
+              "correlation": 0.8068579506845723
+            },
+            {
+              "bpm": 62.54456639921934,
+              "correlation": 0.7440007742417545
+            },
+            {
+              "bpm": 41.72085028537827,
+              "correlation": 0.7123723426910814
+            }
+          ]
+        }
+      ],
+      "sheetsage2_score_clock": {
+        "estimated_bpm": 124.71109698056756,
+        "clock_residual_beats_rms": 0.03817634223820399,
+        "timestamped_events": 62,
+        "windows": [
+          {
+            "start_seconds": 0.0,
+            "end_seconds": 15.0,
+            "estimated_bpm": 124.53719467166646
+          },
+          {
+            "start_seconds": 10.0,
+            "end_seconds": 25.0,
+            "estimated_bpm": 124.84740601517694
+          }
+        ],
+        "warnings": [],
+        "method": "Linear fit of SheetSage2 decoded musical beats against its predicted source timestamps; estimated, not ground-truth tempo"
+      },
+      "timed_melody": {
+        "target_bpm": 120,
+        "duration_seconds": 29.76,
+        "onset_tolerance_seconds": 0.25,
+        "offset_beats": 0,
+        "reference_notes": 56,
+        "transcribed_instrumental_notes": 58,
+        "ordered_matches": 21,
+        "precision": 0.3620689655172414,
+        "recall": 0.375,
+        "f1": 0.368421052631579,
+        "matched_onset_error_median_seconds": 0.02999999999999936,
+        "matched_onset_error_absolute_median_seconds": 0.10999999999999943,
+        "reference_midi_sha256": "0fbef0ef0b8aa7b50c4c922f527510562d8ff856b42220328a00681b87f95107",
+        "events_sha256": "b4450f5e8f9d8491a63feccbac0369a47cae8afdce5b0a8f9fafb4acb5a9fa78",
+        "limitation": "SheetSage2 re-transcription can make mistakes and choose another melody. Octave-equivalent pitches allowed; no transposition, fitted tempo or time warping. This estimates on-clock note preservation, not musical quality or a tempo guarantee."
+      },
+      "run": {
+        "frames": 372,
+        "prompt_frames": 25,
+        "symbolic_frames": 540,
+        "cache_capacity": 1024,
+        "guidance": 1.5,
+        "temperature": 1,
+        "top_k": 250,
+        "seed": 1701,
+        "experimental_tempo": {
+          "method": "conditional-cross-attention-gaussian-v1",
+          "bpm": 120,
+          "width_beats": 1,
+          "offset_beats": 0
+        },
+        "eos": false,
+        "replay_checked": true,
+        "terminal_contract_passed": true,
+        "generator_released_before_decode": true,
+        "generation_with_checks_seconds": 136.619,
+        "weight_bytes": 2939920896,
+        "cache_bytes": 470351872,
+        "graph_bytes": 53535232,
+        "audio_samples_per_channel": 1428480,
+        "audio_peak": 0.647304,
+        "audio_rms": 0.0813827,
+        "decode_seconds": 18.5759,
+        "decoder_seed": 1701,
+        "decoder_steps": 10,
+        "segment_codes": 372,
+        "decoder_guidance": 1.25,
+        "rng": "torch-cuda",
+        "rng_cuda_blocks": 288,
+        "sampler_offset_per_head": 4,
+        "sampler_final_offset": 11904,
+        "decoder_final_offset": 4,
+        "decoder_rng_windows": 1,
+        "ggml_commit": "0f2ed045"
+      },
+      "model_sha256": "74ebd8a8537f55ea3f3566cfa17c7e28734fc555af5fbc1a254bec94a182f814",
+      "cli_sha256": "78a3775e02fd6283606e6202313ed28adcbe83c8c74bcfa9cb2eb1653e9f19e4",
+      "codes_sha256": "324853a510324b3c8c3a589f137794d0f5e4aab944b878a929efdff423aaf163"
+    },
+    {
+      "name": "q4-gaussian-150",
+      "target_bpm": 150,
+      "audio_sha256": "0eb4b487aab590e07318983215b9f7b0564effe1f1eb4b7b5c80af42538258e3",
+      "duration_seconds": 29.76,
+      "onset_candidates": [
+        {
+          "bpm": 129.05823446450032,
+          "correlation": 0.5167950544065644
+        },
+        {
+          "bpm": 64.48248492944782,
+          "correlation": 0.48966431393300325
+        },
+        {
+          "bpm": 85.90436687780453,
+          "correlation": 0.44388029166371507
+        },
+        {
+          "bpm": 42.90422952401659,
+          "correlation": 0.35202079041885515
+        },
+        {
+          "bpm": 51.47515972714735,
+          "correlation": 0.3492218407742467
+        },
+        {
+          "bpm": 212.2102503515866,
+          "correlation": 0.2643594621361932
+        }
+      ],
+      "onset_windows": [
+        {
+          "start_seconds": 0,
+          "candidates": [
+            {
+              "bpm": 128.47449178489848,
+              "correlation": 0.5931829389504767
+            },
+            {
+              "bpm": 85.68140045379262,
+              "correlation": 0.5141354519629029
+            },
+            {
+              "bpm": 51.457827816137055,
+              "correlation": 0.45344135927158863
+            }
+          ]
+        },
+        {
+          "start_seconds": 10,
+          "candidates": [
+            {
+              "bpm": 129.09872637095066,
+              "correlation": 0.4345327124067054
+            },
+            {
+              "bpm": 64.46140213570794,
+              "correlation": 0.39274743560299874
+            },
+            {
+              "bpm": 85.91870739844083,
+              "correlation": 0.35173758961834206
+            }
+          ]
+        },
+        {
+          "start_seconds": 14.760000000000002,
+          "candidates": [
+            {
+              "bpm": 129.4077087849982,
+              "correlation": 0.44788899756001244
+            },
+            {
+              "bpm": 64.55180200086605,
+              "correlation": 0.4078379274249795
+            },
+            {
+              "bpm": 86.04699266175112,
+              "correlation": 0.35398053887699066
+            }
+          ]
+        }
+      ],
+      "sheetsage2_score_clock": {
+        "estimated_bpm": 128.82633774642798,
+        "clock_residual_beats_rms": 0.05735357905578814,
+        "timestamped_events": 64,
+        "windows": [
+          {
+            "start_seconds": 0.0,
+            "end_seconds": 15.0,
+            "estimated_bpm": 128.56899143251206
+          },
+          {
+            "start_seconds": 10.0,
+            "end_seconds": 25.0,
+            "estimated_bpm": 128.91657968919287
+          }
+        ],
+        "warnings": [],
+        "method": "Linear fit of SheetSage2 decoded musical beats against its predicted source timestamps; estimated, not ground-truth tempo"
+      },
+      "timed_melody": {
+        "target_bpm": 150,
+        "duration_seconds": 29.76,
+        "onset_tolerance_seconds": 0.25,
+        "offset_beats": 0,
+        "reference_notes": 76,
+        "transcribed_instrumental_notes": 58,
+        "ordered_matches": 19,
+        "precision": 0.3275862068965517,
+        "recall": 0.25,
+        "f1": 0.2835820895522388,
+        "matched_onset_error_median_seconds": -0.019999999999999574,
+        "matched_onset_error_absolute_median_seconds": 0.08000000000000007,
+        "reference_midi_sha256": "0fbef0ef0b8aa7b50c4c922f527510562d8ff856b42220328a00681b87f95107",
+        "events_sha256": "4f6ca04a00a367485f1adb480b093e66c9d1614ebfa26a954d1d690136309740",
+        "limitation": "SheetSage2 re-transcription can make mistakes and choose another melody. Octave-equivalent pitches allowed; no transposition, fitted tempo or time warping. This estimates on-clock note preservation, not musical quality or a tempo guarantee."
+      },
+      "run": {
+        "frames": 372,
+        "prompt_frames": 25,
+        "symbolic_frames": 540,
+        "cache_capacity": 1024,
+        "guidance": 1.5,
+        "temperature": 1,
+        "top_k": 250,
+        "seed": 1701,
+        "experimental_tempo": {
+          "method": "conditional-cross-attention-gaussian-v1",
+          "bpm": 150,
+          "width_beats": 1,
+          "offset_beats": 0
+        },
+        "eos": false,
+        "replay_checked": true,
+        "terminal_contract_passed": true,
+        "generator_released_before_decode": true,
+        "generation_with_checks_seconds": 131.306,
+        "weight_bytes": 2939920896,
+        "cache_bytes": 470351872,
+        "graph_bytes": 53535232,
+        "audio_samples_per_channel": 1428480,
+        "audio_peak": 1.12447,
+        "audio_rms": 0.143574,
+        "decode_seconds": 21.0659,
+        "decoder_seed": 1701,
+        "decoder_steps": 10,
+        "segment_codes": 372,
+        "decoder_guidance": 1.25,
+        "rng": "torch-cuda",
+        "rng_cuda_blocks": 288,
+        "sampler_offset_per_head": 4,
+        "sampler_final_offset": 11904,
+        "decoder_final_offset": 4,
+        "decoder_rng_windows": 1,
+        "ggml_commit": "0f2ed045"
+      },
+      "model_sha256": "74ebd8a8537f55ea3f3566cfa17c7e28734fc555af5fbc1a254bec94a182f814",
+      "cli_sha256": "78a3775e02fd6283606e6202313ed28adcbe83c8c74bcfa9cb2eb1653e9f19e4",
+      "codes_sha256": "9f5b54e5aabe9c8b16f066e2094bcfa71180cc8933fe3922efe950ca4f51cb8e"
+    },
+    {
+      "name": "f32-gaussian-120",
+      "target_bpm": 120,
+      "audio_sha256": "a258b5075777e7e02881ef0aaae6eecb695c91d4835c1ae45b3c3d92d2f30353",
+      "duration_seconds": 29.76,
+      "onset_candidates": [
+        {
+          "bpm": 130.0143956724677,
+          "correlation": 0.732095303700765
+        },
+        {
+          "bpm": 64.91333643355179,
+          "correlation": 0.6391575355857522
+        },
+        {
+          "bpm": 43.25363981568999,
+          "correlation": 0.6132921249845802
+        },
+        {
+          "bpm": 86.52863190954865,
+          "correlation": 0.5333578608536068
+        },
+        {
+          "bpm": 51.91196157850054,
+          "correlation": 0.5053000984580535
+        },
+        {
+          "bpm": 72.21504447903081,
+          "correlation": 0.024755860801146414
+        }
+      ],
+      "onset_windows": [
+        {
+          "start_seconds": 0,
+          "candidates": [
+            {
+              "bpm": 130.06326447086187,
+              "correlation": 0.5980884176433372
+            },
+            {
+              "bpm": 64.91280907937819,
+              "correlation": 0.4629598855076385
+            },
+            {
+              "bpm": 43.204759185045916,
+              "correlation": 0.4408847550156786
+            }
+          ]
+        },
+        {
+          "start_seconds": 10,
+          "candidates": [
+            {
+              "bpm": 129.94230141866558,
+              "correlation": 0.7489250864548451
+            },
+            {
+              "bpm": 43.228222679417115,
+              "correlation": 0.6366258521637735
+            },
+            {
+              "bpm": 64.86482504056792,
+              "correlation": 0.6355981340116497
+            }
+          ]
+        },
+        {
+          "start_seconds": 14.760000000000002,
+          "candidates": [
+            {
+              "bpm": 129.96451354557718,
+              "correlation": 0.7862364245474741
+            },
+            {
+              "bpm": 64.91441011696938,
+              "correlation": 0.7085694224644372
+            },
+            {
+              "bpm": 43.26365352489421,
+              "correlation": 0.6603457352011137
+            }
+          ]
+        }
+      ],
+      "sheetsage2_score_clock": {
+        "estimated_bpm": 129.67298055611448,
+        "clock_residual_beats_rms": 0.04859820578153578,
+        "timestamped_events": 65,
+        "windows": [
+          {
+            "start_seconds": 0.0,
+            "end_seconds": 15.0,
+            "estimated_bpm": 129.7317016773803
+          },
+          {
+            "start_seconds": 10.0,
+            "end_seconds": 25.0,
+            "estimated_bpm": 129.78389183286373
+          }
+        ],
+        "warnings": [],
+        "method": "Linear fit of SheetSage2 decoded musical beats against its predicted source timestamps; estimated, not ground-truth tempo"
+      },
+      "timed_melody": {
+        "target_bpm": 120,
+        "duration_seconds": 29.76,
+        "onset_tolerance_seconds": 0.25,
+        "offset_beats": 0,
+        "reference_notes": 56,
+        "transcribed_instrumental_notes": 41,
+        "ordered_matches": 8,
+        "precision": 0.1951219512195122,
+        "recall": 0.14285714285714285,
+        "f1": 0.16494845360824742,
+        "matched_onset_error_median_seconds": -0.05500000000000016,
+        "matched_onset_error_absolute_median_seconds": 0.07500000000000018,
+        "reference_midi_sha256": "0fbef0ef0b8aa7b50c4c922f527510562d8ff856b42220328a00681b87f95107",
+        "events_sha256": "fee95989706049cbb1ee4b9aa552f56eb724f3af55f3a938fc9ae110445808c6",
+        "limitation": "SheetSage2 re-transcription can make mistakes and choose another melody. Octave-equivalent pitches allowed; no transposition, fitted tempo or time warping. This estimates on-clock note preservation, not musical quality or a tempo guarantee."
+      },
+      "run": {
+        "frames": 372,
+        "prompt_frames": 25,
+        "symbolic_frames": 540,
+        "cache_capacity": 8192,
+        "guidance": 1.5,
+        "temperature": 1,
+        "top_k": 250,
+        "seed": 1701,
+        "experimental_tempo": {
+          "method": "conditional-cross-attention-gaussian-v1",
+          "bpm": 120,
+          "width_beats": 1,
+          "offset_beats": 0
+        },
+        "eos": false,
+        "replay_checked": true,
+        "terminal_contract_passed": true,
+        "generator_released_before_decode": true,
+        "generation_with_checks_seconds": 260.474,
+        "weight_bytes": 17516732416,
+        "cache_bytes": 3758686208,
+        "graph_bytes": 97575424,
+        "audio_samples_per_channel": 1428480,
+        "audio_peak": 0.651323,
+        "audio_rms": 0.0865496,
+        "decode_seconds": 15.7682,
+        "decoder_seed": 1701,
+        "decoder_steps": 10,
+        "segment_codes": 372,
+        "decoder_guidance": 1.25,
+        "rng": "torch-cuda",
+        "rng_cuda_blocks": 288,
+        "sampler_offset_per_head": 4,
+        "sampler_final_offset": 11904,
+        "decoder_final_offset": 4,
+        "decoder_rng_windows": 1,
+        "ggml_commit": "0f2ed045"
+      },
+      "model_sha256": "5f3bfcb7bd441301d272546e4bfb7ddd690df45447251100f5e223e036dab62c",
+      "cli_sha256": "b5767dce8ccd8db3fb018cdaa241fc83c459b4c81579ea7a6d9940cabc4f22f2",
+      "codes_sha256": "c45e189a1e6d66d1181b602b81223a6e4b54f58523dc00944dbc0aafc7a0e2c1"
+    },
+    {
+      "name": "q4-local-120",
+      "target_bpm": 120,
+      "audio_sha256": "38899cae33fc7f68df8f79bc094f9b1bf918a2bcf1a3c6f8a1e78671b601dfb6",
+      "duration_seconds": 29.76,
+      "onset_candidates": [
+        {
+          "bpm": 97.72656706446591,
+          "correlation": 0.4479916931733743
+        },
+        {
+          "bpm": 48.95960328166018,
+          "correlation": 0.42651381542999095
+        },
+        {
+          "bpm": 193.21391436647153,
+          "correlation": 0.20620088265105038
+        },
+        {
+          "bpm": 65.2457422833396,
+          "correlation": 0.14932371656875212
+        },
+        {
+          "bpm": 63.39509195360579,
+          "correlation": 0.10346586274343163
+        }
+      ],
+      "onset_windows": [
+        {
+          "start_seconds": 0,
+          "candidates": [
+            {
+              "bpm": 198.34499467736563,
+              "correlation": 0.20027336695559736
+            },
+            {
+              "bpm": 238.25458506926606,
+              "correlation": 0.13761483503220798
+            },
+            {
+              "bpm": 128.99382700527357,
+              "correlation": 0.10139153717662834
+            }
+          ]
+        },
+        {
+          "start_seconds": 10,
+          "candidates": [
+            {
+              "bpm": 97.83846521030316,
+              "correlation": 0.5789017671502383
+            },
+            {
+              "bpm": 48.93956524369656,
+              "correlation": 0.5757197419854491
+            },
+            {
+              "bpm": 194.99350592362777,
+              "correlation": 0.20527650982587978
+            }
+          ]
+        },
+        {
+          "start_seconds": 14.760000000000002,
+          "candidates": [
+            {
+              "bpm": 97.74259472033886,
+              "correlation": 0.5197788352919576
+            },
+            {
+              "bpm": 48.96201421993261,
+              "correlation": 0.5112173011429803
+            },
+            {
+              "bpm": 192.83506850998495,
+              "correlation": 0.17046667952162084
+            }
+          ]
+        }
+      ],
+      "sheetsage2_score_clock": {
+        "estimated_bpm": 98.78547063780077,
+        "clock_residual_beats_rms": 0.19245548564418796,
+        "timestamped_events": 49,
+        "windows": [
+          {
+            "start_seconds": 0.0,
+            "end_seconds": 15.0,
+            "estimated_bpm": 100.92549322853547
+          },
+          {
+            "start_seconds": 10.0,
+            "end_seconds": 25.0,
+            "estimated_bpm": 98.0447608868634
+          }
+        ],
+        "warnings": [],
+        "method": "Linear fit of SheetSage2 decoded musical beats against its predicted source timestamps; estimated, not ground-truth tempo"
+      },
+      "timed_melody": {
+        "target_bpm": 120,
+        "duration_seconds": 29.76,
+        "onset_tolerance_seconds": 0.25,
+        "offset_beats": 0,
+        "reference_notes": 56,
+        "transcribed_instrumental_notes": 28,
+        "ordered_matches": 2,
+        "precision": 0.07142857142857142,
+        "recall": 0.03571428571428571,
+        "f1": 0.047619047619047616,
+        "matched_onset_error_median_seconds": -0.0349999999999997,
+        "matched_onset_error_absolute_median_seconds": 0.14500000000000002,
+        "reference_midi_sha256": "0fbef0ef0b8aa7b50c4c922f527510562d8ff856b42220328a00681b87f95107",
+        "events_sha256": "bdce59e1927e5b387b1816f59cfd181f6e89eddf4604cb75d1005fb3e1f6e9aa",
+        "limitation": "SheetSage2 re-transcription can make mistakes and choose another melody. Octave-equivalent pitches allowed; no transposition, fitted tempo or time warping. This estimates on-clock note preservation, not musical quality or a tempo guarantee."
+      },
+      "run": {
+        "frames": 372,
+        "prompt_frames": 25,
+        "symbolic_frames": 540,
+        "cache_capacity": 1024,
+        "guidance": 1.5,
+        "temperature": 1,
+        "top_k": 250,
+        "seed": 1701,
+        "experimental_tempo": {
+          "method": "conditional-cross-attention-gaussian-v1",
+          "bpm": 120,
+          "width_beats": 0.5,
+          "offset_beats": 0,
+          "local_window": 1
+        },
+        "eos": false,
+        "replay_checked": true,
+        "terminal_contract_passed": true,
+        "generator_released_before_decode": true,
+        "generation_with_checks_seconds": 130.018,
+        "weight_bytes": 2939920896,
+        "cache_bytes": 470351872,
+        "graph_bytes": 53535232,
+        "audio_samples_per_channel": 1428480,
+        "audio_peak": 1.20141,
+        "audio_rms": 0.198522,
+        "decode_seconds": 21.1376,
+        "decoder_seed": 1701,
+        "decoder_steps": 10,
+        "segment_codes": 372,
+        "decoder_guidance": 1.25,
+        "rng": "torch-cuda",
+        "rng_cuda_blocks": 288,
+        "sampler_offset_per_head": 4,
+        "sampler_final_offset": 11904,
+        "decoder_final_offset": 4,
+        "decoder_rng_windows": 1,
+        "ggml_commit": "0f2ed045"
+      },
+      "model_sha256": "74ebd8a8537f55ea3f3566cfa17c7e28734fc555af5fbc1a254bec94a182f814",
+      "cli_sha256": "964321b24a77e029e2b8dd1b7ebbe323b937b2d7669b0bca86d2a0fb49491468",
+      "codes_sha256": "58e4fe4443eec4bce9367fb91db820e16459c9862649e7a2c2421c681637a761"
+    },
+    {
+      "name": "f32-local-120",
+      "target_bpm": 120,
+      "audio_sha256": "7d6d6ee665d526d16f523ee3f86c6d8ab69b1905c72ee54f64e500877710a99a",
+      "duration_seconds": 29.76,
+      "onset_candidates": [
+        {
+          "bpm": 122.69224201550352,
+          "correlation": 0.6746358359144865
+        },
+        {
+          "bpm": 61.33507679465181,
+          "correlation": 0.5738186259915858
+        },
+        {
+          "bpm": 40.871019866836164,
+          "correlation": 0.47445364405153545
+        },
+        {
+          "bpm": 46.13445193979049,
+          "correlation": 0.22350593152825288
+        },
+        {
+          "bpm": 184.60357841424087,
+          "correlation": 0.21770224504743288
+        },
+        {
+          "bpm": 92.15639809888417,
+          "correlation": 0.21237633497362662
+        }
+      ],
+      "onset_windows": [
+        {
+          "start_seconds": 0,
+          "candidates": [
+            {
+              "bpm": 122.39993918558723,
+              "correlation": 0.4334008339095913
+            },
+            {
+              "bpm": 61.457288790667036,
+              "correlation": 0.3856614548753345
+            },
+            {
+              "bpm": 40.87052300569424,
+              "correlation": 0.24086258767591914
+            }
+          ]
+        },
+        {
+          "start_seconds": 10,
+          "candidates": [
+            {
+              "bpm": 122.58865140170629,
+              "correlation": 0.7495011822993964
+            },
+            {
+              "bpm": 61.27270427782932,
+              "correlation": 0.621251636404056
+            },
+            {
+              "bpm": 40.83606640655209,
+              "correlation": 0.48984329580175545
+            }
+          ]
+        },
+        {
+          "start_seconds": 14.760000000000002,
+          "candidates": [
+            {
+              "bpm": 122.71460371201584,
+              "correlation": 0.7349610529996731
+            },
+            {
+              "bpm": 61.32474871393915,
+              "correlation": 0.6076853333880878
+            },
+            {
+              "bpm": 40.865618107645645,
+              "correlation": 0.5145271594963778
+            }
+          ]
+        }
+      ],
+      "sheetsage2_score_clock": {
+        "estimated_bpm": 122.79791525157206,
+        "clock_residual_beats_rms": 0.11620388594509928,
+        "timestamped_events": 62,
+        "windows": [
+          {
+            "start_seconds": 0.0,
+            "end_seconds": 15.0,
+            "estimated_bpm": 123.46310219767454
+          },
+          {
+            "start_seconds": 10.0,
+            "end_seconds": 25.0,
+            "estimated_bpm": 122.73788411342804
+          }
+        ],
+        "warnings": [],
+        "method": "Linear fit of SheetSage2 decoded musical beats against its predicted source timestamps; estimated, not ground-truth tempo"
+      },
+      "timed_melody": {
+        "target_bpm": 120,
+        "duration_seconds": 29.76,
+        "onset_tolerance_seconds": 0.25,
+        "offset_beats": 0,
+        "reference_notes": 56,
+        "transcribed_instrumental_notes": 53,
+        "ordered_matches": 5,
+        "precision": 0.09433962264150944,
+        "recall": 0.08928571428571429,
+        "f1": 0.09174311926605506,
+        "matched_onset_error_median_seconds": -0.1399999999999999,
+        "matched_onset_error_absolute_median_seconds": 0.1399999999999999,
+        "reference_midi_sha256": "0fbef0ef0b8aa7b50c4c922f527510562d8ff856b42220328a00681b87f95107",
+        "events_sha256": "0f3141ffeda26a10adb9343db12e35222a76a4f21fac4d215693672291766a2d",
+        "limitation": "SheetSage2 re-transcription can make mistakes and choose another melody. Octave-equivalent pitches allowed; no transposition, fitted tempo or time warping. This estimates on-clock note preservation, not musical quality or a tempo guarantee."
+      },
+      "run": {
+        "frames": 372,
+        "prompt_frames": 25,
+        "symbolic_frames": 540,
+        "cache_capacity": 8192,
+        "guidance": 1.5,
+        "temperature": 1,
+        "top_k": 250,
+        "seed": 1701,
+        "experimental_tempo": {
+          "method": "conditional-cross-attention-gaussian-v1",
+          "bpm": 120,
+          "width_beats": 0.5,
+          "offset_beats": 0,
+          "local_window": 1
+        },
+        "eos": false,
+        "replay_checked": true,
+        "terminal_contract_passed": true,
+        "generator_released_before_decode": true,
+        "generation_with_checks_seconds": 261.913,
+        "weight_bytes": 17516732416,
+        "cache_bytes": 3758686208,
+        "graph_bytes": 97575424,
+        "audio_samples_per_channel": 1428480,
+        "audio_peak": 1.25218,
+        "audio_rms": 0.183031,
+        "decode_seconds": 15.8514,
+        "decoder_seed": 1701,
+        "decoder_steps": 10,
+        "segment_codes": 372,
+        "decoder_guidance": 1.25,
+        "rng": "torch-cuda",
+        "rng_cuda_blocks": 288,
+        "sampler_offset_per_head": 4,
+        "sampler_final_offset": 11904,
+        "decoder_final_offset": 4,
+        "decoder_rng_windows": 1,
+        "ggml_commit": "0f2ed045"
+      },
+      "model_sha256": "5f3bfcb7bd441301d272546e4bfb7ddd690df45447251100f5e223e036dab62c",
+      "cli_sha256": "ff24dc1831424d9523d120cb4cc19f8d6edba70bd50bb4617715c2e9078ecaa6",
+      "codes_sha256": "3d2b3060146bae3d735e78b68e93fe1cea6efe392aa4df0d23504c664ecaae71"
+    },
+    {
+      "name": "q4-narrow-cfg3-120",
+      "target_bpm": 120,
+      "audio_sha256": "f1165fd4b13d6f5ab5c984daf9c3e21ce4f63508b5aec63b0352c32ad027b26b",
+      "duration_seconds": 29.76,
+      "onset_candidates": [
+        {
+          "bpm": 195.6774885749915,
+          "correlation": 0.5486012315431215
+        },
+        {
+          "bpm": 98.4754206811072,
+          "correlation": 0.5204388750245051
+        },
+        {
+          "bpm": 65.23828924371404,
+          "correlation": 0.4774758142465283
+        },
+        {
+          "bpm": 48.76822623954453,
+          "correlation": 0.4275470295329304
+        },
+        {
+          "bpm": 50.10501745578219,
+          "correlation": 0.37034842537147206
+        },
+        {
+          "bpm": 40.396539074022314,
+          "correlation": 0.27157682117395254
+        }
+      ],
+      "onset_windows": [
+        {
+          "start_seconds": 0,
+          "candidates": [
+            {
+              "bpm": 198.37235949706061,
+              "correlation": 0.30955930999110004
+            },
+            {
+              "bpm": 96.77663300491719,
+              "correlation": 0.2866585516213163
+            },
+            {
+              "bpm": 85.19430673753081,
+              "correlation": 0.2592858949404462
+            }
+          ]
+        },
+        {
+          "start_seconds": 10,
+          "candidates": [
+            {
+              "bpm": 194.52019456815287,
+              "correlation": 0.5689383233500762
+            },
+            {
+              "bpm": 97.58524578880352,
+              "correlation": 0.5318859010254555
+            },
+            {
+              "bpm": 65.11613287313402,
+              "correlation": 0.46188926469651476
+            }
+          ]
+        },
+        {
+          "start_seconds": 14.760000000000002,
+          "candidates": [
+            {
+              "bpm": 195.6408394404291,
+              "correlation": 0.5302627044591038
+            },
+            {
+              "bpm": 98.55204596279987,
+              "correlation": 0.5019848584882507
+            },
+            {
+              "bpm": 65.24593761933292,
+              "correlation": 0.4504392349085457
+            }
+          ]
+        }
+      ],
+      "sheetsage2_score_clock": {
+        "estimated_bpm": 95.07401027335018,
+        "clock_residual_beats_rms": 0.11999409646554926,
+        "timestamped_events": 48,
+        "windows": [
+          {
+            "start_seconds": 0.0,
+            "end_seconds": 15.0,
+            "estimated_bpm": 95.48330775857467
+          },
+          {
+            "start_seconds": 10.0,
+            "end_seconds": 25.0,
+            "estimated_bpm": 93.86692035937858
+          }
+        ],
+        "warnings": [],
+        "method": "Linear fit of SheetSage2 decoded musical beats against its predicted source timestamps; estimated, not ground-truth tempo"
+      },
+      "timed_melody": {
+        "target_bpm": 120,
+        "duration_seconds": 29.76,
+        "onset_tolerance_seconds": 0.25,
+        "offset_beats": 0,
+        "reference_notes": 56,
+        "transcribed_instrumental_notes": 23,
+        "ordered_matches": 9,
+        "precision": 0.391304347826087,
+        "recall": 0.16071428571428573,
+        "f1": 0.22784810126582278,
+        "matched_onset_error_median_seconds": 0.01,
+        "matched_onset_error_absolute_median_seconds": 0.03000000000000025,
+        "reference_midi_sha256": "0fbef0ef0b8aa7b50c4c922f527510562d8ff856b42220328a00681b87f95107",
+        "events_sha256": "b14b514a13fc4aba88f903137f057a9de7df95145d3ce569fd0f2cd0ac1f48aa",
+        "limitation": "SheetSage2 re-transcription can make mistakes and choose another melody. Octave-equivalent pitches allowed; no transposition, fitted tempo or time warping. This estimates on-clock note preservation, not musical quality or a tempo guarantee."
+      },
+      "run": {
+        "frames": 372,
+        "prompt_frames": 25,
+        "symbolic_frames": 540,
+        "cache_capacity": 1024,
+        "guidance": 3,
+        "temperature": 1,
+        "top_k": 250,
+        "seed": 1701,
+        "experimental_tempo": {
+          "method": "conditional-cross-attention-gaussian-v1",
+          "bpm": 120,
+          "width_beats": 0.25,
+          "offset_beats": 0,
+          "local_window": 0
+        },
+        "eos": false,
+        "replay_checked": true,
+        "terminal_contract_passed": true,
+        "generator_released_before_decode": true,
+        "generation_with_checks_seconds": 129.641,
+        "weight_bytes": 2939920896,
+        "cache_bytes": 470351872,
+        "graph_bytes": 53535232,
+        "audio_samples_per_channel": 1428480,
+        "audio_peak": 1.10143,
+        "audio_rms": 0.102573,
+        "decode_seconds": 17.3422,
+        "decoder_seed": 1701,
+        "decoder_steps": 10,
+        "segment_codes": 372,
+        "decoder_guidance": 1.25,
+        "rng": "torch-cuda",
+        "rng_cuda_blocks": 288,
+        "sampler_offset_per_head": 4,
+        "sampler_final_offset": 11904,
+        "decoder_final_offset": 4,
+        "decoder_rng_windows": 1,
+        "ggml_commit": "0f2ed045"
+      },
+      "model_sha256": "74ebd8a8537f55ea3f3566cfa17c7e28734fc555af5fbc1a254bec94a182f814",
+      "cli_sha256": "964321b24a77e029e2b8dd1b7ebbe323b937b2d7669b0bca86d2a0fb49491468",
+      "codes_sha256": "4a64a08579d967fd6b43a43a19101fe7d96e9a9849cf53b7350e32b9daee0f4f"
+    }
+  ],
+  "fp32_intervention_parity": [
+    {
+      "report_sha256": "603e2e3c1bf14b0045e3658cf46579e808bfe50d1e46e2a01a08030394559037",
+      "oracle_manifest_sha256": "25b26f8c6a2ff2a9d228c5dc2035d58a6190c02b0db3b1e079aab779bf938f5b",
+      "gates": {
+        "logits_and_cache_max_abs": 0.001,
+        "relative_l2": 0.0001,
+        "activation_atol": 0.001,
+        "activation_rtol": 1e-06,
+        "activation_policy": "elementwise abs(delta)<=atol+rtol*abs(reference), plus relative L2; flat absolute diagnostic retained"
+      },
+      "passed": true,
+      "cases": [
+        {
+          "name": "clock-0",
+          "frames": 3,
+          "tensors": 234,
+          "passed": true,
+          "native_reset_replay_bit_exact": true,
+          "max_abs": 5.91278076171875e-05,
+          "max_relative_l2": 3.50943391710228e-06,
+          "failed_tensors": []
+        },
+        {
+          "name": "clock-90",
+          "frames": 3,
+          "tensors": 234,
+          "passed": true,
+          "native_reset_replay_bit_exact": true,
+          "max_abs": 5.91278076171875e-05,
+          "max_relative_l2": 3.5360061016476203e-06,
+          "failed_tensors": []
+        },
+        {
+          "name": "clock-120",
+          "frames": 3,
+          "tensors": 234,
+          "passed": true,
+          "native_reset_replay_bit_exact": true,
+          "max_abs": 5.91278076171875e-05,
+          "max_relative_l2": 3.5360061016476203e-06,
+          "failed_tensors": []
+        },
+        {
+          "name": "clock-150",
+          "frames": 3,
+          "tensors": 234,
+          "passed": true,
+          "native_reset_replay_bit_exact": true,
+          "max_abs": 5.91278076171875e-05,
+          "max_relative_l2": 3.5360061016476203e-06,
+          "failed_tensors": []
+        }
+      ]
+    },
+    {
+      "report_sha256": "64c14f4cb2083e155bc4dab5d9bee4a37f15e7e9b00d5883430cc7074ddda4cc",
+      "oracle_manifest_sha256": "a15362e12dc952fd84a09465fb954cbf64dc13989a90dcbdb0788c8c822b53c3",
+      "gates": {
+        "logits_and_cache_max_abs": 0.001,
+        "relative_l2": 0.0001,
+        "activation_atol": 0.001,
+        "activation_rtol": 1e-06,
+        "activation_policy": "elementwise abs(delta)<=atol+rtol*abs(reference), plus relative L2; flat absolute diagnostic retained"
+      },
+      "passed": true,
+      "cases": [
+        {
+          "name": "clock-0",
+          "frames": 32,
+          "tensors": 234,
+          "passed": true,
+          "native_reset_replay_bit_exact": true,
+          "max_abs": 5.91278076171875e-05,
+          "max_relative_l2": 3.50943391710228e-06,
+          "failed_tensors": []
+        },
+        {
+          "name": "clock-120",
+          "frames": 32,
+          "tensors": 234,
+          "passed": true,
+          "native_reset_replay_bit_exact": true,
+          "max_abs": 5.91278076171875e-05,
+          "max_relative_l2": 3.361493321195368e-06,
+          "failed_tensors": []
+        }
+      ]
+    }
+  ],
+  "prefix_encoder": {
+    "heartlib_revision": "5858ca8f1ffe58d62be7c007ea55f1033c5ca456",
+    "encoder": {
+      "repository": "HeartMuLa/HeartCodec-oss-encoder",
+      "revision": "e6020510612d6653b73d6cd54393ef80929e3c81",
+      "snapshot": "/workspace/.cache/huggingface/hub/models--HeartMuLa--HeartCodec-oss-encoder/snapshots/e6020510612d6653b73d6cd54393ef80929e3c81",
+      "weights_sha256": "19b3c0284fecac70983731433a213ad20eb08d096be3b9a287078171de0d4e79"
+    },
+    "codec_revision": "f889dab0532cfa4bf459f2a3367eb6d346b8eeda",
+    "source_excerpt_sha256": "fcf2b40a2ec28df65ecbea8dfb7296d2ef6401ec5ec10deb98925e31cc419836",
+    "harness_sha256": "4e6375c490074cd8de38affc05ca441071829e5564de322c0c2c0304fca5cc0a",
+    "torch": "2.7.1+cu128",
+    "cuda": "12.8",
+    "device": "cpu",
+    "cases": [
+      {
+        "speed_factor": 1.0,
+        "frames": 99,
+        "guide_seconds": 7.997301587301587,
+        "complete_token_seconds": 7.92,
+        "codes_file": "guide-1.i32",
+        "codes_sha256": "09672eff2e246ca43fbdb928045e8eab75277a4c54902f841306795d13a2b8fc",
+        "guide_sha256": "27a8953c0b6257ba68e4fc786a97cde34511bd5081d9ac8924d662f03a6608de"
+      },
+      {
+        "speed_factor": 0.75,
+        "frames": 133,
+        "guide_seconds": 10.653582766439909,
+        "complete_token_seconds": 10.64,
+        "codes_file": "guide-0.75.i32",
+        "codes_sha256": "ff6bbc1d056cdf5ab93ded9d8974810dda847fde42be321aeeec4f2dafba35ff",
+        "guide_sha256": "e08dc0591ac462e7322f65b5016b2ba804334b110e9df68c4a41863c74d5f87e"
+      },
+      {
+        "speed_factor": 1.25,
+        "frames": 80,
+        "guide_seconds": 6.401768707482993,
+        "complete_token_seconds": 6.4,
+        "codes_file": "guide-1.25.i32",
+        "codes_sha256": "ce1042dad09637f93302d9e3c30478be5228b76ab7ceab3466a5b234181c9015",
+        "guide_sha256": "9578ff87eb32fbf35875cc3e9d871711bc3a674ab543cacc044a9d5f6c43c424"
+      }
+    ],
+    "intervention": "Pitch-preserving ffmpeg atempo on input guide only, then original FP32 encoder and decoder RVQ; generated continuations must be measured excluding the guide"
+  },
+  "long_prefix_encoder": {
+    "heartlib_revision": "5858ca8f1ffe58d62be7c007ea55f1033c5ca456",
+    "encoder": {
+      "repository": "HeartMuLa/HeartCodec-oss-encoder",
+      "revision": "e6020510612d6653b73d6cd54393ef80929e3c81",
+      "snapshot": "/workspace/.cache/huggingface/hub/models--HeartMuLa--HeartCodec-oss-encoder/snapshots/e6020510612d6653b73d6cd54393ef80929e3c81",
+      "weights_sha256": "19b3c0284fecac70983731433a213ad20eb08d096be3b9a287078171de0d4e79"
+    },
+    "codec_revision": "f889dab0532cfa4bf459f2a3367eb6d346b8eeda",
+    "source_excerpt_sha256": "ff700ca0aa7a9bca414e4a6bb0877a5f4eb47d0912232d563be9bd6e50311a0c",
+    "harness_sha256": "707cc8b07ab4b2c38cdcf3850f81bf6290edc356d83ece94342ee73493af4987",
+    "torch": "2.7.1+cu128",
+    "cuda": "12.8",
+    "device": "cpu",
+    "cases": [
+      {
+        "speed_factor": 1.0,
+        "frames": 372,
+        "guide_seconds": 29.76,
+        "complete_token_seconds": 29.76,
+        "codes_file": "guide-1.i32",
+        "codes_sha256": "bdbeab789d35496a3744f41410ab4ffeaecf91e7a0a9759dd1a9e7ae075ab342",
+        "guide_sha256": "ff700ca0aa7a9bca414e4a6bb0877a5f4eb47d0912232d563be9bd6e50311a0c"
+      }
+    ],
+    "intervention": "Pitch-preserving ffmpeg atempo on input guide only, then original FP32 encoder and decoder RVQ; generated continuations must be measured excluding the guide"
+  },
+  "prefix_cases": [
+    {
+      "name": "q4-guide1",
+      "guide_speed_factor": 1,
+      "nominal_guide_bpm": 120,
+      "run": {
+        "frames": 101,
+        "prompt_frames": 25,
+        "symbolic_frames": 540,
+        "cache_capacity": 1024,
+        "audio_prefix_frames": 99,
+        "newly_generated_frames": 2,
+        "guidance": 1.5,
+        "temperature": 1,
+        "top_k": 250,
+        "seed": 1701,
+        "experimental_tempo": {
+          "method": "conditional-cross-attention-gaussian-v1",
+          "bpm": 0,
+          "width_beats": 1,
+          "offset_beats": 0,
+          "local_window": 0
+        },
+        "eos": true,
+        "replay_checked": true,
+        "terminal_contract_passed": true,
+        "generator_released_before_decode": true,
+        "generation_with_checks_seconds": 35.885,
+        "weight_bytes": 2939920896,
+        "cache_bytes": 470351872,
+        "graph_bytes": 53535232,
+        "audio_samples_per_channel": 387840,
+        "audio_peak": 0.395909,
+        "audio_rms": 0.0732927,
+        "decode_seconds": 20.7056,
+        "decoder_seed": 1701,
+        "decoder_steps": 10,
+        "segment_codes": 372,
+        "decoder_guidance": 1.25,
+        "rng": "torch-cuda",
+        "rng_cuda_blocks": 288,
+        "sampler_offset_per_head": 4,
+        "sampler_final_offset": 96,
+        "decoder_final_offset": 4,
+        "decoder_rng_windows": 1,
+        "ggml_commit": "0f2ed045"
+      },
+      "model_sha256": "74ebd8a8537f55ea3f3566cfa17c7e28734fc555af5fbc1a254bec94a182f814",
+      "cli_sha256": "82925d1e756d24f73c540c28023c4850d6f565177e0139c692fb2fe4a621eafa",
+      "codes_sha256": "e067292651f2203555e0b9daa5bd12eb7c141111d02fe9e7aba5b01d549695ac",
+      "audio_sha256": "b90839409765d607e637be66f1ff8514a0dd80bc72d47c53b7499d408481f05d",
+      "audio_prefix_sha256": "09672eff2e246ca43fbdb928045e8eab75277a4c54902f841306795d13a2b8fc",
+      "new_audio_seconds": 0.16,
+      "guide_excluded_from_metrics": true,
+      "bpm_evaluable": false,
+      "reason": "EOS after too little newly generated audio; guide is not evidence of tempo adherence"
+    },
+    {
+      "name": "q4-guide1-cfg1",
+      "guide_speed_factor": 1,
+      "nominal_guide_bpm": 120,
+      "run": {
+        "frames": 101,
+        "prompt_frames": 25,
+        "symbolic_frames": 540,
+        "cache_capacity": 1024,
+        "audio_prefix_frames": 99,
+        "newly_generated_frames": 2,
+        "guidance": 1,
+        "temperature": 1,
+        "top_k": 250,
+        "seed": 1701,
+        "experimental_tempo": {
+          "method": "conditional-cross-attention-gaussian-v1",
+          "bpm": 0,
+          "width_beats": 1,
+          "offset_beats": 0,
+          "local_window": 0
+        },
+        "eos": true,
+        "replay_checked": true,
+        "terminal_contract_passed": true,
+        "generator_released_before_decode": true,
+        "generation_with_checks_seconds": 18.0774,
+        "weight_bytes": 2939920896,
+        "cache_bytes": 235175936,
+        "graph_bytes": 53535232,
+        "audio_samples_per_channel": 387840,
+        "audio_peak": 0.397509,
+        "audio_rms": 0.0730108,
+        "decode_seconds": 20.5618,
+        "decoder_seed": 1701,
+        "decoder_steps": 10,
+        "segment_codes": 372,
+        "decoder_guidance": 1.25,
+        "rng": "torch-cuda",
+        "rng_cuda_blocks": 288,
+        "sampler_offset_per_head": 4,
+        "sampler_final_offset": 96,
+        "decoder_final_offset": 4,
+        "decoder_rng_windows": 1,
+        "ggml_commit": "0f2ed045"
+      },
+      "model_sha256": "74ebd8a8537f55ea3f3566cfa17c7e28734fc555af5fbc1a254bec94a182f814",
+      "cli_sha256": "82925d1e756d24f73c540c28023c4850d6f565177e0139c692fb2fe4a621eafa",
+      "codes_sha256": "9a51e775ce73d26c5cadce46285556e73345c94e25d1fd57f665327dbe5e1e85",
+      "audio_sha256": "2d84d9acd41496dfa1fac46bb80fd65866375fbdd9812773cb66bc6aa222fc91",
+      "audio_prefix_sha256": "09672eff2e246ca43fbdb928045e8eab75277a4c54902f841306795d13a2b8fc",
+      "new_audio_seconds": 0.16,
+      "guide_excluded_from_metrics": true,
+      "bpm_evaluable": false,
+      "reason": "EOS after too little newly generated audio; guide is not evidence of tempo adherence"
+    },
+    {
+      "name": "f32-guide1",
+      "guide_speed_factor": 1,
+      "nominal_guide_bpm": 120,
+      "run": {
+        "frames": 101,
+        "prompt_frames": 25,
+        "symbolic_frames": 540,
+        "cache_capacity": 8192,
+        "audio_prefix_frames": 99,
+        "newly_generated_frames": 2,
+        "guidance": 1.5,
+        "temperature": 1,
+        "top_k": 250,
+        "seed": 1701,
+        "experimental_tempo": {
+          "method": "conditional-cross-attention-gaussian-v1",
+          "bpm": 0,
+          "width_beats": 1,
+          "offset_beats": 0,
+          "local_window": 0
+        },
+        "eos": true,
+        "replay_checked": true,
+        "terminal_contract_passed": true,
+        "generator_released_before_decode": true,
+        "generation_with_checks_seconds": 73.2662,
+        "weight_bytes": 17516732416,
+        "cache_bytes": 3758686208,
+        "graph_bytes": 97575424,
+        "audio_samples_per_channel": 387840,
+        "audio_peak": 0.405583,
+        "audio_rms": 0.0734234,
+        "decode_seconds": 16.2579,
+        "decoder_seed": 1701,
+        "decoder_steps": 10,
+        "segment_codes": 372,
+        "decoder_guidance": 1.25,
+        "rng": "torch-cuda",
+        "rng_cuda_blocks": 288,
+        "sampler_offset_per_head": 4,
+        "sampler_final_offset": 96,
+        "decoder_final_offset": 4,
+        "decoder_rng_windows": 1,
+        "ggml_commit": "0f2ed045"
+      },
+      "model_sha256": "5f3bfcb7bd441301d272546e4bfb7ddd690df45447251100f5e223e036dab62c",
+      "cli_sha256": "6c6c88b15ef704282645dc5a9b76fd8034ed823ebdd9dff9784e9e6d4f2e96d0",
+      "codes_sha256": "c8c03ecedc7ca8761210f90c4c1f33e6e5e44775ecb1a5dcb1fcf5d1e2b360bb",
+      "audio_sha256": "ed041e00f0f6029795b154e1f89cc9533c668a3d6d7d16a4d592f4415d746fa1",
+      "audio_prefix_sha256": "09672eff2e246ca43fbdb928045e8eab75277a4c54902f841306795d13a2b8fc",
+      "new_audio_seconds": 0.16,
+      "guide_excluded_from_metrics": true,
+      "bpm_evaluable": false,
+      "reason": "EOS after too little newly generated audio; guide is not evidence of tempo adherence"
+    },
+    {
+      "name": "q4-guide1-first25",
+      "guide_speed_factor": 1,
+      "nominal_guide_bpm": 120,
+      "run": {
+        "frames": 174,
+        "prompt_frames": 25,
+        "symbolic_frames": 540,
+        "cache_capacity": 1024,
+        "audio_prefix_frames": 25,
+        "newly_generated_frames": 149,
+        "guidance": 1.5,
+        "temperature": 1,
+        "top_k": 250,
+        "seed": 1701,
+        "experimental_tempo": {
+          "method": "conditional-cross-attention-gaussian-v1",
+          "bpm": 0,
+          "width_beats": 1,
+          "offset_beats": 0,
+          "local_window": 0
+        },
+        "eos": true,
+        "replay_checked": true,
+        "terminal_contract_passed": true,
+        "generator_released_before_decode": true,
+        "generation_with_checks_seconds": 61.5053,
+        "weight_bytes": 2939920896,
+        "cache_bytes": 470351872,
+        "graph_bytes": 53535232,
+        "audio_samples_per_channel": 668160,
+        "audio_peak": 0.738526,
+        "audio_rms": 0.0966288,
+        "decode_seconds": 18.0998,
+        "decoder_seed": 1701,
+        "decoder_steps": 10,
+        "segment_codes": 372,
+        "decoder_guidance": 1.25,
+        "rng": "torch-cuda",
+        "rng_cuda_blocks": 288,
+        "sampler_offset_per_head": 4,
+        "sampler_start_offset": 0,
+        "sampler_final_offset": 4800,
+        "decoder_final_offset": 4,
+        "decoder_rng_windows": 1,
+        "ggml_commit": "0f2ed045"
+      },
+      "model_sha256": "74ebd8a8537f55ea3f3566cfa17c7e28734fc555af5fbc1a254bec94a182f814",
+      "cli_sha256": "afa84c9ae2243dd15306db280d6fd74e422d7430e8b8955d247844489c87db62",
+      "codes_sha256": "5e2d846405851df48e5e7a0fd597d162bede25588fe2982a19d06393429f368c",
+      "audio_sha256": "c203b99c6df75d397082827e23a0d5869efb5574c3e765726814ce3feaa797e5",
+      "audio_prefix_sha256": "0ea2c09afbb19bc8481e25ae2743d10e0966581003017a3ea94579b14a8f8904",
+      "new_audio_seconds": 11.92,
+      "guide_excluded_from_metrics": true,
+      "bpm_evaluable": true,
+      "continuation": {
+        "audio_sha256": "7c1eb74dba4094a0e0b803f39cc79f7d9d66e7d57b2d274c187a93ab0ad80b48",
+        "duration_seconds": 11.92,
+        "onset_candidates": [
+          {
+            "bpm": 59.959584146709695,
+            "correlation": 0.6925321828580677
+          },
+          {
+            "bpm": 119.8230209297244,
+            "correlation": 0.6833511440443495
+          },
+          {
+            "bpm": 79.94055914797704,
+            "correlation": 0.6286980249675768
+          },
+          {
+            "bpm": 47.968903586911054,
+            "correlation": 0.5890215226862077
+          }
+        ],
+        "onset_windows": [
+          {
+            "start_seconds": 0,
+            "candidates": [
+              {
+                "bpm": 59.959584146709695,
+                "correlation": 0.6925321828580677
+              },
+              {
+                "bpm": 119.8230209297244,
+                "correlation": 0.6833511440443495
+              },
+              {
+                "bpm": 79.94055914797704,
+                "correlation": 0.6286980249675768
+              }
+            ]
+          }
+        ],
+        "sheetsage2_score_clock": {
+          "estimated_bpm": 119.82788779179316,
+          "clock_residual_beats_rms": 0.02213675503272701,
+          "timestamped_events": 24,
+          "windows": [
+            {
+              "start_seconds": 0.0,
+              "end_seconds": 11.53,
+              "estimated_bpm": 119.82788779179316
+            }
+          ],
+          "warnings": [],
+          "method": "Linear fit of SheetSage2 decoded musical beats against its predicted source timestamps; estimated, not ground-truth tempo"
+        }
+      },
+      "timed_melody": {
+        "target_bpm": 120,
+        "duration_seconds": 11.92,
+        "onset_tolerance_seconds": 0.25,
+        "offset_beats": 4.0,
+        "reference_notes": 34,
+        "transcribed_instrumental_notes": 19,
+        "ordered_matches": 10,
+        "precision": 0.5263157894736842,
+        "recall": 0.29411764705882354,
+        "f1": 0.3773584905660377,
+        "matched_onset_error_median_seconds": -0.004999999999999893,
+        "matched_onset_error_absolute_median_seconds": 0.009999999999999787,
+        "reference_midi_sha256": "0fbef0ef0b8aa7b50c4c922f527510562d8ff856b42220328a00681b87f95107",
+        "events_sha256": "ae3548a9b96a63c3332bc0122057bb1f240ab134d74d4f40ae773ba6ea25142f",
+        "limitation": "SheetSage2 re-transcription can make mistakes and choose another melody. Octave-equivalent pitches allowed; no transposition, fitted tempo or time warping. This estimates on-clock note preservation, not musical quality or a tempo guarantee."
+      }
+    },
+    {
+      "name": "f32-guide1-first25",
+      "guide_speed_factor": 1,
+      "nominal_guide_bpm": 120,
+      "run": {
+        "frames": 177,
+        "prompt_frames": 25,
+        "symbolic_frames": 540,
+        "cache_capacity": 8192,
+        "audio_prefix_frames": 25,
+        "newly_generated_frames": 152,
+        "guidance": 1.5,
+        "temperature": 1,
+        "top_k": 250,
+        "seed": 1701,
+        "experimental_tempo": {
+          "method": "conditional-cross-attention-gaussian-v1",
+          "bpm": 0,
+          "width_beats": 1,
+          "offset_beats": 0,
+          "local_window": 0
+        },
+        "eos": true,
+        "replay_checked": true,
+        "terminal_contract_passed": true,
+        "generator_released_before_decode": true,
+        "generation_with_checks_seconds": 125.227,
+        "weight_bytes": 17516732416,
+        "cache_bytes": 3758686208,
+        "graph_bytes": 97575424,
+        "audio_samples_per_channel": 679680,
+        "audio_peak": 0.540805,
+        "audio_rms": 0.0702819,
+        "decode_seconds": 15.4261,
+        "decoder_seed": 1701,
+        "decoder_steps": 10,
+        "segment_codes": 372,
+        "decoder_guidance": 1.25,
+        "rng": "torch-cuda",
+        "rng_cuda_blocks": 288,
+        "sampler_offset_per_head": 4,
+        "sampler_start_offset": 0,
+        "sampler_final_offset": 4896,
+        "decoder_final_offset": 4,
+        "decoder_rng_windows": 1,
+        "ggml_commit": "0f2ed045"
+      },
+      "model_sha256": "5f3bfcb7bd441301d272546e4bfb7ddd690df45447251100f5e223e036dab62c",
+      "cli_sha256": "3af80c6abc4e84deba08103bad44de373d36466dd09d960e3e9d5e3e00c0f020",
+      "codes_sha256": "984f5d8d9e67677362c1d265fc73240919deddc5bc4bcd8579eb3d9a2b49af30",
+      "audio_sha256": "b6d740f8c567cfc2122885229049f31bd938effc124625956efdd51e44e4ae67",
+      "audio_prefix_sha256": "0ea2c09afbb19bc8481e25ae2743d10e0966581003017a3ea94579b14a8f8904",
+      "new_audio_seconds": 12.16,
+      "guide_excluded_from_metrics": true,
+      "bpm_evaluable": true,
+      "continuation": {
+        "audio_sha256": "08a93dcb9f8d648bcfdd911fa3cf0c8c47700dab71deb28a151d0227a5154b12",
+        "duration_seconds": 12.16,
+        "onset_candidates": [
+          {
+            "bpm": 59.463785218442474,
+            "correlation": 0.37921199383435433
+          },
+          {
+            "bpm": 119.12566450163496,
+            "correlation": 0.37657264955687275
+          },
+          {
+            "bpm": 237.0974985610323,
+            "correlation": 0.3006025480388251
+          },
+          {
+            "bpm": 47.63143627252227,
+            "correlation": 0.29196123886273484
+          },
+          {
+            "bpm": 79.35691486699847,
+            "correlation": 0.26802528950133153
+          },
+          {
+            "bpm": 111.48888598150499,
+            "correlation": 0.022064963418658864
+          }
+        ],
+        "onset_windows": [
+          {
+            "start_seconds": 0,
+            "candidates": [
+              {
+                "bpm": 59.463785218442474,
+                "correlation": 0.37921199383435433
+              },
+              {
+                "bpm": 119.12566450163496,
+                "correlation": 0.37657264955687275
+              },
+              {
+                "bpm": 237.0974985610323,
+                "correlation": 0.3006025480388251
+              }
+            ]
+          }
+        ],
+        "sheetsage2_score_clock": {
+          "estimated_bpm": 115.87307535633622,
+          "clock_residual_beats_rms": 0.1444051168721988,
+          "timestamped_events": 24,
+          "windows": [
+            {
+              "start_seconds": 0.0,
+              "end_seconds": 11.88,
+              "estimated_bpm": 115.87307535633622
+            }
+          ],
+          "warnings": [],
+          "method": "Linear fit of SheetSage2 decoded musical beats against its predicted source timestamps; estimated, not ground-truth tempo"
+        }
+      },
+      "timed_melody": {
+        "target_bpm": 120,
+        "duration_seconds": 12.16,
+        "onset_tolerance_seconds": 0.25,
+        "offset_beats": 4.0,
+        "reference_notes": 35,
+        "transcribed_instrumental_notes": 15,
+        "ordered_matches": 7,
+        "precision": 0.4666666666666667,
+        "recall": 0.2,
+        "f1": 0.27999999999999997,
+        "matched_onset_error_median_seconds": 0.0,
+        "matched_onset_error_absolute_median_seconds": 0.010000000000000009,
+        "reference_midi_sha256": "0fbef0ef0b8aa7b50c4c922f527510562d8ff856b42220328a00681b87f95107",
+        "events_sha256": "d2e40dcece00ed48ef19b0cf0bbcfa5386c1a954495499af6fc055380f29f2b7",
+        "limitation": "SheetSage2 re-transcription can make mistakes and choose another melody. Octave-equivalent pitches allowed; no transposition, fitted tempo or time warping. This estimates on-clock note preservation, not musical quality or a tempo guarantee."
+      }
+    },
+    {
+      "name": "q4-guide075-first33",
+      "guide_speed_factor": 0.75,
+      "nominal_guide_bpm": 90.0,
+      "run": {
+        "frames": 231,
+        "prompt_frames": 25,
+        "symbolic_frames": 540,
+        "cache_capacity": 1024,
+        "audio_prefix_frames": 33,
+        "newly_generated_frames": 198,
+        "guidance": 1.5,
+        "temperature": 1,
+        "top_k": 250,
+        "seed": 1701,
+        "experimental_tempo": {
+          "method": "conditional-cross-attention-gaussian-v1",
+          "bpm": 0,
+          "width_beats": 1,
+          "offset_beats": 0,
+          "local_window": 0
+        },
+        "eos": true,
+        "replay_checked": true,
+        "terminal_contract_passed": true,
+        "generator_released_before_decode": true,
+        "generation_with_checks_seconds": 81.7482,
+        "weight_bytes": 2939920896,
+        "cache_bytes": 470351872,
+        "graph_bytes": 53535232,
+        "audio_samples_per_channel": 887040,
+        "audio_peak": 0.5279,
+        "audio_rms": 0.0773985,
+        "decode_seconds": 18.1987,
+        "decoder_seed": 1701,
+        "decoder_steps": 10,
+        "segment_codes": 372,
+        "decoder_guidance": 1.25,
+        "rng": "torch-cuda",
+        "rng_cuda_blocks": 288,
+        "sampler_offset_per_head": 4,
+        "sampler_start_offset": 0,
+        "sampler_final_offset": 6368,
+        "decoder_final_offset": 4,
+        "decoder_rng_windows": 1,
+        "ggml_commit": "0f2ed045"
+      },
+      "model_sha256": "74ebd8a8537f55ea3f3566cfa17c7e28734fc555af5fbc1a254bec94a182f814",
+      "cli_sha256": "afa84c9ae2243dd15306db280d6fd74e422d7430e8b8955d247844489c87db62",
+      "codes_sha256": "9ee762c88239d7c91637355be4355df636e81aa3e39623b3f046584735239a06",
+      "audio_sha256": "6dfe95771fdcca1a00d477a96fdc6799aeddb78f5cc37e9bb6276f87955e5c81",
+      "audio_prefix_sha256": "39962b0fd17ce44504d7cec66a2c0a1b5f4f5775ecbc3ef36b97662ddd554959",
+      "new_audio_seconds": 15.84,
+      "guide_excluded_from_metrics": true,
+      "bpm_evaluable": true,
+      "continuation": {
+        "audio_sha256": "0ccc6c18a9b75a5f7038eb825e423f7d8c13117efdaccb5a6ce9498061f389fc",
+        "duration_seconds": 15.84,
+        "onset_candidates": [
+          {
+            "bpm": 163.5331260374676,
+            "correlation": 0.14634494698007197
+          },
+          {
+            "bpm": 155.39179263186617,
+            "correlation": 0.11288393741678591
+          },
+          {
+            "bpm": 85.98859712719691,
+            "correlation": 0.09148037870236143
+          },
+          {
+            "bpm": 80.47793730979838,
+            "correlation": 0.08640964293379023
+          },
+          {
+            "bpm": 40.69571076951041,
+            "correlation": 0.0812552113681799
+          },
+          {
+            "bpm": 113.73426106076093,
+            "correlation": 0.07753485995332036
+          }
+        ],
+        "onset_windows": [
+          {
+            "start_seconds": 0,
+            "candidates": [
+              {
+                "bpm": 163.5339196757619,
+                "correlation": 0.1506757303707086
+              },
+              {
+                "bpm": 155.5022290276978,
+                "correlation": 0.11526479096449675
+              },
+              {
+                "bpm": 85.98648588987578,
+                "correlation": 0.09525033232226017
+              }
+            ]
+          },
+          {
+            "start_seconds": 0.8399999999999999,
+            "candidates": [
+              {
+                "bpm": 163.4246894185665,
+                "correlation": 0.15608850614883354
+              },
+              {
+                "bpm": 155.2043153750267,
+                "correlation": 0.12129516992905953
+              },
+              {
+                "bpm": 80.50649777540522,
+                "correlation": 0.0932883174357627
+              }
+            ]
+          }
+        ],
+        "sheetsage2_score_clock": {
+          "estimated_bpm": 85.16497329569701,
+          "clock_residual_beats_rms": 0.07418072801166031,
+          "timestamped_events": 23,
+          "windows": [
+            {
+              "start_seconds": 0.0,
+              "end_seconds": 15.0,
+              "estimated_bpm": 85.09166335555702
+            }
+          ],
+          "warnings": [],
+          "method": "Linear fit of SheetSage2 decoded musical beats against its predicted source timestamps; estimated, not ground-truth tempo"
+        }
+      },
+      "timed_melody": {
+        "target_bpm": 90.0,
+        "duration_seconds": 15.84,
+        "onset_tolerance_seconds": 0.25,
+        "offset_beats": 3.9600000000000004,
+        "reference_notes": 34,
+        "transcribed_instrumental_notes": 14,
+        "ordered_matches": 4,
+        "precision": 0.2857142857142857,
+        "recall": 0.11764705882352941,
+        "f1": 0.16666666666666666,
+        "matched_onset_error_median_seconds": -0.019999999999999296,
+        "matched_onset_error_absolute_median_seconds": 0.02666666666666595,
+        "reference_midi_sha256": "0fbef0ef0b8aa7b50c4c922f527510562d8ff856b42220328a00681b87f95107",
+        "events_sha256": "722b0ed9bbc011b18f12f5b3237189e0373459457fb0824ae2e630e7a565bd53",
+        "limitation": "SheetSage2 re-transcription can make mistakes and choose another melody. Octave-equivalent pitches allowed; no transposition, fitted tempo or time warping. This estimates on-clock note preservation, not musical quality or a tempo guarantee."
+      }
+    },
+    {
+      "name": "q4-guide125-first20",
+      "guide_speed_factor": 1.25,
+      "nominal_guide_bpm": 150.0,
+      "run": {
+        "frames": 173,
+        "prompt_frames": 25,
+        "symbolic_frames": 540,
+        "cache_capacity": 1024,
+        "audio_prefix_frames": 20,
+        "newly_generated_frames": 153,
+        "guidance": 1.5,
+        "temperature": 1,
+        "top_k": 250,
+        "seed": 1701,
+        "experimental_tempo": {
+          "method": "conditional-cross-attention-gaussian-v1",
+          "bpm": 0,
+          "width_beats": 1,
+          "offset_beats": 0,
+          "local_window": 0
+        },
+        "eos": true,
+        "replay_checked": true,
+        "terminal_contract_passed": true,
+        "generator_released_before_decode": true,
+        "generation_with_checks_seconds": 59.3423,
+        "weight_bytes": 2939920896,
+        "cache_bytes": 470351872,
+        "graph_bytes": 53535232,
+        "audio_samples_per_channel": 664320,
+        "audio_peak": 0.606843,
+        "audio_rms": 0.0962753,
+        "decode_seconds": 17.7317,
+        "decoder_seed": 1701,
+        "decoder_steps": 10,
+        "segment_codes": 372,
+        "decoder_guidance": 1.25,
+        "rng": "torch-cuda",
+        "rng_cuda_blocks": 288,
+        "sampler_offset_per_head": 4,
+        "sampler_start_offset": 0,
+        "sampler_final_offset": 4928,
+        "decoder_final_offset": 4,
+        "decoder_rng_windows": 1,
+        "ggml_commit": "0f2ed045"
+      },
+      "model_sha256": "74ebd8a8537f55ea3f3566cfa17c7e28734fc555af5fbc1a254bec94a182f814",
+      "cli_sha256": "afa84c9ae2243dd15306db280d6fd74e422d7430e8b8955d247844489c87db62",
+      "codes_sha256": "3e1f7c5cd5a95a693d5a8a41e8f204d7aac780a8aebcf68b5313317399dd771f",
+      "audio_sha256": "750b5117b813be5a5887da422d1ceb90e18a597a1f92c0c2e5afa3549c97d6d7",
+      "audio_prefix_sha256": "aabeaafc27104aeb205ab4606c02b20a4370f5db60e1bb84a4af496efbe002ec",
+      "new_audio_seconds": 12.24,
+      "guide_excluded_from_metrics": true,
+      "bpm_evaluable": true,
+      "continuation": {
+        "audio_sha256": "36d99cd7bf6245dfbf9e148ecb56f12a9591f3f8b894fe39efbadcc908489c3f",
+        "duration_seconds": 12.24,
+        "onset_candidates": [
+          {
+            "bpm": 74.25844625169717,
+            "correlation": 0.5542667214002303
+          },
+          {
+            "bpm": 148.92903041136285,
+            "correlation": 0.5329548991303231
+          },
+          {
+            "bpm": 49.626643124243934,
+            "correlation": 0.5123404672841224
+          },
+          {
+            "bpm": 59.39913580930091,
+            "correlation": 0.23375448411478503
+          },
+          {
+            "bpm": 99.4302310329816,
+            "correlation": 0.20705467710595457
+          },
+          {
+            "bpm": 42.47891879159208,
+            "correlation": 0.168484783312762
+          }
+        ],
+        "onset_windows": [
+          {
+            "start_seconds": 0,
+            "candidates": [
+              {
+                "bpm": 74.25844625169717,
+                "correlation": 0.5542667214002303
+              },
+              {
+                "bpm": 148.92903041136285,
+                "correlation": 0.5329548991303231
+              },
+              {
+                "bpm": 49.626643124243934,
+                "correlation": 0.5123404672841224
+              }
+            ]
+          }
+        ],
+        "sheetsage2_score_clock": {
+          "estimated_bpm": 74.32057140389647,
+          "clock_residual_beats_rms": 0.011084815133206726,
+          "timestamped_events": 16,
+          "windows": [
+            {
+              "start_seconds": 0.0,
+              "end_seconds": 12.12,
+              "estimated_bpm": 74.32057140389647
+            }
+          ],
+          "warnings": [],
+          "method": "Linear fit of SheetSage2 decoded musical beats against its predicted source timestamps; estimated, not ground-truth tempo"
+        }
+      },
+      "timed_melody": {
+        "target_bpm": 150.0,
+        "duration_seconds": 12.24,
+        "onset_tolerance_seconds": 0.25,
+        "offset_beats": 4.0,
+        "reference_notes": 38,
+        "transcribed_instrumental_notes": 12,
+        "ordered_matches": 6,
+        "precision": 0.5,
+        "recall": 0.15789473684210525,
+        "f1": 0.23999999999999996,
+        "matched_onset_error_median_seconds": 0.03500000000000014,
+        "matched_onset_error_absolute_median_seconds": 0.03500000000000014,
+        "reference_midi_sha256": "0fbef0ef0b8aa7b50c4c922f527510562d8ff856b42220328a00681b87f95107",
+        "events_sha256": "b75c072bb6d58b8cd38804c211315466caa70a7b0c243c5d4f14f08c3521ed9b",
+        "limitation": "SheetSage2 re-transcription can make mistakes and choose another melody. Octave-equivalent pitches allowed; no transposition, fitted tempo or time warping. This estimates on-clock note preservation, not musical quality or a tempo guarantee."
+      }
+    },
+    {
+      "name": "q4-long-guide100",
+      "guide_speed_factor": 1,
+      "nominal_guide_bpm": 120,
+      "run": {
+        "frames": 875,
+        "prompt_frames": 25,
+        "symbolic_frames": 540,
+        "cache_capacity": 1024,
+        "audio_prefix_frames": 100,
+        "newly_generated_frames": 775,
+        "guidance": 1.5,
+        "temperature": 1,
+        "top_k": 250,
+        "seed": 1701,
+        "experimental_tempo": {
+          "method": "conditional-cross-attention-gaussian-v1",
+          "bpm": 0,
+          "width_beats": 1,
+          "offset_beats": 0,
+          "local_window": 0
+        },
+        "eos": false,
+        "replay_checked": true,
+        "terminal_contract_passed": true,
+        "generator_released_before_decode": true,
+        "generation_with_checks_seconds": 317.53,
+        "weight_bytes": 2939920896,
+        "cache_bytes": 470351872,
+        "graph_bytes": 53535232,
+        "audio_samples_per_channel": 3360000,
+        "audio_peak": 0.878642,
+        "audio_rms": 0.143521,
+        "decode_seconds": 38.6081,
+        "decoder_seed": 1701,
+        "decoder_steps": 10,
+        "segment_codes": 372,
+        "decoder_guidance": 1.25,
+        "rng": "torch-cuda",
+        "rng_cuda_blocks": 288,
+        "sampler_offset_per_head": 4,
+        "sampler_start_offset": 0,
+        "sampler_final_offset": 24800,
+        "decoder_final_offset": 12,
+        "decoder_rng_windows": 3,
+        "ggml_commit": "0f2ed045"
+      },
+      "model_sha256": "74ebd8a8537f55ea3f3566cfa17c7e28734fc555af5fbc1a254bec94a182f814",
+      "cli_sha256": "afa84c9ae2243dd15306db280d6fd74e422d7430e8b8955d247844489c87db62",
+      "codes_sha256": "4369c50660336354fae0be08385d1911e23cfdba3d310cff598edd690a440a4b",
+      "audio_sha256": "da6edf95814fc484f8d840899aae3dc6a45a2b09b68d432f201c03a272e187fa",
+      "audio_prefix_sha256": "c208eb77e9b1450c4f56789d1580bbf07d5b0ac724ad43384d4009ada20c140f",
+      "new_audio_seconds": 62.0,
+      "guide_excluded_from_metrics": true,
+      "bpm_evaluable": true,
+      "continuation": {
+        "audio_sha256": "669d45730bbd30d2706e9ddbed08f033e4c4cb9d3b1b9511dd482fd3eebcc3a4",
+        "duration_seconds": 62.0,
+        "onset_candidates": [
+          {
+            "bpm": 119.64670691710221,
+            "correlation": 0.6983463606456923
+          },
+          {
+            "bpm": 59.843656182298545,
+            "correlation": 0.6386400052591635
+          },
+          {
+            "bpm": 238.89457498981952,
+            "correlation": 0.5562061332848094
+          },
+          {
+            "bpm": 79.7600969576232,
+            "correlation": 0.5236508707741516
+          },
+          {
+            "bpm": 47.85545219214784,
+            "correlation": 0.481364237515725
+          }
+        ],
+        "onset_windows": [
+          {
+            "start_seconds": 0,
+            "candidates": [
+              {
+                "bpm": 119.7127171769901,
+                "correlation": 0.4883575436230844
+              },
+              {
+                "bpm": 40.01063670840086,
+                "correlation": 0.41301819926848027
+              },
+              {
+                "bpm": 59.97605316639514,
+                "correlation": 0.3735230654870167
+              }
+            ]
+          },
+          {
+            "start_seconds": 10,
+            "candidates": [
+              {
+                "bpm": 120.05885498252702,
+                "correlation": 0.7241629105288665
+              },
+              {
+                "bpm": 59.96608169553324,
+                "correlation": 0.6454239678746941
+              },
+              {
+                "bpm": 237.7356766479699,
+                "correlation": 0.4381893953831309
+              }
+            ]
+          },
+          {
+            "start_seconds": 20,
+            "candidates": [
+              {
+                "bpm": 119.91925800709326,
+                "correlation": 0.8293520401871612
+              },
+              {
+                "bpm": 59.99341036856776,
+                "correlation": 0.7881994726073641
+              },
+              {
+                "bpm": 239.48607833231958,
+                "correlation": 0.5770369401382842
+              }
+            ]
+          },
+          {
+            "start_seconds": 30,
+            "candidates": [
+              {
+                "bpm": 119.74799281539595,
+                "correlation": 0.8190991148032746
+              },
+              {
+                "bpm": 59.88200595040387,
+                "correlation": 0.7805787067343222
+              },
+              {
+                "bpm": 79.85170443781502,
+                "correlation": 0.6090828978765652
+              }
+            ]
+          },
+          {
+            "start_seconds": 40,
+            "candidates": [
+              {
+                "bpm": 119.69557399109816,
+                "correlation": 0.7212025318389751
+              },
+              {
+                "bpm": 59.80073899507069,
+                "correlation": 0.6784277921550497
+              },
+              {
+                "bpm": 238.974272855287,
+                "correlation": 0.5990188965593902
+              }
+            ]
+          },
+          {
+            "start_seconds": 47.0,
+            "candidates": [
+              {
+                "bpm": 119.31551845161255,
+                "correlation": 0.6259084296436868
+              },
+              {
+                "bpm": 238.4876776802368,
+                "correlation": 0.6192469007772212
+              },
+              {
+                "bpm": 59.70544620400538,
+                "correlation": 0.5522423915810255
+              }
+            ]
+          }
+        ],
+        "sheetsage2_score_clock": {
+          "estimated_bpm": 118.66022730342307,
+          "clock_residual_beats_rms": 0.23990291987113002,
+          "timestamped_events": 123,
+          "windows": [
+            {
+              "start_seconds": 0.0,
+              "end_seconds": 15.0,
+              "estimated_bpm": 119.87604374155455
+            },
+            {
+              "start_seconds": 10.0,
+              "end_seconds": 25.0,
+              "estimated_bpm": 119.5905511185602
+            },
+            {
+              "start_seconds": 20.0,
+              "end_seconds": 35.0,
+              "estimated_bpm": 120.10872937047792
+            },
+            {
+              "start_seconds": 30.0,
+              "end_seconds": 45.0,
+              "estimated_bpm": 117.1556672875033
+            },
+            {
+              "start_seconds": 40.0,
+              "end_seconds": 55.0,
+              "estimated_bpm": 116.178165869776
+            }
+          ],
+          "warnings": [],
+          "method": "Linear fit of SheetSage2 decoded musical beats against its predicted source timestamps; estimated, not ground-truth tempo"
+        }
+      },
+      "timed_melody": {
+        "target_bpm": 120,
+        "duration_seconds": 62.0,
+        "onset_tolerance_seconds": 0.25,
+        "offset_beats": 16.0,
+        "reference_notes": 114,
+        "transcribed_instrumental_notes": 93,
+        "ordered_matches": 31,
+        "precision": 0.3333333333333333,
+        "recall": 0.2719298245614035,
+        "f1": 0.2995169082125604,
+        "matched_onset_error_median_seconds": 0.010000000000001563,
+        "matched_onset_error_absolute_median_seconds": 0.020000000000003126,
+        "reference_midi_sha256": "0fbef0ef0b8aa7b50c4c922f527510562d8ff856b42220328a00681b87f95107",
+        "events_sha256": "a67ad8bbd69808ea45ecb6189f0a1ba5c7571e82b54c52156767bd6dee7f600d",
+        "limitation": "SheetSage2 re-transcription can make mistakes and choose another melody. Octave-equivalent pitches allowed; no transposition, fitted tempo or time warping. This estimates on-clock note preservation, not musical quality or a tempo guarantee."
+      }
+    },
+    {
+      "name": "f32-long-guide100",
+      "guide_speed_factor": 1,
+      "nominal_guide_bpm": 120,
+      "run": {
+        "frames": 875,
+        "prompt_frames": 25,
+        "symbolic_frames": 540,
+        "cache_capacity": 8192,
+        "audio_prefix_frames": 100,
+        "newly_generated_frames": 775,
+        "guidance": 1.5,
+        "temperature": 1,
+        "top_k": 250,
+        "seed": 1701,
+        "experimental_tempo": {
+          "method": "conditional-cross-attention-gaussian-v1",
+          "bpm": 0,
+          "width_beats": 1,
+          "offset_beats": 0,
+          "local_window": 0
+        },
+        "eos": false,
+        "replay_checked": true,
+        "terminal_contract_passed": true,
+        "generator_released_before_decode": true,
+        "generation_with_checks_seconds": 610.351,
+        "weight_bytes": 17516732416,
+        "cache_bytes": 3758686208,
+        "graph_bytes": 97575424,
+        "audio_samples_per_channel": 3360000,
+        "audio_peak": 0.721757,
+        "audio_rms": 0.108262,
+        "decode_seconds": 28.9094,
+        "decoder_seed": 1701,
+        "decoder_steps": 10,
+        "segment_codes": 372,
+        "decoder_guidance": 1.25,
+        "rng": "torch-cuda",
+        "rng_cuda_blocks": 288,
+        "sampler_offset_per_head": 4,
+        "sampler_start_offset": 0,
+        "sampler_final_offset": 24800,
+        "decoder_final_offset": 12,
+        "decoder_rng_windows": 3,
+        "ggml_commit": "0f2ed045"
+      },
+      "model_sha256": "5f3bfcb7bd441301d272546e4bfb7ddd690df45447251100f5e223e036dab62c",
+      "cli_sha256": "3af80c6abc4e84deba08103bad44de373d36466dd09d960e3e9d5e3e00c0f020",
+      "codes_sha256": "0c19118559646010a5e852669a1cf2a20b022152583273a5865ca354a5166d94",
+      "audio_sha256": "96b05fec327cc33add80da6adee5a9bf58d04b3482cd7ef4e9db8040d4df37cc",
+      "audio_prefix_sha256": "c208eb77e9b1450c4f56789d1580bbf07d5b0ac724ad43384d4009ada20c140f",
+      "new_audio_seconds": 62.0,
+      "guide_excluded_from_metrics": true,
+      "bpm_evaluable": true,
+      "continuation": {
+        "audio_sha256": "b71d63abf3674da84bd8739d5bfb8e6b042fe29fddd9db8c8f442b9997515991",
+        "duration_seconds": 62.0,
+        "onset_candidates": [
+          {
+            "bpm": 59.90094878132026,
+            "correlation": 0.7573347301516534
+          },
+          {
+            "bpm": 119.78974436410338,
+            "correlation": 0.6741946949440351
+          },
+          {
+            "bpm": 239.54000677832497,
+            "correlation": 0.3989403733315078
+          },
+          {
+            "bpm": 79.8793061043428,
+            "correlation": 0.3862800896175511
+          },
+          {
+            "bpm": 47.90194779785847,
+            "correlation": 0.35633381765658645
+          }
+        ],
+        "onset_windows": [
+          {
+            "start_seconds": 0,
+            "candidates": [
+              {
+                "bpm": 59.95614704765383,
+                "correlation": 0.7120800525537236
+              },
+              {
+                "bpm": 119.85643202209555,
+                "correlation": 0.6186758699772561
+              },
+              {
+                "bpm": 80.0949944662181,
+                "correlation": 0.33660296886425467
+              }
+            ]
+          },
+          {
+            "start_seconds": 10,
+            "candidates": [
+              {
+                "bpm": 59.90573196885897,
+                "correlation": 0.8110586689038976
+              },
+              {
+                "bpm": 119.82472044187112,
+                "correlation": 0.6853557278119057
+              },
+              {
+                "bpm": 239.27678348299085,
+                "correlation": 0.3035519482637736
+              }
+            ]
+          },
+          {
+            "start_seconds": 20,
+            "candidates": [
+              {
+                "bpm": 59.899675909901106,
+                "correlation": 0.7629497173945908
+              },
+              {
+                "bpm": 119.81241844938073,
+                "correlation": 0.6269086538184995
+              },
+              {
+                "bpm": 79.85421312804041,
+                "correlation": 0.4520146828009873
+              }
+            ]
+          },
+          {
+            "start_seconds": 30,
+            "candidates": [
+              {
+                "bpm": 59.904349120524934,
+                "correlation": 0.8129503254729468
+              },
+              {
+                "bpm": 119.83002244186905,
+                "correlation": 0.7328326495824302
+              },
+              {
+                "bpm": 239.62110132864356,
+                "correlation": 0.4835288360674239
+              }
+            ]
+          },
+          {
+            "start_seconds": 40,
+            "candidates": [
+              {
+                "bpm": 59.878368520429106,
+                "correlation": 0.7719469016200323
+              },
+              {
+                "bpm": 119.80358235235339,
+                "correlation": 0.7203531334816037
+              },
+              {
+                "bpm": 239.50036758795983,
+                "correlation": 0.4227995261621149
+              }
+            ]
+          },
+          {
+            "start_seconds": 47.0,
+            "candidates": [
+              {
+                "bpm": 59.82852451554485,
+                "correlation": 0.7013846987990792
+              },
+              {
+                "bpm": 119.63414780591992,
+                "correlation": 0.6787045071455572
+              },
+              {
+                "bpm": 239.21670396664345,
+                "correlation": 0.4421311288048857
+              }
+            ]
+          }
+        ],
+        "sheetsage2_score_clock": {
+          "estimated_bpm": 119.58652326875584,
+          "clock_residual_beats_rms": 0.14940467206930558,
+          "timestamped_events": 123,
+          "windows": [
+            {
+              "start_seconds": 0.0,
+              "end_seconds": 15.0,
+              "estimated_bpm": 119.75017348669566
+            },
+            {
+              "start_seconds": 10.0,
+              "end_seconds": 25.0,
+              "estimated_bpm": 119.52597997535207
+            },
+            {
+              "start_seconds": 20.0,
+              "end_seconds": 35.0,
+              "estimated_bpm": 119.93170024092609
+            },
+            {
+              "start_seconds": 30.0,
+              "end_seconds": 45.0,
+              "estimated_bpm": 120.52195334447335
+            },
+            {
+              "start_seconds": 40.0,
+              "end_seconds": 55.0,
+              "estimated_bpm": 118.94365120719779
+            }
+          ],
+          "warnings": [],
+          "method": "Linear fit of SheetSage2 decoded musical beats against its predicted source timestamps; estimated, not ground-truth tempo"
+        }
+      },
+      "timed_melody": {
+        "target_bpm": 120,
+        "duration_seconds": 62.0,
+        "onset_tolerance_seconds": 0.25,
+        "offset_beats": 16.0,
+        "reference_notes": 114,
+        "transcribed_instrumental_notes": 62,
+        "ordered_matches": 20,
+        "precision": 0.3225806451612903,
+        "recall": 0.17543859649122806,
+        "f1": 0.22727272727272727,
+        "matched_onset_error_median_seconds": 0.004999999999999893,
+        "matched_onset_error_absolute_median_seconds": 0.030000000000001137,
+        "reference_midi_sha256": "0fbef0ef0b8aa7b50c4c922f527510562d8ff856b42220328a00681b87f95107",
+        "events_sha256": "5700efff7dbd10f8993b26a93635c92201693da0dae2396e67dabd420761e5e2",
+        "limitation": "SheetSage2 re-transcription can make mistakes and choose another melody. Octave-equivalent pitches allowed; no transposition, fitted tempo or time warping. This estimates on-clock note preservation, not musical quality or a tempo guarantee."
+      }
+    },
+    {
+      "name": "q4-long-guide100-seed1702",
+      "guide_speed_factor": 1,
+      "nominal_guide_bpm": 120,
+      "run": {
+        "frames": 372,
+        "prompt_frames": 25,
+        "symbolic_frames": 540,
+        "cache_capacity": 1024,
+        "audio_prefix_frames": 100,
+        "newly_generated_frames": 272,
+        "guidance": 1.5,
+        "temperature": 1,
+        "top_k": 250,
+        "seed": 1702,
+        "experimental_tempo": {
+          "method": "conditional-cross-attention-gaussian-v1",
+          "bpm": 0,
+          "width_beats": 1,
+          "offset_beats": 0,
+          "local_window": 0
+        },
+        "eos": false,
+        "replay_checked": true,
+        "terminal_contract_passed": true,
+        "generator_released_before_decode": true,
+        "generation_with_checks_seconds": 131.911,
+        "weight_bytes": 2939920896,
+        "cache_bytes": 470351872,
+        "graph_bytes": 53535232,
+        "audio_samples_per_channel": 1428480,
+        "audio_peak": 1.13172,
+        "audio_rms": 0.13666,
+        "decode_seconds": 20.0271,
+        "decoder_seed": 1701,
+        "decoder_steps": 10,
+        "segment_codes": 372,
+        "decoder_guidance": 1.25,
+        "rng": "torch-cuda",
+        "rng_cuda_blocks": 288,
+        "sampler_offset_per_head": 4,
+        "sampler_start_offset": 0,
+        "sampler_final_offset": 8704,
+        "decoder_final_offset": 4,
+        "decoder_rng_windows": 1,
+        "ggml_commit": "0f2ed045"
+      },
+      "model_sha256": "74ebd8a8537f55ea3f3566cfa17c7e28734fc555af5fbc1a254bec94a182f814",
+      "cli_sha256": "afa84c9ae2243dd15306db280d6fd74e422d7430e8b8955d247844489c87db62",
+      "codes_sha256": "f8b9c9f62fd37ab70546ee814133ebce0780c529805427f59ad51eb3cd46289c",
+      "audio_sha256": "bdfa8614b4aae0131b48693d1d217bc55bf69a19b1f4be7464b4c73203eb0ef5",
+      "audio_prefix_sha256": "c208eb77e9b1450c4f56789d1580bbf07d5b0ac724ad43384d4009ada20c140f",
+      "new_audio_seconds": 21.76,
+      "guide_excluded_from_metrics": true,
+      "bpm_evaluable": true,
+      "continuation": {
+        "audio_sha256": "67fa931f0600a34ada136b4aa989a8116f09a7b2129a176ccff7a20604f337c6",
+        "duration_seconds": 21.76,
+        "onset_candidates": [
+          {
+            "bpm": 119.62270793459977,
+            "correlation": 0.5017663447441897
+          },
+          {
+            "bpm": 59.79946817402139,
+            "correlation": 0.47821197359412265
+          },
+          {
+            "bpm": 79.61517801024758,
+            "correlation": 0.32019969312484
+          },
+          {
+            "bpm": 47.81074149236448,
+            "correlation": 0.2779351317481263
+          },
+          {
+            "bpm": 182.6816440396022,
+            "correlation": 0.05603734936215305
+          },
+          {
+            "bpm": 89.73921658736417,
+            "correlation": 0.02817568765097172
+          }
+        ],
+        "onset_windows": [
+          {
+            "start_seconds": 0,
+            "candidates": [
+              {
+                "bpm": 118.63517086051934,
+                "correlation": 0.3264303910551338
+              },
+              {
+                "bpm": 79.94838113417929,
+                "correlation": 0.2777491611047463
+              },
+              {
+                "bpm": 59.37917929817119,
+                "correlation": 0.2239882512572067
+              }
+            ]
+          },
+          {
+            "start_seconds": 6.760000000000002,
+            "candidates": [
+              {
+                "bpm": 59.81661058574737,
+                "correlation": 0.5235012668540296
+              },
+              {
+                "bpm": 119.66868520481886,
+                "correlation": 0.5203071217634544
+              },
+              {
+                "bpm": 79.46280336529556,
+                "correlation": 0.2852558214123294
+              }
+            ]
+          }
+        ],
+        "sheetsage2_score_clock": {
+          "estimated_bpm": 119.54537954385974,
+          "clock_residual_beats_rms": 0.04027832334378425,
+          "timestamped_events": 44,
+          "windows": [
+            {
+              "start_seconds": 0.0,
+              "end_seconds": 15.0,
+              "estimated_bpm": 119.69306528372732
+            }
+          ],
+          "warnings": [],
+          "method": "Linear fit of SheetSage2 decoded musical beats against its predicted source timestamps; estimated, not ground-truth tempo"
+        }
+      },
+      "timed_melody": {
+        "target_bpm": 120,
+        "duration_seconds": 21.76,
+        "onset_tolerance_seconds": 0.25,
+        "offset_beats": 16.0,
+        "reference_notes": 33,
+        "transcribed_instrumental_notes": 9,
+        "ordered_matches": 5,
+        "precision": 0.5555555555555556,
+        "recall": 0.15151515151515152,
+        "f1": 0.2380952380952381,
+        "matched_onset_error_median_seconds": 0.0,
+        "matched_onset_error_absolute_median_seconds": 0.0,
+        "reference_midi_sha256": "0fbef0ef0b8aa7b50c4c922f527510562d8ff856b42220328a00681b87f95107",
+        "events_sha256": "535cfb1cc7b094b6d00e7c5aa3ceea2b5e19d1a5c8eccdcacb7a7933df326066",
+        "limitation": "SheetSage2 re-transcription can make mistakes and choose another melody. Octave-equivalent pitches allowed; no transposition, fitted tempo or time warping. This estimates on-clock note preservation, not musical quality or a tempo guarantee."
+      }
+    }
+  ],
+  "pending_cases": [],
+  "rng_resume_control": {
+    "frames": 128,
+    "forced_frames": 99,
+    "new_frames": 29,
+    "codes": 1024,
+    "all_codes_bit_exact": true,
+    "sampler_start_offset": 3168,
+    "sampler_final_offset": 4096,
+    "codes_sha256": "158e6f4e606c9ab1824fdf346b637103dd009fe57090d95b662b5d70d54627cd"
+  },
+  "native_tests": {
+    "windows_cuda": 7,
+    "spark_cuda": 7,
+    "windows_cpu_dll": 7,
+    "python": 14
+  },
+  "listener_feedback": {
+    "assessment": "Positive for Q4 continuation and encoding quality; user identifies this as the intended DAW use case",
+    "scope": "Source-guided Q4 continuation only; no explicit exact-melody or hard-beat-lock acceptance"
+  },
+  "guide_selection_validation": {
+    "offline": {
+      "selected_8s_matches_listened_guide": true,
+      "export_matches_listened_continuation": true,
+      "selection": {
+        "source_codes_sha256": "bdbeab789d35496a3744f41410ab4ffeaecf91e7a0a9759dd1a9e7ae075ab342",
+        "source_frames": 372,
+        "requested_start_seconds": "0",
+        "requested_guide_seconds": "8",
+        "source_start_frame": 0,
+        "source_start_seconds": 0.0,
+        "guide_frames": 100,
+        "guide_seconds": 8.0,
+        "rounding": "Start and duration independently rounded down to complete 80-ms frames"
+      },
+      "continuation_sha256": "669d45730bbd30d2706e9ddbed08f033e4c4cb9d3b1b9511dd482fd3eebcc3a4"
+    },
+    "native_resume": {
+      "all_1024_codes_match_baseline": true,
+      "guide_frames": 99,
+      "new_frames": 29,
+      "cache_capacity": 1024,
+      "codes_sha256": "158e6f4e606c9ab1824fdf346b637103dd009fe57090d95b662b5d70d54627cd",
+      "selection": {
+        "source_codes_sha256": "47b83f66148c432a313a1cb6f8156a65b9ae62d161ab87a5af54f624ca57f443",
+        "source_frames": 875,
+        "requested_start_seconds": "0",
+        "requested_guide_seconds": "7.92",
+        "source_start_frame": 0,
+        "source_start_seconds": 0.0,
+        "guide_frames": 99,
+        "guide_seconds": 7.92,
+        "rounding": "Start and duration independently rounded down to complete 80-ms frames"
+      },
+      "requested_timeline": {
+        "total_frames": 128,
+        "guide_frames": 99,
+        "new_frames": 29,
+        "continuation_seconds": "2.32"
+      }
+    },
+    "windows_python_tests": 17,
+    "spark_docker_selection_tests": 3
+  }
+}

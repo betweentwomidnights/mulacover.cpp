@@ -59,7 +59,8 @@ ggml_tensor * Graph::rope(ggml_tensor * x,ggml_tensor * positions,int dim) {
     return ggml_reshape_3d(ctx,joined,dim,heads,time);
 }
 ggml_tensor * Graph::attention(const std::string & p,ggml_tensor * x,ggml_tensor * context,int heads,int kv_heads,
-                               int pos,bool causal,const std::vector<uint8_t> & padding,Cache * cache,int layer,int branch) {
+                               int pos,bool causal,const std::vector<uint8_t> & padding,Cache * cache,int layer,int branch,
+                               const std::vector<float> & score_bias) {
     const int64_t dim=x->ne[0]/heads, queries=x->ne[1], keys=context->ne[1];
     std::vector<int32_t> qpos(size_t(queries),0),kpos(size_t(keys),0);
     for(int64_t t=0;t<queries;++t)qpos[size_t(t)]=pos+int32_t(t);
@@ -81,6 +82,10 @@ ggml_tensor * Graph::attention(const std::string & p,ggml_tensor * x,ggml_tensor
         attended_keys=cache->capacity;
     }
     std::vector<float> mask(size_t(attended_keys*queries),0.0f);
+    if(!score_bias.empty()) {
+        if(score_bias.size()!=mask.size())throw std::invalid_argument("Wrong score-clock bias dimensions");
+        mask=score_bias;
+    }
     for(int64_t t=0;t<queries;++t)for(int64_t key=0;key<attended_keys;++key) {
         bool hidden=(causal&&key>pos+t)||(!padding.empty()&&padding.at(size_t(key))!=0);
         if(hidden)mask[size_t(t*attended_keys+key)]=-INFINITY;
