@@ -19,6 +19,13 @@ license; see [third-party and model terms](THIRD_PARTY_NOTICES.md) for upstream
 components and separate checkpoint/output terms. This is a development library;
 Q4 quality and the remaining numerical gaps are documented below.
 
+**Known severe limitation: premature endings.** Both continuation and
+Transcribe + remix can stop after only a few seconds despite a much longer
+requested duration. The experimental overlap option remains hit or miss and
+is not a reliable fix. The native pipeline works end to end, but reliable song
+extension and source-length remix behavior remain unresolved. Track the work in
+[issue #6](https://github.com/betweentwomidnights/mulacover.cpp/issues/6).
+
 **A native server and embedded continuation UI are available.** Build
 `mulacover-server`, then open `http://127.0.0.1:8010/`. Choose **Continue audio** or
 **Transcribe + remix**, set the opening audio context duration and maximum new
@@ -66,6 +73,13 @@ WAV, an original-clock cursor and prepared conditioning, with separate encoder
 context/guide lengths, `natural_max_seconds`, progress and cancellation. It returns
 only new audio and stages all models on the laptop. Its native conditioning path
 also prepares text/Qwen/MIDI inputs. See the [extended run report](docs/validation/extended-continuation.json).
+
+An experimental [overlap capability](docs/OVERLAP_CONTINUATION.md) can regenerate
+the final 0.64s of past context before returning new audio at the original cursor.
+It helped one listener-approved score-free Love Is Blue continuation. The native
+API, CLI and Continue audio UI expose it explicitly; it defaults off and still
+honors early EOS. The [bounded lifecycle audit](docs/SERVER_LIFECYCLE_EOS.md)
+reproduced both good and prematurely ending anchors across mixed requests/restart.
 
 **Native FP32 teacher-forced frame/logit/cache parity passes all 600 tensors on
 Spark CUDA at `e3db5210`.** Exact reset/replay also passes; see

@@ -6,12 +6,31 @@
 #include <stdexcept>
 
 namespace mula {
-Graph::Graph(Model & m):model(m) {
-    ctx=ggml_init({128*1024*1024,nullptr,true});
-    if(!ctx) throw std::runtime_error("Cannot allocate graph metadata");
-    graph=ggml_new_graph_custom(ctx,32768,false);
+GraphWorkspace::GraphWorkspace(ggml_backend_t backend,int max_nodes):nodes(max_nodes) {
+    // Include tensor leaves/views in addition to graph nodes. ACE-Step uses the
+    // same ggml_reset arena pattern; no backend or shared allocator patch needed.
+    const size_t bytes=ggml_tensor_overhead()*size_t(2*nodes)+ggml_graph_overhead_custom(nodes,false);
+    ctx=ggml_init({bytes,nullptr,true});
+    if(!ctx)throw std::runtime_error("Cannot allocate reusable graph metadata");
+    allocator=ggml_gallocr_new(ggml_backend_get_default_buffer_type(backend));
+    if(!allocator){ggml_free(ctx);ctx=nullptr;throw std::runtime_error("Cannot create reusable graph allocator");}
 }
-Graph::~Graph(){if(allocator)ggml_gallocr_free(allocator);if(ctx)ggml_free(ctx);}
+GraphWorkspace::~GraphWorkspace(){if(allocator)ggml_gallocr_free(allocator);if(ctx)ggml_free(ctx);}
+Graph::Graph(Model & m,const std::string & key):model(m) {
+    int nodes=32768;
+    if(model.graph_reuse&&!key.empty()) {
+        auto & slot=model.workspaces[key];
+        if(!slot)slot=std::make_unique<GraphWorkspace>(model.backend,key=="embedding"?1024:key=="backbone"?32768:4096);
+        if(slot->in_use)throw std::logic_error("Generator workspace is already in use");
+        workspace=slot.get();workspace->in_use=true;ctx=workspace->ctx;allocator=workspace->allocator;nodes=workspace->nodes;
+        ggml_reset(ctx);
+    }else {
+        ctx=ggml_init({128*1024*1024,nullptr,true});
+        if(!ctx) throw std::runtime_error("Cannot allocate graph metadata");
+    }
+    graph=ggml_new_graph_custom(ctx,nodes,false);
+}
+Graph::~Graph(){if(workspace)workspace->in_use=false;else{if(allocator)ggml_gallocr_free(allocator);if(ctx)ggml_free(ctx);}}
 ggml_tensor * Graph::input(const std::vector<float> & data,int64_t width,int64_t frames) {
     if(data.size()!=size_t(width)*size_t(frames)) throw std::runtime_error("Internal input shape mismatch");
     auto * t=ggml_new_tensor_2d(ctx,GGML_TYPE_F32,width,frames);ggml_set_input(t);
@@ -59,19 +78,27 @@ ggml_tensor * Graph::rope(ggml_tensor * x,ggml_tensor * positions,int dim) {
     joined=ggml_cont(ctx,ggml_permute(ctx,joined,1,2,3,0));
     return ggml_reshape_3d(ctx,joined,dim,heads,time);
 }
+AttentionKV Graph::project_kv(const std::string & p,ggml_tensor * context,int dim,int kv_heads,int pos) {
+    const int64_t keys=context->ne[1];std::vector<int32_t> kpos(size_t(keys),0);
+    for(int64_t t=0;t<keys;++t)kpos[size_t(t)]=pos+int32_t(t);
+    auto * k=rope(ggml_reshape_3d(ctx,linear(p+".k_proj",context),dim,kv_heads,keys),ids(kpos),dim);
+    auto * v=ggml_reshape_3d(ctx,linear(p+".v_proj",context),dim,kv_heads,keys);
+    return {ggml_cont(ctx,ggml_permute(ctx,k,0,2,1,3)),ggml_cont(ctx,ggml_permute(ctx,v,0,2,1,3))};
+}
+void Graph::save(ggml_tensor * source,ggml_tensor * destination) {
+    ggml_build_forward_expand(graph,ggml_cpy(ctx,source,destination));
+}
 ggml_tensor * Graph::attention(const std::string & p,ggml_tensor * x,ggml_tensor * context,int heads,int kv_heads,
                                int pos,bool causal,const std::vector<uint8_t> & padding,Cache * cache,int layer,int branch,
-                               const std::vector<float> & score_bias) {
-    const int64_t dim=x->ne[0]/heads, queries=x->ne[1], keys=context->ne[1];
-    std::vector<int32_t> qpos(size_t(queries),0),kpos(size_t(keys),0);
+                               const std::vector<float> & score_bias,const AttentionKV * prepared) {
+    if(cache&&prepared)throw std::logic_error("Cannot combine prepared context with autoregressive KV");
+    const int64_t dim=x->ne[0]/heads, queries=x->ne[1], keys=prepared?prepared->key->ne[1]:context->ne[1];
+    std::vector<int32_t> qpos(size_t(queries),0);
     for(int64_t t=0;t<queries;++t)qpos[size_t(t)]=pos+int32_t(t);
-    for(int64_t t=0;t<keys;++t)kpos[size_t(t)]=cache?pos+int32_t(t):int32_t(t);
     auto * q=rope(ggml_reshape_3d(ctx,linear(p+".q_proj",x),dim,heads,queries),ids(qpos),int(dim));
-    auto * k=rope(ggml_reshape_3d(ctx,linear(p+".k_proj",context),dim,kv_heads,keys),ids(kpos),int(dim));
-    auto * v=ggml_reshape_3d(ctx,linear(p+".v_proj",context),dim,kv_heads,keys);
+    const auto kv=prepared?*prepared:project_kv(p,context,int(dim),kv_heads,cache?pos:0);
+    auto * k=kv.key,* v=kv.value;
     q=ggml_permute(ctx,q,0,2,1,3); // [dim,queries,heads]
-    k=ggml_cont(ctx,ggml_permute(ctx,k,0,2,1,3));
-    v=ggml_cont(ctx,ggml_permute(ctx,v,0,2,1,3));
     int64_t attended_keys=keys;
     if(cache) {
         auto write=[&](ggml_tensor * root,ggml_tensor * value) {
@@ -108,21 +135,35 @@ ggml_tensor * Graph::transformer(const std::string & p,ggml_tensor * x,int heads
     return ggml_add(ctx,x,linear(p+".mlp.w2",ggml_mul(ctx,gate,up)));
 }
 void Graph::execute() {
+    using Clock=std::chrono::steady_clock;auto start=Clock::now();
+    auto ms=[](auto a,auto b){return std::chrono::duration<double,std::milli>(b-a).count();};
+    Model::Timing * timing=model.profiling?&model.timings[role]:nullptr;
+    if(timing){++timing->graphs;timing->build_ms+=ms(created,start);}
     for(auto & pair:outputs)ggml_build_forward_expand(graph,pair.second);
     for(int i=0;i<ggml_graph_n_nodes(graph);++i) {
         auto * n=ggml_graph_node(graph,i);
         if(!ggml_backend_supports_op(model.backend,n))throw std::runtime_error("Unsupported native operation: "+mula::describe_op(n));
     }
-    allocator=ggml_gallocr_new(ggml_backend_get_default_buffer_type(model.backend));
+    if(!allocator)allocator=ggml_gallocr_new(ggml_backend_get_default_buffer_type(model.backend));
+    // Shapes alone do not identify an allocation plan: diagnostic outputs,
+    // views and persistent inputs change lifetimes even with equal node counts.
+    // Re-plan each rebuilt graph, retaining its allocator storage/high-water.
+    if(workspace&&!ggml_gallocr_reserve(allocator,graph))throw std::runtime_error("Cannot reserve reusable generator graph");
     if(!allocator||!ggml_gallocr_alloc_graph(allocator,graph))throw std::runtime_error("Cannot allocate generator graph");
     model.graph_bytes=std::max(model.graph_bytes,ggml_gallocr_get_buffer_size(allocator,0));
+    if(workspace)workspace->buffer_bytes=ggml_gallocr_get_buffer_size(allocator,0);
+    if(timing){timing->nodes+=ggml_graph_n_nodes(graph);timing->allocate_ms+=ms(start,Clock::now());}start=Clock::now();
     for(const auto & b:bindings)ggml_backend_tensor_set(b.tensor,b.bytes.data(),0,b.bytes.size());
+    if(timing)timing->upload_ms+=ms(start,Clock::now());start=Clock::now();
     if(ggml_backend_graph_compute(model.backend,graph)!=GGML_STATUS_SUCCESS)throw std::runtime_error("Generator graph execution failed");
+    if(timing)timing->compute_ms+=ms(start,Clock::now());
 }
 std::vector<float> Graph::read(const std::string & name) const {
+    const auto start=std::chrono::steady_clock::now();
     auto * t=outputs.at(name);std::vector<float> data(size_t(ggml_nelements(t)));
     ggml_backend_tensor_get(t,data.data(),0,data.size()*4);
     if(!std::all_of(data.begin(),data.end(),[](float x){return std::isfinite(x);}))throw std::runtime_error("Nonfinite native tensor: "+name);
+    if(model.profiling)model.timings[role].read_ms+=std::chrono::duration<double,std::milli>(std::chrono::steady_clock::now()-start).count();
     return data;
 }
 }

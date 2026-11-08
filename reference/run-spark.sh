@@ -17,6 +17,8 @@ capacity="${MULACOVER_CACHE_CAPACITY:-8192}"
 common=(--rm --user "$(id -u):$(id -g)" -e USER=heartcodec -e LOGNAME=heartcodec
   -e HOME=/workspace -e TORCHINDUCTOR_CACHE_DIR=/workspace/.cache/inductor
   -e CUBLAS_WORKSPACE_CONFIG=:4096:8 -e GGML_CUDA_TF32=0 -e GGML_CUDA_CUBLAS_COMPUTE_TYPE=auto
+  -e MULACOVER_SCORE_CACHE="${MULACOVER_SCORE_CACHE:-0}" -e MULACOVER_PROFILE="${MULACOVER_PROFILE:-0}"
+  -e MULACOVER_DEVICE_CACHE="${MULACOVER_DEVICE_CACHE:-0}" -e MULACOVER_GRAPH_REUSE="${MULACOVER_GRAPH_REUSE:-0}"
   -v "$project_root:/workspace" -w /workspace)
 case "$command" in
   conditioning-native)
@@ -90,7 +92,7 @@ case "$command" in
     docker run "${common[@]}" --gpus all --network none -e GGML_CUDA_TF32=0 \
       -v "$codec:/codec:ro" "$image" /opt/sa3-venv/bin/python tools/run-parity.py \
       --reference refdata/upstream-f32 --model models/mulacover-f32.gguf \
-      --cli "$build/bin/mulacover-parity" --output "refdata/$suffix" \
+      --cli "$build/bin/mulacover-parity" --output "${MULACOVER_PARITY_OUTPUT:-refdata/$suffix}" \
       --backend cuda --ggml-source /codec/ggml --capacity "$capacity"
     ;;
   quantize)

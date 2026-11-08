@@ -22,9 +22,10 @@ int main(int argc,char ** argv){try{
               "  --model-dir DIR         generator, tokenizers and style GGUFs\n"
               "  --codec-model-dir DIR   encoder, flow and SQ GGUFs\n"
               "  --backend cpu|cuda|vulkan|metal\n"
-              "  --port 8010 --threads 4 --max-cache-capacity 1536\n"
+              "  --port 8010 --threads 4 --max-cache-capacity 2048\n"
               "  --transcription-port 8011  local Yue2/SheetSage2 service (0 disables)\n"
               "  --allow-origin URL      optional exact downstream browser origin\n"
+              "  --diagnostic-dir DIR    opt-in local conditioning/code exports\n"
               "  --props | --version     model-free installer probes\n"
               "Listens on 127.0.0.1. Open / for the embedded continuation UI.\n";return 0;
         }
@@ -39,6 +40,7 @@ int main(int argc,char ** argv){try{
         else if(key=="--threads")config.threads=integer();
         else if(key=="--max-cache-capacity")config.max_cache_capacity=integer();
         else if(key=="--allow-origin")config.allow_origin=value;
+        else if(key=="--diagnostic-dir")config.diagnostic_dir=value;
         else throw std::invalid_argument("Unknown option: "+key);
     }
     if(!std::set<std::string>{"cpu","cuda","vulkan","metal"}.count(config.backend)||config.port<1||config.port>65535||config.threads<1||config.threads>1024||config.max_cache_capacity<256||config.max_cache_capacity>8192)

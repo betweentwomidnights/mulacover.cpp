@@ -1,0 +1,225 @@
+{
+  "date": "2026-11-07",
+  "purpose": "Investigate reported early endings and 132-second remix cache rejection without attributing them to optimizations from unmatched runs",
+  "implementation_commit": "f662e97",
+  "ggml_revision": "e3db5210fe3ecdaa4d65b4c93d515f2cf15524b7",
+  "ggml_changed": false,
+  "frozen_abi_layouts_changed": false,
+  "eos_policy_changed": false,
+  "laptop_gpu": "RTX 5070 Laptop 8GB",
+  "native_paths": {
+    "rng": "Torch CUDA Philox",
+    "baseline": {
+      "device_cache": 0,
+      "graph_reuse": 0,
+      "host_cache": 0
+    },
+    "cap": 288,
+    "optimized": {
+      "device_cache": 1,
+      "graph_reuse": 1,
+      "host_cache": 0
+    }
+  },
+  "source_files": [
+    {
+      "file": "billiegasm_yuey.wav",
+      "sha256": "140f18292989b1026113f02e0b6e2c9c1eaea29df05965f9404e40d76f74af9a"
+    },
+    {
+      "file": "love_is_blue_billied.wav",
+      "sha256": "a037530d84b665f87471ffe31131c62a7890cc019ffa628fb5a9bd64ced07171"
+    }
+  ],
+  "cases": [
+    {
+      "sampler_final_offset": 64,
+      "eos": true,
+      "name": "love-20",
+      "score_mode": "none",
+      "new_seconds": 0.08,
+      "cache_capacity": 1024,
+      "guidance": 1.5,
+      "seed": "1701",
+      "waveforms_byte_exact": true,
+      "guide_frames": 250,
+      "new_frames": 1,
+      "guide_seconds": 20.0,
+      "artifact_sha256": {
+        "codes_i32": "79867eed14e1800082a2c6e5262bd9b02ebf61eade83e4a087d2d44adc580d61",
+        "guide.i32": "d858523fcfd8e661dd63dd50765e99901955958af8a9d375bdec3cecbec9c596",
+        "continuation.wav": "97c86a508cabb6b1ceb497ce74b286c3b0db5e586f847f3506ab1e7194613cc3",
+        "audio.wav": "a66fb4939b1c727f7d9fe3e7f83718af4d7bfc705dc764407ce652543e042972"
+      },
+      "lyrics": "[Instrumental]",
+      "codes_count": 2008,
+      "temperature": 1,
+      "top_k": 250,
+      "codes_byte_exact": true,
+      "tags": "warm acoustic pop, soft drums, instrumental, no vocals",
+      "decode_performed": true
+    },
+    {
+      "sampler_final_offset": 3488,
+      "eos": true,
+      "name": "billie-user",
+      "score_mode": "none",
+      "new_seconds": 8.64,
+      "cache_capacity": 768,
+      "guidance": 1.5,
+      "seed": "17442424470364887450",
+      "waveforms_byte_exact": true,
+      "guide_frames": 334,
+      "new_frames": 108,
+      "guide_seconds": 26.72,
+      "artifact_sha256": {
+        "codes_i32": "57dfafb8f60934fe31e5b82ec6b9c1ef28df2292fe38941e682444673d41c2c2",
+        "guide.i32": "8b3794d24546c41f0709099714a9bc8b8d794beee417586ba9b31f42d747a366",
+        "continuation.wav": "b397b135caf39af58cc4c93647d7d43891f211d62c63cab5f20295f7090c9572",
+        "audio.wav": "3a404c5e0b02a3c9da564dc1a471816a498d2e70d73679fb7b77d7f62ef9b750"
+      },
+      "lyrics": "[Instrumental]",
+      "codes_count": 3536,
+      "temperature": 1,
+      "top_k": 250,
+      "codes_byte_exact": true,
+      "tags": "lofi hip hop",
+      "decode_performed": true
+    },
+    {
+      "sampler_final_offset": 64,
+      "eos": true,
+      "name": "love-remix",
+      "score_mode": "provided",
+      "new_seconds": 0.08,
+      "cache_capacity": 2048,
+      "guidance": 1.5,
+      "seed": "1701",
+      "waveforms_byte_exact": null,
+      "guide_frames": 250,
+      "new_frames": 1,
+      "guide_seconds": 20.0,
+      "artifact_sha256": {
+        "codes_i32": "79867eed14e1800082a2c6e5262bd9b02ebf61eade83e4a087d2d44adc580d61"
+      },
+      "lyrics": "[Instrumental]",
+      "codes_count": 2008,
+      "temperature": 1,
+      "top_k": 250,
+      "codes_byte_exact": true,
+      "tags": "lofi hip hop",
+      "decode_performed": false
+    }
+  ],
+  "exact_user_case": {
+    "name": "billie-user",
+    "raw_pcm_job_includes_cuda_encoding_and_stereo_decode": true,
+    "requested_context_seconds": 26.76,
+    "original_browser_artifact_byte_equality_claimed": false,
+    "native_preparation_frozen_between_runs": true,
+    "aligned_context_seconds": 26.72,
+    "decoder_seed": "17442424470364887450",
+    "seed": "17442424470364887450",
+    "original_browser_session_expired": true,
+    "maximum_new_seconds": 30
+  },
+  "score_control": {
+    "source": "love_is_blue_billied.wav",
+    "owned_provider_session_consumed": true,
+    "provider": "native Yue2/SheetSage2 on local port8011",
+    "symbolic_frames": 455,
+    "chords_sha256": "55a74763ffd42fb611022412848475b17f70bd023bed740e9935618b4ab74f0a",
+    "guide_frames": 250,
+    "keep_models": false,
+    "new_ceiling_frames": 673,
+    "scope": "full source",
+    "decoder_run": false,
+    "melody_sha256": "23e0e16d6a809ff174cb4828248a30a5a1b607dba5bec777b051f63dc0fcd9e9",
+    "pickup": "keep",
+    "target_total_frames": 923,
+    "prepared_score_and_guide_frozen": true
+  },
+  "f32_control": {
+    "upstream_parity_claimed": false,
+    "sampler_final_offset": 4192,
+    "source": "billiegasm_yuey.wav",
+    "graph_reuse": 0,
+    "new_seconds": 10.4,
+    "cache_capacity": 768,
+    "eos": true,
+    "seed": "17442424470364887450",
+    "host_python_used": false,
+    "guide_frames": 334,
+    "new_frames": 130,
+    "new_ceiling_frames": 375,
+    "codes_sha256": "edb4e4be8e901df2c7540fc0ad6e90b6c42cf29e66d08ca8272f08f6e2440401",
+    "inference_python_used": false,
+    "runtime": "Native F32 generator in dedicated HeartCodec Docker on Spark; not a fresh upstream PyTorch run",
+    "gpu": "GB10",
+    "device_cache": 0,
+    "prepared_inputs_and_guide_match_q4": true,
+    "quantization_isolated_from_hardware": false
+  },
+  "cache_budget": {
+    "old_server_default": 1536,
+    "source_seconds": 132,
+    "measured_symbolic_rows": 455,
+    "measured_capacity": 2048,
+    "complete_audio_frames": 1650,
+    "plan_checks_passed": true,
+    "new_server_default": 2048,
+    "guide_length_does_not_reduce_remix_total": true,
+    "short_prompt_required_rounded_positions": 1792,
+    "maximum_8192_positions_and_5000_rows_validated": false,
+    "full_132_second_model_run_performed": false,
+    "memory": {
+      "scope": "Whole device including desktop and other processes; 200ms plus nvidia-smi latency, both provided-score trials",
+      "samples": 292,
+      "first_mib": 673,
+      "peak_mib": 4804.0,
+      "total_mib": 8123
+    }
+  },
+  "deployment": {
+    "health_additions": "optimization_requests (environment requests, not hit counters)",
+    "job_metadata_additions": "optimization_requests and settings",
+    "issue": "MSBuild OutDir redirected newly built libraries, but CMake explicit linker dependencies selected original library paths, including stale server-support metadata",
+    "ui_additions": "optimized/standard badge and build commit tooltip",
+    "previous_optimized_server_path": "refdata/optimized-ui/mulacover-server.exe",
+    "optimization_code_present_in_previous_binary": true,
+    "previous_reported_commit": "e85548be8a12652f5cd7b1fe5b4a91d5a6aefe39",
+    "fix": "Honor CMAKE_RUNTIME_OUTPUT_DIRECTORY at configure time and build normally; canonical build restored"
+  },
+  "tests": {
+    "windows_cuda_static_passed": 15,
+    "failures": 0,
+    "new_planner_regressions": "132-second source rejected with actionable counts at1536, accepted at2048; 10s and30s guides preserve same source-length target",
+    "windows_cpu_dll_passed": 14
+  },
+  "conclusions": [
+    "All three matched Q4 controls preserve codes and EOS with optimizations enabled; raw-PCM controls also preserve decoded WAV bytes.",
+    "The current native unquantized generator also ends early in the exact Billiegasm input control.",
+    "These cases do not isolate the remaining model/conditioning/sampling cause of early EOS or establish upstream parity.",
+    "A larger server admission budget fixes the 132-second planning rejection; it does not force generation to reach its duration ceiling."
+  ],
+  "limits": [
+    "No EOS suppression, forced minimum, time stretching, padding or RNG changes.",
+    "Controls are scoped examples, not universal optimization correctness or musical-quality acceptance.",
+    "Raw PCM preparation is frozen for A/B; Love remix uses a newly frozen full-source transcription, not the expired user session.",
+    "Strict historical waveform/encoder and expanded activation failures remain unchanged.",
+    "No large fixtures, weights, builds or audio are committed."
+  ],
+  "verified_live_server": {
+    "source_dirty": false,
+    "url": "http://127.0.0.1:8010/",
+    "commit": "f662e97dea245c5b7ade7d059a0e3dea86da2565",
+    "max_cache_capacity": 2048,
+    "models_present": true,
+    "optimization_requests": {
+      "device_cache": true,
+      "graph_reuse": true,
+      "host_score_cache": false
+    },
+    "binary_sha256": "81ec0eee175d24a64c8fa49e20fa54fb42be2deecc4db61b3160b7de09744675"
+  }
+}
