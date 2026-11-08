@@ -1,5 +1,8 @@
 # Native continuation and next milestones
 
+Dependency adoption now follows [the coordinated GGML 0.29 profile](GGML_029_ADOPTION.md).
+Earlier measurements below retain their original pin provenance.
+
 The runtime target is a C++ DAW worker that accepts an audio guide, optional
 symbolic score and style conditioning, primes the generator, and returns only
 new audio. Two useful workflows are score-guided transformation/continuation
@@ -14,7 +17,7 @@ it should not be required by the shipped inference path.
 | --- | --- | --- |
 | PCM audio to eight RVQ streams | Native HeartCodec F32 encoder | Retain documented backend/numerical limits |
 | Transcription | Native SheetSage2 in sibling yuey.cpp | Consume its public interface; do not duplicate the model |
-| MIDI, prompt tokens and Qwen style embedding | Upstream Python reference preparation | Native conditioning preparation and Qwen/tokenizer inference |
+| MIDI, prompt tokens and Qwen style embedding | Native conditioning capability | Preserve CPU intermediate failures and broaden validation |
 | Guide selection, duration/cache planning | C++ continuation and raw-PCM job capabilities | Host supplies original-clock cursor/sample counts |
 | Guide priming, generator, CFG, Philox, EOS/reset | Native C++ job with progress/cancellation | Integrate with the host worker |
 | RVQ/flow/SQ to stereo | Native shared HeartCodec | Retain staged memory ownership |
@@ -22,8 +25,8 @@ it should not be required by the shipped inference path.
 
 The [native PCM job](NATIVE_AUDIO_JOB.md) now runs from **raw PCM and prepared
 conditioning** through continuation output without launching Python. The older
-cached-RVQ command below remains available. Custom text/Qwen/MIDI preparation
-still uses the reference bridge; the inference path accepts cached presets.
+cached-RVQ command below remains available. [Native conditioning](NATIVE_CONDITIONING.md)
+now prepares custom text, Qwen and MIDI/score inputs too; cached presets remain usable.
 
 ## Reusable C interface
 
@@ -65,7 +68,7 @@ For the existing cached regression fixture, run from the repository root:
 $env:GGML_CUDA_TF32='0'
 $env:GGML_CUDA_CUBLAS_COMPUTE_TYPE='auto'
 $env:CUBLAS_WORKSPACE_CONFIG=':4096:8'
-./build-windows-development-cuda/bin/Release/mulacover-generate.exe `
+./build-windows-cuda/bin/Release/mulacover-generate.exe `
   --model models/mulacover-q4_k_m.gguf `
   --input refdata/covers/billiegasm-full-acoustic/generation-q4-philox-laptop/input `
   --output refdata/native-continuation/new-run `
@@ -124,11 +127,11 @@ does not perform production guide slicing or write the continuation WAV.
    The PCM job stages it separately from generator/decoder. Preserve those gates;
    use Spark Docker for reference work and keep encoder quantization deferred.
 
-3. **Port conditioning preparation.** Native MIDI-to-pianoroll/chord assembly,
-   text tokenization, prompt layout and Qwen style embedding remove the remaining
-   runtime Python dependency. Reuse sibling library patterns and existing GGML
-   operations. Cached prepared presets can support interim native experiments;
-   they are not a native custom-style frontend.
+3. **Maintain native conditioning preparation.** MIDI/triplet score assembly,
+   both tokenizers, prompt layout and F32 Qwen style embedding are now native.
+   See [the capability and validation](NATIVE_CONDITIONING.md). Preserve its CPU
+   intermediate gate failures while using the validated CUDA path; keep reference
+   Python offline and cached presets available for controlled comparisons.
 
 4. **Integrate the native job into the DAW worker.** Its shared C APIs provide model/RNG lifecycle,
    progress/cancellation between inference steps, selected context ending at
@@ -141,8 +144,8 @@ the newer PCM job also incorporates the full encoder port. Numerical gates
 remain unchanged. The prior full-song strict
 decoder waveform comparison with upstream still fails and requires diagnostics.
 No claim of a hard BPM lock or arbitrary-song quality follows from this work.
-Shared GGML stays at the agreed baseline with the already-authorized isolated
-development override; no sibling bump or ggml-bump-check is initiated.
+Shared GGML now uses the coordinated `e3db5210` pin after the sibling adoption.
+The isolated override is retired; historical reports retain their original pin.
 
 Validation is recorded in `docs/validation/native-continuation.json`:
 

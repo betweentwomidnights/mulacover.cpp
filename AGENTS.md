@@ -6,9 +6,10 @@
   inside dedicated Docker images. Do not change production containers.
 - Match unquantized reference tensors before quantizing the generator.
 - Keep weights, caches and large fixtures out of Git; keep compact manifests and reports.
-- Native FP32 teacher-forced frame/logit/cache parity passed 600 tensors on
-  Spark CUDA at historical `07b77b0`; see `docs/NATIVE_PARITY.md`. The coordinated
-  `b77ae79` baseline currently fails CUDA precision parity; see
+- Native FP32 teacher-forced frame/logit/cache parity passes 600 tensors on
+  Spark CUDA at coordinated `e3db5210`; see `docs/validation/ggml-029-adoption.json`.
+  Earlier `07b77b0` evidence remains in `docs/NATIVE_PARITY.md`. The former
+  `b77ae79` baseline failed CUDA precision parity; see
   `docs/GGML_B77_ALIGNMENT.md`. Windows static/DLL smoke tests pass.
   Full F32 weights exceed laptop VRAM; F32 native/reference GPU execution stays in
   Spark Docker. Q4_K_M native execution now runs on the laptop. See
@@ -18,7 +19,8 @@
   diagnostics. Q4_K_M is an experimental measured policy, not quality-approved.
   Native top-k sampling and staged HeartCodec decoding now work from prepared
   conditioning through a separate sampling capability API. Native preprocessing
-  is still absent. See `docs/SAMPLING_AND_AUDIO.md` for eight-second clips and
+  now lives in a separate conditioning capability; historical sampling reports
+  still use prepared fixtures. See `docs/SAMPLING_AND_AUDIO.md` for eight-second clips and
   long-context tests. The original 600-tensor suite passes; the 128-prompt suite
   passes public logits/KV but retains two prefill activation gate failures per
   case. Do not relax those gates or call the complete expanded suite passed.
@@ -27,16 +29,17 @@
   An essential GGML change belongs in an isolated worktree/branch and a focused
   draft PR for other agents to review. Do not advance consumer pins as part of
   that proposal; adoption must be coordinated after review.
-- The coordinated GGML pin is `b77ae790e628270af46a8af1eca38441c23f1252`,
+- The coordinated GGML pin is `e3db5210fe3ecdaa4d65b4c93d515f2cf15524b7`
+  (GGML 0.29.0, merged ggml#22), recorded in `dependencies/ggml.json`,
   branch `feature/shared-sa3-acestep-v0.17` (historical name). Any necessary PR
   must be based on that baseline and target that branch. Do not patch shared
-  checkouts or coordinate adoption of an unreviewed fix. Earlier `07b77b0` reports are historical.
+  checkouts or coordinate adoption of an unreviewed fix. Earlier `07b77b0`,
+  `b77ae79` and isolated `0f2ed045` reports retain historical provenance.
   Do not automatically repair another repository's working checkout.
-- User explicitly authorized continued MuLaCover development on CUDA fix
-  `0f2ed045` before coordinated sibling bumps. Use the isolated source override
-  and `dependencies/ggml-development.json`; leave HeartCodec's recorded GGML pin
-  at `b77ae79`. Do not run ggml-bump-check or update sa3.cpp, yuey.cpp, acestep.cpp,
-  stems.cpp or audiocraft.cpp until the user starts that process after MuLaCover works.
+- GGML #22 subsumes #21's CUDA F32-source fix plus Vulkan/Metal precision fixes.
+  The coordinated bump-check/adoption has completed. Reuse HeartCodec's normal
+  submodule/parent-provided target; the isolated source override and development
+  scripts are retired. Do not rerun or alter the other agent's sibling migrations.
 - User selected `C:/Users/thegr/Music/billiegasm_yuey.wav` for the first real
   transcription-to-cover test. See `docs/TRANSCRIPTION_INTEGRATION.md` and the
   input manifest; keep the audio outside Git and unchanged. Instrumental control
@@ -94,7 +97,7 @@
   mulacover.cpp. Publish source/docs/compact reports only; retain model, audio,
   fixture and build exclusions. HeartCodec's GitHub-initialized MIT LICENSE
   commit is preserved in local history; MulaCover uses matching own-source MIT
-  with separate upstream source/model notices. Shared-GGML adoption stays deferred.
+  with separate upstream source/model notices. Shared-GGML adoption uses #22.
 - BPM intervention work is isolated on `experiment/score-clock`.
   `docs/SCORE_CLOCK_EXPERIMENT.md` records conditional Gaussian score-attention
   bias and optional local symbolic masks. The initial 1,404 public logit/KV
@@ -120,7 +123,7 @@
   `tools/generate.py` delegates them and independently validates outputs. Core
   and existing capability layouts are frozen. See `docs/NATIVE_CONTINUATION.md`.
   The audio-to-RVQ encoder is now native in sibling HeartCodec; Qwen/prompt
-  preprocessing remains reference Python. Raw-PCM inference with prepared
+  preprocessing is native through the new conditioning capability. Raw-PCM inference with prepared
   conditioning now runs through the native job. The user values both score-guided
   transformation/continuation and score-free audio continuation; preserve both
   workflows. `--score-mode none` uses the upstream -1 dropped-score convention
@@ -172,6 +175,19 @@
   and mulacover-continue CLI. See docs/NATIVE_AUDIO_JOB.md. It trims context backwards
   from the exact original-clock cursor before encoding, selects a tail guide, honors
   natural_max_seconds/EOS, stages models, reports progress and cooperatively cancels.
-  Prepared text/Qwen/MuQ and optional score remain a caller/offline boundary. Reuse
+  Prepared conditioning remains a caller boundary of that job API; the new native
+  conditioning capability supplies text/Qwen/MuQ and optional score. Reuse
   HeartCodec's validated Torch CUDA Philox (cap 288); do not substitute sibling RNG
   mappings or change legacy defaults. Earlier paragraphs describe historical runs.
+- Native conditioning is separately negotiated in `mulacover_conditioning.h`;
+  see `docs/NATIVE_CONDITIONING.md`. Own tokenizer maps on CPU, stage strict F32
+  Qwen per preparation, release it before encoder/generator/decoder, and preserve
+  existing ABI layouts and prepared-input paths. No runtime Python/subprocesses.
+  Both tokenizers and Python lower/strip match 262 corpus cases; score assembly
+  matches synthetic, edge and both real 540-row lanes. CUDA passes five sampled
+  style cases on laptop and Spark, including actual upstream default-SDPA style.
+  CPU final embeddings pass, but four layer-14 absolute gates fail (worst 0.01318);
+  retain the false reports and do not claim complete CPU activation parity or
+  waive gates. Style weights remain unquantized; no GGML work is justified here.
+  Native text+PCM continuation reproduces all 8760 accepted codes and both WAVs.
+  Score lanes/transcription trimming remain explicit caller responsibilities.
